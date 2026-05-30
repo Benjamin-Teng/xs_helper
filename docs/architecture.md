@@ -159,7 +159,7 @@ flowchart TD
         STRIP["strip_comments(src: str) → str<br/>去區塊/行註解 + 字串字面量"]
         CHKSTRUCT["check_structure(code: str) → list[str]<br/>begin/end 配對；if 缺 then"]
         CHKTOK["check_unknown_tokens(code: str) → list[str]<br/>抓 識別字( 比對；去尾數正規化"]
-        KTOK["KNOWN_TOKENS: frozenset[str]<br/>483 token(grammar 2023 快照 · 小寫)"]
+        KTOK["KNOWN_TOKENS: frozenset[str]<br/>484 token(483 grammar 2023 快照 + 1 手動 setbarmode · 小寫)"]
     end
 
     subgraph TEST["🧪 tests/test_xs_lint.py（17 stdlib 測試）"]

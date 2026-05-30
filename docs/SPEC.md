@@ -185,7 +185,7 @@ xs_helper/
 - **可維護性**：reference 為快照，須在 SKILL.md 標注蒸餾自哪個來源 commit / 文件版本，便於日後比對更新。
 - **離線可用**：核心問答與生成只依賴內建 reference，無網路時仍可運作；僅冷門 fallback 需網路。
 - **零重型相依**：Hook 腳本只用 Python stdlib，避免使用者端額外安裝。
-- **版本策略**：開發迭代期 `plugin.json` 的 `version` 留空（用 git commit SHA 當版本），穩定後再起 semver；一旦設了 `version` 就須每次改動進版，否則使用者收不到更新。
+- **版本策略**：開發迭代期 `plugin.json` 的 `version` 留空（用 git commit SHA 當版本），穩定後再起 semver；一旦設了 `version` 就須每次改動進版，否則使用者收不到更新。**現況：已於 `v0.1.0` 起版**（`plugin.json` 為權威，marketplace entry 不重複設），自此每次對外改動須進版。
 
 ---
 
@@ -196,7 +196,7 @@ xs_helper/
 3. **Reference 建置方式** → ✅ **Claude 讀來源後人工蒸餾**（KISS）；自動 build 腳本 v2 再說。
 4. **Hook 腳本語言** → ✅ **Python 3 stdlib**（跨平台）。附帶前提：使用者端需 `python` 在 PATH。ruff/ty 不裝（僅單支 stdlib 腳本）。
 5. **範例庫去留** → ✅ **只蒸餾不 ship**。授權實查：vscode-xs = MIT；**XScript_Preset / XQStrategy 無 LICENSE 檔** → 更不可 bundle 原始 `.xs`，只蒸餾「DSL 事實」。`sources/` 已在 `.gitignore`。
-6. **散佈方式** → ✅ **確定要做 `marketplace.json`**（未來確定散佈，非僅自用）。自用階段先以 local plugin / skills-dir 過渡；**待本版 reference 蒸餾全數完成後製作 `marketplace.json`**（見「下一步」）。〔v1.1 原決議為「暫不做」，本次改為要做。〕
+6. **散佈方式** → ✅ **已完成 `marketplace.json`**（marketplace `xs-tools`，v0.1.0 起版）。自用階段曾以 local plugin / skills-dir 過渡，現已具可散佈狀態。〔v1.1 原決議為「暫不做」→ 改為要做 → 本版完成。〕
 
 ---
 
@@ -216,7 +216,7 @@ xs_helper/
 - ✅ **語法錨點（離線、grammar 確定性）已蒸餾**（commit `47a24de`）：
   - `reference/language.md`：grammar 五類 token × Preset 真實語法校對；`intraBarPersist`
     列一級概念（回捲對比表 + `IsXLOrder.xs` 換 Bar 重設慣例）。
-  - `scripts/xs_lint.py`：`KNOWN_TOKENS` 已嵌入 **483 個 grammar token**（小寫）+ 數字後綴
+  - `scripts/xs_lint.py`：`KNOWN_TOKENS` 已嵌入 **484 個 token**（483 grammar 快照 + 1 手動補 `setbarmode`，小寫）+ 數字後綴
     正規化 + 字串字面量 strip + 警示改「未收錄(可能自訂函數)」→ **達成 AC5**。
   - `tests/test_xs_lint.py`：17 個 stdlib 單元測試全過。
 - ✅ **`system-functions.md` 已蒸餾**（「下一步」第 1 項完成）：`XScript_Preset/函數/` 全 **224 個 sysfnc**
@@ -260,10 +260,11 @@ xs_helper/
 - `intraBarPersist`：逐筆洗價時變數不回捲 → 見 memory `xs-intrabarpersist-semantics`。
 - 執行/觸發模型：歷史回放→即時、**換棒必觸發**、洗價模式×觸發設定 → 見 memory `xs-execution-trigger-model`。
 
-#### 下一步（依序）— 接手 session 從這裡開始
+#### 實作項目（原「下一步」，1~5 項全數 ✅ 完成於 v0.1.0）
 
-> 語法錨點（language.md + KNOWN_TOKENS）+ `system-functions.md` 已完成。
-> 剩下的是 reference 蒸餾主體，量大且部分需網路，建議**一個子項一個 commit**，勿混在同一工作樹。
+> 🎉 **全數完成**：reference 蒸餾主體（語法錨點 / sysfnc / bif / 欄位 / 腳本類型 + 範例）、
+> Phase 2 FBD、marketplace.json 散佈皆已落地，plugin 達可散佈狀態並已起版 `v0.1.0`。
+> 以下保留為歷史記錄（含各項 commit baseline），未來新工作另起新節。
 
 1. ~~**`system-functions.md`（sysfnc）**~~ → ✅ **已完成**（見上「已完成」節）。
 2. ~~**`builtin-functions.md`（bif）+ `fields.md`（三類欄位）**~~ → ✅ **已完成**（見上「已完成」節）。
@@ -289,6 +290,6 @@ xs_helper/
 
 ### 後續流程（依全域工作慣例）
 
-- 本檔自 v1.1 起兼作 **session 交接介面**；接手 session 以本檔 + `architecture.md` + memory 為輸入，直接進「下一步」。
+- 本檔自 v1.1 起兼作 **session 交接介面**；v0.1.0 起實作項目已全數收斂，接手 session 以本檔 + `architecture.md` + memory 為輸入。未來若有新工作，另起新節（勿復用已收斂的「實作項目」清單）。
 - `sources/` 為 build-time 蒸餾輸入，不 ship、不進版。
 - **build-time 蒸餾 vs runtime F3 是兩件事**：reference 的所有「待補/校對」都是 build-time（須實際編輯 `.md`）；F3 是 runtime 對使用者單次提問的線上 fallback，**查完即丟、不回寫 reference**（Out of Scope「不建立自動全量同步」）。接手蒸餾時別把待補項丟給 F3。

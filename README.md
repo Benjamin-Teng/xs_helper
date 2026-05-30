@@ -42,6 +42,13 @@ XS 是 XQ全球贏家專屬、繁體中文、小眾的 DSL，沒有公開的編�
 
 安裝後輸入 `/xs` 即進入 XS 專家模式。
 
+### 使用方式（兩條路徑）
+
+- **自動觸發（主要）**：不必打任何指令——只要對話講到 XS / 選股條件 / 某個函數怎麼用，Claude 會依 skill 的 `description` 自動載入 XS 知識再作答。
+- **手動觸發**：輸入 `/xs <需求>`（依環境亦可能顯示為命名空間形式 `/xs-helper:xs`）。
+
+> ⚠️ `/xs` 是**單次注入**、不是常駐模式：它把 XS 規範塞進「那一則」prompt，沒有「退出」指令。要徹底脫離 XS 脈絡用 `/clear` 重置對話即可。
+
 ## 狀態
 
 ✅ **v0.1.0** —— reference 全數蒸餾完成、`/plugin validate` 通過、可散佈。功能仍在迭代，故版號自 v0.1.0 起。reference 進度：
@@ -49,7 +56,7 @@ XS 是 XQ全球贏家專屬、繁體中文、小眾的 DSL，沒有公開的編�
 | reference | 狀態 |
 |-----------|------|
 | `language.md`（語法基礎） | ✅ 已蒸餾（grammar token × Preset 真實語法校對） |
-| `xs_lint.py` 已知 token 清單 | ✅ 啟用（483 個 grammar token） |
+| `xs_lint.py` 已知 token 清單 | ✅ 啟用（484 個 token：483 grammar 快照 + 1 手動補 `setbarmode`） |
 | `system-functions.md`（sysfnc） | ✅ 已蒸餾（Preset 224 函數 × 14 分類） |
 | `builtin-functions.md`（bif） | ✅ 已蒸餾（xshelp 8 分類） |
 | `fields.md`（三類欄位） | ✅ 已蒸餾（xshelp `Q*`/`T*`/`F*` × XQStrategy `GetField` 交叉驗證） |

@@ -29,6 +29,10 @@ for _stream in (sys.stdout, sys.stderr):
 #   讀 grammar repository 的 keyword.control / functions[bif] / functions[sysfnc] /
 #   variables[builtin/field/constant] 各 "match" 正則，逐條：去 (?i)、去 \b 邊界、
 #   去 [0-9]{n,m} 數字後綴量詞，再 findall [A-Za-z_]\w+ 取識別字、轉小寫、去重排序。
+#
+# 手動補充（grammar 2023 快照漏收、經 xshelp 一手確認的真實 token，重生時務必保留）：
+#   - setbarmode（bif, GENERALFUNC；Preset 用 202 次，漏收會誤判合法函數）。
+# 總數＝483（grammar 快照）+ 1（手動）= 484。
 KNOWN_TOKENS: frozenset[str] = frozenset({
     "above", "absvalue", "acc", "addspread", "adi", "ado", "alert", "and", "angle", "ar",
     "arccosine", "arcsine", "arctangent", "array", "array_compare", "array_copy",
@@ -93,7 +97,7 @@ KNOWN_TOKENS: frozenset[str] = frozenset({
     "q_vega", "q_volatility", "q_volatilitydiff", "q_volumeratio", "qoq",
     "raiseruntimeerror", "random", "range", "rateofchange", "rc", "repeat", "ret", "retmsg",
     "return", "retval", "rightstr", "round", "rsi", "rsquare", "rsv", "sar", "saturday",
-    "second", "sell", "setbarback", "setbarfreq", "setinputname", "setoutputname",
+    "second", "sell", "setbarback", "setbarfreq", "setbarmode", "setinputname", "setoutputname",
     "setplotlabel", "setposition", "settotalbar", "short", "sign", "simplehighest",
     "simplelowest", "sin", "sine", "square", "squareroot", "standarddev", "stochastic",
     "string", "stringarray", "stringarrayref", "stringref", "stringseries", "stringsimple",

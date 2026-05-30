@@ -28,7 +28,10 @@
    | `TFSimple` | truefalsesimple | 布林純量 |
 
    回傳型別：`Num`（數值）、`Bool`（布林，源碼 `{@type:function_bool}`）、`Str`（字串，`{@type:function_string}`）、`狀態` = 回傳成功/失敗碼、`(out)` = 主要結果在 `Ref↑` 參數。
-4. **`SetBarMode(n)`**：多數源碼開頭有此行，為函數**內部洗價模式宣告**，呼叫端無須理會、不影響呼叫方式（精確語意以 xshelp 為準）。
+4. **`SetBarMode(n)`**（其實是 bif，群組 `GENERALFUNC`）：多數函數源碼開頭有此行，宣告該函數的**計算模式**，呼叫端無須理會、不影響呼叫方式。官方三值語意（xshelp 一手）：
+   - `SetBarMode(0)`＝**Auto（預設）**：由系統自動判定屬 simple 或 series。
+   - `SetBarMode(1)`＝**Simple**：今期計算與前期**各自獨立、互不引用**（如 `AvgPrice`＝單根 OHLC 算完）。Preset 實證：155 處簡單函數用此。
+   - `SetBarMode(2)`＝**Series**：今期計算會**引用前期數值**（連續/遞迴，如 `EMA`/`XAverage`/MACD/RSI）。Preset 實證：47 處遞迴型函數用此。
 5. **頻率代碼**（價格取得 / 跨頻率用）：`D`=日、`W`=週、`M`=月、`Q`=季、`H`=半年、`Y`=年；分鐘頻率以數字字串 `"1"/"5"/"60"` 等表示。
 
 ---
@@ -441,6 +444,6 @@ value4 = IFF(Close > Open, 1, -1);                  // 三元選值
 > 以下皆為 **build-time（蒸餾 session）** 工作，須實際編輯本檔。
 > ⚠️ **不會由 runtime F3 自動完成** —— F3 只補使用者單次提問、查完即丟，**不回寫 reference**（見 SPEC Out of Scope「不建立自動全量同步」）。
 
-- [ ] `SetBarMode(n)` 各值精確語意：併入「下一步」第 2 項蒸餾時，以 xshelp 校對後補一句說明。
+- [x] `SetBarMode(n)` 各值精確語意 → **已補**（見開頭共通慣例第 4 點：0=Auto / 1=Simple / 2=Series，xshelp 一手校對）。
 - [ ] `xshelp` 系統函數清單若有 Preset 未涵蓋者（例如 `GetBarOffset` 本體於日期/跨頻多處被呼叫，但分類在 bif/欄位），於 `builtin-functions.md` 蒸餾時交叉補上。
 - [ ] 各函數官方中文說明文字：於後續蒸餾 session 用 xshelp 對應頁面 WebFetch 回填校對（動作是蒸餾，非 runtime F3）。
