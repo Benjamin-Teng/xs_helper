@@ -1,7 +1,9 @@
 # xs_helper — Architecture (FBD)
 
-> Phase 1（模組層，coding 前）。驗證模組劃分完整、資料流閉合、無循環依賴。
-> Phase 2（函式層）待實作完成後補上，屆時本檔升級為常駐架構文件。
+> 本檔為 **常駐架構文件**，含兩階段 FBD：
+> - **Phase 1（模組層）**：coding 前畫，驗證模組劃分完整、資料流閉合、無循環依賴。
+> - **Phase 2（函式層）**：coding 後畫，標 `/xs` Skill runtime 的程序步驟與 `xs_lint.py`
+>   的 public function 真實簽名/型別/資料流，供未來上手者參考。
 >
 > 對應 SPEC：[SPEC.md](SPEC.md) 的 Project Structure / Features。
 
@@ -116,6 +118,114 @@ flowchart TD
 | Hook token 來源？ | ✅ grammar（建置期嵌入，runtime 不依賴 sources/） |
 | 有無循環依賴？ | ✅ 無，資料單向：xshelp/sources→distill→reference→skill |
 | sources/ 是否進 runtime？ | ❌ 僅 build-time 輸入，gitignored、不打包（授權+體積） |
+
+## Phase 2 — 函式層資料流
+
+runtime 有兩條互不耦合的路徑：**`/xs` Skill**（SKILL.md 的程序：判類型 → 選擇性載 reference → 產出）與 **`xs_lint.py`**（PostToolUse 觸發的純函式管線）。兩者共用知識來源 grammar 的事實（KNOWN_TOKENS 嵌自同一 grammar），但 runtime 不互相呼叫。節點 label 標真實簽名與型別，邊標傳遞的資料。
+
+```mermaid
+flowchart TD
+    %% ===== I/O 邊界 =====
+    USER(["使用者 /xs &lt;需求 / 提問&gt;"])
+    XSFILE(["*.xs 檔被 Write / Edit"])
+    HOOKCFG["hooks.json<br/>PostToolUse: Write / Edit<br/>→ python xs_lint.py"]
+
+    %% ===== /xs Skill runtime（SKILL.md 程序）=====
+    subgraph SKILLRT["📦 /xs Skill runtime（SKILL.md）"]
+        S1["① 判定腳本類型<br/>autotrade / function / indicator / filter / sensor<br/>★ 不明確→反問；選股再問市場"]
+        S2["② 選擇性載入 reference<br/>★ 只讀需要的檔，不一次全載"]
+        S3["③ 產出<br/>腳本生成(帶 {@type:}) 或 規範問答(簽名+範例)"]
+    end
+
+    %% ===== knowledge base（reference/*.md，資料）=====
+    subgraph REF["skills/xs/reference/*.md（knowledge base · 資料）"]
+        LANG["language.md<br/>關鍵字 / 流程 / 運算子 / 內建變數"]
+        BIF["builtin-functions.md<br/>bif 8 類 · 簽名+語意"]
+        SYS["system-functions.md<br/>224 sysfnc · 14 分類"]
+        FIELDS["fields.md<br/>報價 q_* / 資料 T* / 選股 F*"]
+        TYPES["script-types.md<br/>5 類 {@type:} 結構 / 邊界 / 回傳機制"]
+        EX["examples/*.md ×5<br/>每類型 1 份(標出處)"]
+    end
+
+    subgraph WEB["🌐 F3 Fallback（runtime · 冷門查詢）"]
+        XSHELP["xshelp.xq.com.tw/XSHelp<br/>lists?a=&lt;代碼&gt; / ?HelpName=&lt;名&gt;"]
+    end
+
+    %% ===== xs_lint.py 函式管線 =====
+    subgraph LINT["🛠️ scripts/xs_lint.py（PostToolUse 管線 · stdlib · 恆 exit 0）"]
+        MAIN["main() → int<br/>★ orchestrator · 恆回 0(非阻斷)"]
+        READEV["read_event() → dict<br/>讀 stdin 事件 JSON;失敗回 {}"]
+        GETPATH["get_target_path(event: dict) → str | None<br/>★ 非 *.xs 回 None → 靜默"]
+        STRIP["strip_comments(src: str) → str<br/>去區塊/行註解 + 字串字面量"]
+        CHKSTRUCT["check_structure(code: str) → list[str]<br/>begin/end 配對；if 缺 then"]
+        CHKTOK["check_unknown_tokens(code: str) → list[str]<br/>抓 識別字( 比對；去尾數正規化"]
+        KTOK["KNOWN_TOKENS: frozenset[str]<br/>483 token(grammar 2023 快照 · 小寫)"]
+    end
+
+    subgraph TEST["🧪 tests/test_xs_lint.py（17 stdlib 測試）"]
+        T["StripComments / CheckStructure /<br/>CheckUnknownTokens / GetTargetPath"]
+    end
+
+    %% ----- /xs 資料流（實線：傳什麼）-----
+    USER -->|"自然語言需求 / 提問"| S1
+    S1 -->|"腳本類型(+市場)"| S2
+    LANG -->|"markdown 知識"| S2
+    BIF -->|"markdown 知識"| S2
+    SYS -->|"markdown 知識"| S2
+    FIELDS -->|"markdown 知識"| S2
+    TYPES -->|"markdown 知識"| S2
+    EX -->|"markdown 知識"| S2
+    S2 -->|"已載入的 reference 上下文"| S3
+    S3 -->|"XS 程式碼 / 規範解說"| USER
+    XSHELP -.->|"WebFetch 冷門 token(標線上結果)"| S3
+
+    %% ----- xs_lint 資料流（實線：傳什麼 / 虛線：事件）-----
+    XSFILE -.->|"觸發 PostToolUse 事件"| HOOKCFG
+    HOOKCFG -->|"event JSON 經 stdin"| MAIN
+    MAIN --> READEV
+    READEV -->|"event: dict"| GETPATH
+    GETPATH -->|"path: str(*.xs) 或 None"| MAIN
+    MAIN -->|"raw: str(utf-8-sig 讀檔)"| STRIP
+    STRIP -->|"code: str(去註解 / 字串)"| CHKSTRUCT
+    STRIP -->|"code: str"| CHKTOK
+    KTOK -->|"已知 token 比對集"| CHKTOK
+    CHKSTRUCT -->|"list[str] 結構警示"| MAIN
+    CHKTOK -->|"list[str] 未知 token 警示"| MAIN
+    MAIN -.->|"⚠️ 警示 → stderr(非阻斷)"| USER
+
+    %% ----- 測試消費關係（虛線）-----
+    T -.->|"unittest 驗證"| STRIP
+    T -.->|"unittest 驗證"| CHKSTRUCT
+    T -.->|"unittest 驗證"| CHKTOK
+    T -.->|"unittest 驗證"| GETPATH
+
+    classDef io fill:#f1f5f9,stroke:#64748b,color:#1f2937;
+    classDef skill fill:#cffafe,stroke:#0891b2,color:#1f2937;
+    classDef ref fill:#dcfce7,stroke:#16a34a,color:#1f2937;
+    classDef web fill:#e0e7ff,stroke:#4f46e5,color:#1f2937;
+    classDef lint fill:#e0f2fe,stroke:#0284c7,color:#1f2937;
+    classDef data fill:#fef3c7,stroke:#d97706,color:#1f2937;
+    classDef test fill:#fae8ff,stroke:#a21caf,color:#1f2937;
+
+    class USER,XSFILE,HOOKCFG io;
+    class S1,S2,S3 skill;
+    class LANG,BIF,SYS,FIELDS,TYPES,EX ref;
+    class XSHELP web;
+    class MAIN,READEV,GETPATH,STRIP,CHKSTRUCT,CHKTOK lint;
+    class KTOK data;
+    class T test;
+```
+
+### Phase 2 閉合性檢查
+
+| 檢查項 | 結論 |
+|--------|------|
+| 每個 public function 都有節點？ | ✅ `xs_lint.py` 6 函式（main/read_event/get_target_path/strip_comments/check_structure/check_unknown_tokens）全收，標真實簽名 |
+| 節點 label 有真實型別？ | ✅ `→ dict` / `→ str \| None` / `→ list[str]` / `→ int` 皆為原始碼簽名 |
+| 資料流閉合（lint）？ | ✅ stdin event → dict → path → raw → code →(struct+token)→ warnings → stderr，單向無回環 |
+| 資料流閉合（skill）？ | ✅ 需求 → 類型 → 選擇性載 reference → 產出；冷門走 xshelp 虛線 fallback |
+| 兩 runtime 是否耦合？ | ❌ 不互呼叫；僅共用 grammar 事實（KNOWN_TOKENS 嵌入 vs Hook 離線清單） |
+| 測試覆蓋公開函式？ | ✅ strip_comments / check_structure / check_unknown_tokens / get_target_path 皆有 unittest（虛線消費） |
 
 ## 與 SPEC 的落差 / 校正
 

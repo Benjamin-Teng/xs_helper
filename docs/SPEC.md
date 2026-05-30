@@ -268,7 +268,10 @@ xs_helper/
 1. ~~**`system-functions.md`（sysfnc）**~~ → ✅ **已完成**（見上「已完成」節）。
 2. ~~**`builtin-functions.md`（bif）+ `fields.md`（三類欄位）**~~ → ✅ **已完成**（見上「已完成」節）。
 3. ~~**`script-types.md` + `examples/*.md`**~~ → ✅ **已完成**（見上「已完成」節）。
-4. **Phase 2 FBD**（函式層）收進 `architecture.md`。
+4. ~~**Phase 2 FBD**（函式層）收進 `architecture.md`~~ → ✅ **已完成**：`architecture.md`
+   新增「Phase 2 — 函式層資料流」（`xs_lint.py` 6 個 public function 真實簽名 + `/xs` Skill
+   程序步驟 + reference 載入 + F3 fallback + tests 消費關係），含 Phase 2 閉合性檢查表；
+   檔頭升級為**常駐架構文件**（兩階段 FBD 並存）。
 5. **`marketplace.json`（散佈）**：reference 蒸餾全數完成、plugin 達可散佈狀態後製作，供未來散佈
    （Open Q6 已改為**確定要做**）。此步驟需起 semver（一旦 ship 給他人，`plugin.json` 的
    `version` 不可再留空，見 Non-Functional Requirements 版本策略）。
