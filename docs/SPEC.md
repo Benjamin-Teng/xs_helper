@@ -216,7 +216,7 @@ xs_helper/
 - ✅ **語法錨點（離線、grammar 確定性）已蒸餾**（commit `47a24de`）：
   - `reference/language.md`：grammar 五類 token × Preset 真實語法校對；`intraBarPersist`
     列一級概念（回捲對比表 + `IsXLOrder.xs` 換 Bar 重設慣例）。
-  - `scripts/xs_lint.py`：`KNOWN_TOKENS` 已嵌入 **484 個 token**（483 grammar 快照 + 1 手動補 `setbarmode`，小寫）+ 數字後綴
+  - `scripts/xs_lint.py`：`KNOWN_TOKENS` 已嵌入 **604 個 token**（grammar 2023 快照 ∪ Preset 215 sysfnc ∪ xshelp 8 群組 bif，小寫）+ 數字後綴
     正規化 + 字串字面量 strip + 警示改「未收錄(可能自訂函數)」→ **達成 AC5**。
   - `tests/test_xs_lint.py`：17 個 stdlib 單元測試全過。
 - ✅ **`system-functions.md` 已蒸餾**（「下一步」第 1 項完成）：`XScript_Preset/函數/` 全 **224 個 sysfnc**

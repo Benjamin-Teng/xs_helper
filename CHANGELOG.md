@@ -17,7 +17,7 @@
   - `builtin-functions.md` — xshelp 8 分類內建函數。
   - `fields.md` — 報價 `Q*` / 資料 `T*` / 選股 `F*` 三類欄位，× XQStrategy `GetField` 交叉驗證。
   - `script-types.md` + `examples/*.md` ×5 — 五類 `{@type:}` 腳本結構/觸發模型/邊界 + 各一份精選範例。
-- **`.xs` 編輯驗證 Hook**（`PostToolUse: Write|Edit` → `xs_lint.py`）：對照 484 個 token（483 grammar 快照 + 1 手動補 `setbarmode`）的啟發式檢查，對未收錄函數與明顯結構問題提出非阻斷式警示。
+- **`.xs` 編輯驗證 Hook**（`PostToolUse: Write|Edit` → `xs_lint.py`）：對照 604 個 token（grammar 2023 快照 ∪ Preset 215 sysfnc ∪ xshelp 8 群組 bif）的啟發式檢查，對未收錄函數與明顯結構問題提出非阻斷式警示。
 - **散佈基礎建設**：`.claude-plugin/marketplace.json`（marketplace `xs-tools`）、`plugin.json` 起 semver `0.1.0`、MIT LICENSE。
 
 [0.1.0]: https://github.com/Benjamin-Teng/xs_helper/releases/tag/v0.1.0
