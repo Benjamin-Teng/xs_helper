@@ -117,7 +117,7 @@
 | Hook 腳本 | Python 3 stdlib（零第三方相依）**（待確認，見 Open Q4）** | 以 `${CLAUDE_PLUGIN_ROOT}` 定位；跨平台 |
 | Reference 來源 | XScript_Preset / XQStrategy / vscode-xs / xshelp 官方站 | 實作階段 clone 到 `sources/` 後蒸餾 |
 | Docker | **否** | plugin 為 markdown + 輕量腳本，無容器化需求（已依規則評估） |
-| 散佈方式 | skills-dir / local plugin（自用優先）**（待確認，見 Open Q6）** | 是否做 marketplace.json 待定 |
+| 散佈方式 | local plugin / skills-dir（自用過渡）→ **`marketplace.json`（確定要做，本版完成後製作）** | 未來確定散佈，見 Open Q6 |
 
 > **AI Agentic Dev 注意：** Tech Stack 在第一個檔案產生前定案；標「待確認」者須在實作 session 開頭先收斂，不得逕自選擇。
 
@@ -196,7 +196,7 @@ xs_helper/
 3. **Reference 建置方式** → ✅ **Claude 讀來源後人工蒸餾**（KISS）；自動 build 腳本 v2 再說。
 4. **Hook 腳本語言** → ✅ **Python 3 stdlib**（跨平台）。附帶前提：使用者端需 `python` 在 PATH。ruff/ty 不裝（僅單支 stdlib 腳本）。
 5. **範例庫去留** → ✅ **只蒸餾不 ship**。授權實查：vscode-xs = MIT；**XScript_Preset / XQStrategy 無 LICENSE 檔** → 更不可 bundle 原始 `.xs`，只蒸餾「DSL 事實」。`sources/` 已在 `.gitignore`。
-6. **散佈方式** → ✅ **local plugin / skills-dir 自用優先**；`marketplace.json` 暫不做。
+6. **散佈方式** → ✅ **確定要做 `marketplace.json`**（未來確定散佈，非僅自用）。自用階段先以 local plugin / skills-dir 過渡；**待本版 reference 蒸餾全數完成後製作 `marketplace.json`**（見「下一步」）。〔v1.1 原決議為「暫不做」，本次改為要做。〕
 
 ---
 
@@ -226,8 +226,14 @@ xs_helper/
   發現：存在中文名函數（`KO成交量擺盪指標`/`Q指標`/`KST確認指標`/`漲幅排行榜`系列）；
   `排行/` 6 支實為「自訂排行條件範本」；`xfMin_*` 不支援 XS 選股/排行/回測。
   檔尾 3 個待補項皆已標明為 **build-time、不由 F3 回寫**。
-- ⬜ **其餘 reference 仍為佔位**：`builtin-functions.md` / `fields.md` /
-  `script-types.md` + `examples/*.md` ×5（各標蒸餾來源 + TODO，未動）。
+- ✅ **`builtin-functions.md`（bif）已蒸餾**（「下一步」第 2 項之一）：xshelp 8 分類
+  （`GENERALFUNC`/`TIMEFUNC`/`DATEFUNC`/`STRINGFUNC`/`NUMBERFUNC`/`FIELDFUNC`/`ARRAYFUNC`/
+  `TRANSACTIONFUNC`）全收，每條 `名稱 / 簽名 / 一行語意`；開頭立 bif vs sysfnc 差異 +
+  欄位/報價/交易函數的腳本邊界（`GetQuote`/交易函數限即時/自動交易）。
+- ✅ **`fields.md`（三類欄位）已蒸餾**（「下一步」第 2 項之二）：報價`Q*`（含 grammar `q_*`
+  全名單錨定）/ 資料`T*` / 選股`F*` 七子類；選股欄位以 `XQStrategy` `GetField` 實際用例
+  **交叉驗證**（高頻標 ✅）。立三類欄位×入口×腳本邊界表。`FFINANCE` 200+ 僅收高頻子集，餘走 F3。
+- ⬜ **其餘 reference 仍為佔位**：`script-types.md` + `examples/*.md` ×5（各標蒸餾來源 + TODO，未動）。
 
 #### 關鍵探勘校正（影響蒸餾策略，詳見 architecture.md 角色分層表）
 
@@ -249,11 +255,13 @@ xs_helper/
 > 剩下的是 reference 蒸餾主體，量大且部分需網路，建議**一個子項一個 commit**，勿混在同一工作樹。
 
 1. ~~**`system-functions.md`（sysfnc）**~~ → ✅ **已完成**（見上「已完成」節）。
-2. **`builtin-functions.md`（bif）+ `fields.md`（三類欄位）**：以 xshelp 為主幹
-   （WebFetch 抓簽名/欄位定義），選股欄位以 `XQStrategy` 的 `GetField("中文")` 交叉驗證。**需網路。**
+2. ~~**`builtin-functions.md`（bif）+ `fields.md`（三類欄位）**~~ → ✅ **已完成**（見上「已完成」節）。
 3. **`script-types.md` + `examples/*.md`**：5 類 `{@type:}` 結構/邊界（含 `function_bool` 等
    子型別、自動交易「第一次洗價控管」、盤中累計用 `intraBarPersist`），各類型挑一份範例（標出處）。
 4. **Phase 2 FBD**（函式層）收進 `architecture.md`。
+5. **`marketplace.json`（散佈）**：reference 蒸餾全數完成、plugin 達可散佈狀態後製作，供未來散佈
+   （Open Q6 已改為**確定要做**）。此步驟需起 semver（一旦 ship 給他人，`plugin.json` 的
+   `version` 不可再留空，見 Non-Functional Requirements 版本策略）。
 
 每個 reference 條目格式統一：`名稱 / 簽名 / 參數 / 回傳 / 範例 / 來源`（見 Naming Conventions）。
 冷門 / 無源者走 SKILL.md F3 線上查證，**不杜撰**（G1）。

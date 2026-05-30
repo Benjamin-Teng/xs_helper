@@ -39,8 +39,9 @@ XS 是 XQ全球贏家專屬、繁體中文、小眾的 DSL，沒有公開的編�
 |-----------|------|
 | `language.md`（語法基礎） | ✅ 已蒸餾（grammar token × Preset 真實語法校對） |
 | `xs_lint.py` 已知 token 清單 | ✅ 啟用（483 個 grammar token） |
-| `system-functions.md`（sysfnc） | ⬜ 待蒸餾 |
-| `builtin-functions.md`（bif）/ `fields.md`（欄位） | ⬜ 待蒸餾（需 xshelp） |
+| `system-functions.md`（sysfnc） | ✅ 已蒸餾（Preset 224 函數 × 14 分類） |
+| `builtin-functions.md`（bif） | ✅ 已蒸餾（xshelp 8 分類） |
+| `fields.md`（三類欄位） | ✅ 已蒸餾（xshelp `Q*`/`T*`/`F*` × XQStrategy `GetField` 交叉驗證） |
 | `script-types.md` + `examples/` | ⬜ 待蒸餾 |
 
 完整規格與交接見 [docs/SPEC.md](docs/SPEC.md)。
