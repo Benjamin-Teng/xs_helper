@@ -10,8 +10,9 @@ description: >-
 
 # XS 專家模式
 
-> ⚠️ 骨架階段：以下流程已定，`reference/` 內容尚待蒸餾（見各檔 TODO）。在 reference 補齊前，
-> 函數 / 欄位 / 簽名一律走線上查證（F3 Fallback），不得憑記憶杜撰。
+> reference 已全數蒸餾完成（`language` / `builtin-functions` / `system-functions` / `fields` /
+> `script-types` + `examples/` ×5）。**優先用內建 reference 作答**；僅 reference 未涵蓋的冷門
+> 函數 / 欄位才走 F3 線上查證。任何情況都不得憑記憶杜撰不存在的 token。
 
 依 XQ 全球贏家的 **XScript（XS）** 規範作答。XS 是券商專屬 DSL，**不得**用你對其他語言的直覺臆測函數名或欄位名——只用 reference 收錄、或經 F3 線上查證確認存在的 token。
 
@@ -20,11 +21,11 @@ description: >-
 1. **判定腳本類型**（5 類，對應原始碼 `{@type:}` 標記）：
    | 類型 | `{@type:}` | 特徵 |
    |------|-----------|------|
-   | 自動交易 | `autotrade` | 用 `SetPosition` 下單；需控管第一次洗價 |
-   | 函數 | `function` | 被呼叫才執行；`retval` 回傳 |
+   | 自動交易 | `autotrade` | 用 `SetPosition` 下單；需控管第一次洗價；`Alert()` 屬此類 |
+   | 函數 | `function` / `function_bool` / `function_string` | 被呼叫才執行；回傳數值 / 布林 / 字串 |
    | 指標 | `indicator` | `Plot` 畫線 |
-   | 選股 | `filter` | `ret=1` 篩選；`GetField("中文欄位")` |
-   | 警示 | `sensor` | `Alert` 通知；靠觸發設定去重 |
+   | 選股 | `filter` | `ret=1` 表入選；`GetField("中文欄位")` |
+   | 警示 | `sensor` | `ret=1` 表觸發（**非 `Alert()`**）；靠 XQ 警示設定去重 |
 
    類型不明確時**反問**，不要猜。選股情境再問目標市場（台股/陸股/港股/美股），影響可用欄位。
 
