@@ -219,8 +219,15 @@ xs_helper/
   - `scripts/xs_lint.py`：`KNOWN_TOKENS` 已嵌入 **483 個 grammar token**（小寫）+ 數字後綴
     正規化 + 字串字面量 strip + 警示改「未收錄(可能自訂函數)」→ **達成 AC5**。
   - `tests/test_xs_lint.py`：17 個 stdlib 單元測試全過。
-- ⬜ **其餘 reference 仍為佔位**：`builtin-functions.md` / `system-functions.md` /
-  `fields.md` / `script-types.md` + `examples/*.md` ×5（各標蒸餾來源 + TODO，未動）。
+- ✅ **`system-functions.md` 已蒸餾**（「下一步」第 1 項完成）：`XScript_Preset/函數/` 全 **224 個 sysfnc**
+  依官方 14 分類入檔，每條 `簽名（input 宣告）+ 一行語意（實作）`；開頭立共通慣例
+  （回傳機制：同名變數 / `ret`/`retval` / `numericref` 回填；型別縮寫表；頻率代碼 `H`=半年）。
+  含「重點函數詳解」可貼用範例（MA 族 / 極值 / 穿越 / MACD / KD / DMI / RSI / 布林 / ATR / 條件統計）。
+  發現：存在中文名函數（`KO成交量擺盪指標`/`Q指標`/`KST確認指標`/`漲幅排行榜`系列）；
+  `排行/` 6 支實為「自訂排行條件範本」；`xfMin_*` 不支援 XS 選股/排行/回測。
+  檔尾 3 個待補項皆已標明為 **build-time、不由 F3 回寫**。
+- ⬜ **其餘 reference 仍為佔位**：`builtin-functions.md` / `fields.md` /
+  `script-types.md` + `examples/*.md` ×5（各標蒸餾來源 + TODO，未動）。
 
 #### 關鍵探勘校正（影響蒸餾策略，詳見 architecture.md 角色分層表）
 
@@ -238,11 +245,10 @@ xs_helper/
 
 #### 下一步（依序）— 接手 session 從這裡開始
 
-> 語法錨點（language.md + KNOWN_TOKENS）已完成。剩下的是 reference 蒸餾主體，
-> 量大且部分需網路，建議**一個子項一個 commit**，勿混在同一工作樹。
+> 語法錨點（language.md + KNOWN_TOKENS）+ `system-functions.md` 已完成。
+> 剩下的是 reference 蒸餾主體，量大且部分需網路，建議**一個子項一個 commit**，勿混在同一工作樹。
 
-1. **`system-functions.md`（sysfnc）**：142/143 自 `XScript_Preset/函數` 原始碼蒸餾
-   （`input:` 宣告＝簽名、實作＝語意），xshelp 校對。離線為主、量大。
+1. ~~**`system-functions.md`（sysfnc）**~~ → ✅ **已完成**（見上「已完成」節）。
 2. **`builtin-functions.md`（bif）+ `fields.md`（三類欄位）**：以 xshelp 為主幹
    （WebFetch 抓簽名/欄位定義），選股欄位以 `XQStrategy` 的 `GetField("中文")` 交叉驗證。**需網路。**
 3. **`script-types.md` + `examples/*.md`**：5 類 `{@type:}` 結構/邊界（含 `function_bool` 等
@@ -256,3 +262,4 @@ xs_helper/
 
 - 本檔自 v1.1 起兼作 **session 交接介面**；接手 session 以本檔 + `architecture.md` + memory 為輸入，直接進「下一步」。
 - `sources/` 為 build-time 蒸餾輸入，不 ship、不進版。
+- **build-time 蒸餾 vs runtime F3 是兩件事**：reference 的所有「待補/校對」都是 build-time（須實際編輯 `.md`）；F3 是 runtime 對使用者單次提問的線上 fallback，**查完即丟、不回寫 reference**（Out of Scope「不建立自動全量同步」）。接手蒸餾時別把待補項丟給 F3。
