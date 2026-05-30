@@ -1,0 +1,17 @@
+{
+  "name": "xs-tools",
+  "owner": {
+    "name": "benjamin31588",
+    "email": "benjamin31588@gmail.com"
+  },
+  "description": "XQ 全球贏家 XScript（XS）相關的 Claude Code plugin。",
+  "plugins": [
+    {
+      "name": "xs-helper",
+      "source": "./",
+      "description": "XScript (XS) 專家模式：依 XQ 全球贏家的 XScript 語言規範，協助撰寫/修改五類 XS 腳本並回答 XS 函數、欄位、關鍵字的用法。",
+      "category": "productivity",
+      "keywords": ["xscript", "xs", "xq", "全球贏家", "選股", "自動交易", "技術指標", "量化交易"]
+    }
+  ]
+}

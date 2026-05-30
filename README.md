@@ -31,9 +31,20 @@ XS 是 XQ全球贏家專屬、繁體中文、小眾的 DSL，沒有公開的編�
 - 即時同步官方文件全量（reference 為人工蒸餾快照）
 - XQ 平台帳號 / API 整合（不連帳號、不下單、不取報價）
 
+## 安裝
+
+本 plugin 透過 marketplace `xs-tools` 散佈。在 Claude Code 中：
+
+```shell
+/plugin marketplace add Benjamin-Teng/xs_helper
+/plugin install xs-helper@xs-tools
+```
+
+安裝後輸入 `/xs` 即進入 XS 專家模式。
+
 ## 狀態
 
-🚧 **實作中（reference 蒸餾）** —— plugin 骨架完成、`/plugin validate` 通過。reference 進度：
+✅ **v0.1.0** —— reference 全數蒸餾完成、`/plugin validate` 通過、可散佈。功能仍在迭代，故版號自 v0.1.0 起。reference 進度：
 
 | reference | 狀態 |
 |-----------|------|
@@ -42,9 +53,9 @@ XS 是 XQ全球贏家專屬、繁體中文、小眾的 DSL，沒有公開的編�
 | `system-functions.md`（sysfnc） | ✅ 已蒸餾（Preset 224 函數 × 14 分類） |
 | `builtin-functions.md`（bif） | ✅ 已蒸餾（xshelp 8 分類） |
 | `fields.md`（三類欄位） | ✅ 已蒸餾（xshelp `Q*`/`T*`/`F*` × XQStrategy `GetField` 交叉驗證） |
-| `script-types.md` + `examples/` | ⬜ 待蒸餾 |
+| `script-types.md` + `examples/` ×5 | ✅ 已蒸餾（5 類 `{@type:}` 結構/邊界 + 各一份精選範例） |
 
-完整規格與交接見 [docs/SPEC.md](docs/SPEC.md)。
+完整規格與交接見 [docs/SPEC.md](docs/SPEC.md)，版本變動見 [CHANGELOG.md](CHANGELOG.md)。
 
 ## 知識來源
 
@@ -52,4 +63,4 @@ reference 蒸餾自 XQ 官方範例庫與說明站：`XScript_Preset`、`XQStrat
 
 ## License
 
-待定（見 SPEC Open Questions：範例庫授權待查）。
+[MIT](LICENSE)。本 plugin 只散佈自己撰寫的程式碼與「蒸餾後的 DSL 事實」，**不含**任何來源庫的原始 `.xs`（`XScript_Preset` / `XQStrategy` 無授權檔，故未 bundle；見 [docs/SPEC.md](docs/SPEC.md) Open Q5）。

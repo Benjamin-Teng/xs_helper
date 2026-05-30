@@ -272,9 +272,17 @@ xs_helper/
    新增「Phase 2 — 函式層資料流」（`xs_lint.py` 6 個 public function 真實簽名 + `/xs` Skill
    程序步驟 + reference 載入 + F3 fallback + tests 消費關係），含 Phase 2 閉合性檢查表；
    檔頭升級為**常駐架構文件**（兩階段 FBD 並存）。
-5. **`marketplace.json`（散佈）**：reference 蒸餾全數完成、plugin 達可散佈狀態後製作，供未來散佈
-   （Open Q6 已改為**確定要做**）。此步驟需起 semver（一旦 ship 給他人，`plugin.json` 的
-   `version` 不可再留空，見 Non-Functional Requirements 版本策略）。
+5. ~~**`marketplace.json`（散佈）**~~ → ✅ **已完成**：
+   - `.claude-plugin/marketplace.json`（marketplace name=`xs-tools`，owner，單一 plugin entry
+     `source: "./"`＝plugin 在 repo 根；version 不在 entry 重複，交由 `plugin.json` 作權威，
+     避免官方文件警告的「兩處都設 version → plugin.json 靜默勝出」陷阱）。
+   - **首次起 semver `v0.1.0`** 寫進 `plugin.json`（語意：功能可用但仍迭代）；同步補
+     `license: MIT` + `homepage`/`repository`；新增 root `LICENSE`(MIT) 與 `CHANGELOG.md`。
+   - `/plugin validate .` 通過（marketplace 模式，含對 referenced `plugin.json` 的 version/path 交叉檢查）。
+   - README 更新：狀態升 v0.1.0、補安裝指引（`/plugin marketplace add Benjamin-Teng/xs_helper`
+     → `/plugin install xs-helper@xs-tools`）、License 改 MIT。
+   - 散佈 schema 求證自 `code.claude.com/docs/en/plugin-marketplaces`（文件網域已自
+     `docs.claude.com` 遷至 `code.claude.com`）。
 
 每個 reference 條目格式統一：`名稱 / 簽名 / 參數 / 回傳 / 範例 / 來源`（見 Naming Conventions）。
 冷門 / 無源者走 SKILL.md F3 線上查證，**不杜撰**（G1）。
