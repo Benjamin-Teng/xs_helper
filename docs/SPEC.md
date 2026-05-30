@@ -233,7 +233,18 @@ xs_helper/
 - ✅ **`fields.md`（三類欄位）已蒸餾**（「下一步」第 2 項之二）：報價`Q*`（含 grammar `q_*`
   全名單錨定）/ 資料`T*` / 選股`F*` 七子類；選股欄位以 `XQStrategy` `GetField` 實際用例
   **交叉驗證**（高頻標 ✅）。立三類欄位×入口×腳本邊界表。`FFINANCE` 200+ 僅收高頻子集，餘走 F3。
-- ⬜ **其餘 reference 仍為佔位**：`script-types.md` + `examples/*.md` ×5（各標蒸餾來源 + TODO，未動）。
+- ✅ **`script-types.md` + `examples/*.md` ×5 已蒸餾**（「下一步」第 3 項完成）：
+  - `script-types.md`：5 類 `{@type:}` 結構/觸發模型/邊界；立**跨類型回傳機制表**
+    （`ret=1` 在 filter=入選 vs sensor=觸發，寫法同義不同）；`function` 家族三子型別
+    （`function`/`function_bool`/`function_string`）回傳型別對應；autotrade 第一次洗價控管
+    （`intraBarPersist` 旗標 + 換 Bar 重設）；末附「選哪個 `{@type:}`」速查表。
+  - `examples/*.md` ×5 各一份精選範例（標 Preset/Strategy 原始檔出處）：autotrade（均線交叉
+    +停利停損%）/ function（CountIF + CrossOver bool + FormatMQY string）/ indicator（BBand 主圖
+    + Aroon 副圖）/ filter（GetField 基本 + 輸出欄 + 美股跨市場）/ sensor（技術條件 + GetQuote 即時）。
+  - ⚠️ **校正既有佔位假設**：警示**用 `ret=1` 觸發、非 `Alert()`**（Preset 警示 359 檔 333 用
+    `ret=1`、0 用 `Alert()`；`Alert()` 實為 autotrade 通知函數）。佔位檔誤標 `Alert(...)` 已修正。
+  - 型別分佈實證：autotrade 64 / filter 324 / indicator 395 / sensor 359 / function 207 /
+    function_bool 16 / function_string 1。
 
 #### 關鍵探勘校正（影響蒸餾策略，詳見 architecture.md 角色分層表）
 
@@ -256,8 +267,7 @@ xs_helper/
 
 1. ~~**`system-functions.md`（sysfnc）**~~ → ✅ **已完成**（見上「已完成」節）。
 2. ~~**`builtin-functions.md`（bif）+ `fields.md`（三類欄位）**~~ → ✅ **已完成**（見上「已完成」節）。
-3. **`script-types.md` + `examples/*.md`**：5 類 `{@type:}` 結構/邊界（含 `function_bool` 等
-   子型別、自動交易「第一次洗價控管」、盤中累計用 `intraBarPersist`），各類型挑一份範例（標出處）。
+3. ~~**`script-types.md` + `examples/*.md`**~~ → ✅ **已完成**（見上「已完成」節）。
 4. **Phase 2 FBD**（函式層）收進 `architecture.md`。
 5. **`marketplace.json`（散佈）**：reference 蒸餾全數完成、plugin 達可散佈狀態後製作，供未來散佈
    （Open Q6 已改為**確定要做**）。此步驟需起 semver（一旦 ship 給他人，`plugin.json` 的
