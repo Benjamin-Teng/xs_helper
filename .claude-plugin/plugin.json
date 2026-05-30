@@ -1,0 +1,9 @@
+{
+  "name": "xs-helper",
+  "description": "XScript (XS) 專家模式：依 XQ 全球贏家的 XScript 語言規範，協助撰寫/修改五類 XS 腳本並回答 XS 函數、欄位、關鍵字的用法。",
+  "author": {
+    "name": "benjamin31588",
+    "email": "benjamin31588@gmail.com"
+  },
+  "keywords": ["xscript", "xs", "xq", "全球贏家", "選股", "自動交易", "技術指標", "量化交易"]
+}
