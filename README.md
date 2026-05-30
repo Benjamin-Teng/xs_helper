@@ -33,7 +33,17 @@ XS 是 XQ全球贏家專屬、繁體中文、小眾的 DSL，沒有公開的編�
 
 ## 狀態
 
-🚧 **SPEC 階段** —— 規格已定案，尚未進入實作。完整規格見 [docs/SPEC.md](docs/SPEC.md)。
+🚧 **實作中（reference 蒸餾）** —— plugin 骨架完成、`/plugin validate` 通過。reference 進度：
+
+| reference | 狀態 |
+|-----------|------|
+| `language.md`（語法基礎） | ✅ 已蒸餾（grammar token × Preset 真實語法校對） |
+| `xs_lint.py` 已知 token 清單 | ✅ 啟用（483 個 grammar token） |
+| `system-functions.md`（sysfnc） | ⬜ 待蒸餾 |
+| `builtin-functions.md`（bif）/ `fields.md`（欄位） | ⬜ 待蒸餾（需 xshelp） |
+| `script-types.md` + `examples/` | ⬜ 待蒸餾 |
+
+完整規格與交接見 [docs/SPEC.md](docs/SPEC.md)。
 
 ## 知識來源
 
