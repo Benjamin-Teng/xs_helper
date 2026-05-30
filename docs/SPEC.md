@@ -209,18 +209,26 @@ xs_helper/
 - ✅ Open Questions 全收斂（見上）。
 - ✅ 三來源 clone 至 `sources/`（gitignored）：`vscode-xs`(MIT) / `XScript_Preset`(無授權) / `XQStrategy`(無授權)。
 - ✅ **Phase 1 FBD** → [architecture.md](architecture.md)（已 commit `5863d75`）。資料流閉合、無循環依賴。
-- ✅ **Plugin 骨架**（純新增，**尚未 commit**，待 `/plugin validate` 過再 commit）：
+- ✅ **Plugin 骨架**（已 commit `588c2c4`，`/plugin validate` 通過、僅 version warning）：
   - `.claude-plugin/plugin.json`（name=`xs-helper`，version 省略＝dev 用 SHA）
   - `skills/xs/SKILL.md`（`/xs` 入口，description 觸發詞 + 流程 + F3 fallback + 硬邊界）
-  - `skills/xs/reference/*.md` ×5 + `examples/*.md` ×5（**佔位**，各標蒸餾來源 + TODO）
   - `hooks/hooks.json`（PostToolUse:Write|Edit → `python xs_lint.py`）
-  - `scripts/xs_lint.py`（結構檢查可用；`KNOWN_TOKENS` 為空＝未知函數檢查待蒸餾）
+- ✅ **語法錨點（離線、grammar 確定性）已蒸餾**（commit `47a24de`）：
+  - `reference/language.md`：grammar 五類 token × Preset 真實語法校對；`intraBarPersist`
+    列一級概念（回捲對比表 + `IsXLOrder.xs` 換 Bar 重設慣例）。
+  - `scripts/xs_lint.py`：`KNOWN_TOKENS` 已嵌入 **483 個 grammar token**（小寫）+ 數字後綴
+    正規化 + 字串字面量 strip + 警示改「未收錄(可能自訂函數)」→ **達成 AC5**。
+  - `tests/test_xs_lint.py`：17 個 stdlib 單元測試全過。
+- ⬜ **其餘 reference 仍為佔位**：`builtin-functions.md` / `system-functions.md` /
+  `fields.md` / `script-types.md` + `examples/*.md` ×5（各標蒸餾來源 + TODO，未動）。
 
 #### 關鍵探勘校正（影響蒸餾策略，詳見 architecture.md 角色分層表）
 
 - **xshelp 為蒸餾主幹**（活的名單權威 + bif 簽名 + 三類欄位定義），且身兼 build-time 與 runtime。grammar 是 **2023 快照已落後**，降為 Hook 離線 token 清單。
 - **sysfnc 142/143 在 `XScript_Preset/函數` 有原始碼**（簽名+語意）；**bif 0 個有源**（引擎原語，簽名只能靠 xshelp）。
 - 腳本類型由 `{@type:}` **確定性**分類：autotrade / function / indicator / filter / sensor。
+  ⚠️ 新發現：`function` 有子型別，Preset 實見 `{@type:function_bool}`（回傳布林的函數）→ 蒸餾
+  `script-types.md` 時須涵蓋 `function*` 子型別家族，勿假設只有 `function` 單一標記。
 - 選股欄位走 `GetField("中文")`，掃出 498+ 種。
 
 #### XS 語意地雷（生成正確性關鍵，已寫入 memory，蒸餾時務必納入 reference）
@@ -228,12 +236,21 @@ xs_helper/
 - `intraBarPersist`：逐筆洗價時變數不回捲 → 見 memory `xs-intrabarpersist-semantics`。
 - 執行/觸發模型：歷史回放→即時、**換棒必觸發**、洗價模式×觸發設定 → 見 memory `xs-execution-trigger-model`。
 
-#### 下一步（依序）
+#### 下一步（依序）— 接手 session 從這裡開始
 
-1. 待 `/plugin validate` 通過 → commit 骨架（訊息：`feat: plugin 骨架（manifest + /xs skill + hook + reference 佔位）`）。
-2. **蒸餾 reference**（核心工作）：xshelp 名單為主幹 × Preset sysfnc 用法 × Strategy 選股欄位交叉驗證 × grammar 生 `xs_lint.py` 的 `KNOWN_TOKENS`。
-3. 各類型挑一份 examples、補齊 `script-types.md` 邊界與第一次洗價慣例。
-4. Phase 2 FBD（函式層）收進 architecture.md。
+> 語法錨點（language.md + KNOWN_TOKENS）已完成。剩下的是 reference 蒸餾主體，
+> 量大且部分需網路，建議**一個子項一個 commit**，勿混在同一工作樹。
+
+1. **`system-functions.md`（sysfnc）**：142/143 自 `XScript_Preset/函數` 原始碼蒸餾
+   （`input:` 宣告＝簽名、實作＝語意），xshelp 校對。離線為主、量大。
+2. **`builtin-functions.md`（bif）+ `fields.md`（三類欄位）**：以 xshelp 為主幹
+   （WebFetch 抓簽名/欄位定義），選股欄位以 `XQStrategy` 的 `GetField("中文")` 交叉驗證。**需網路。**
+3. **`script-types.md` + `examples/*.md`**：5 類 `{@type:}` 結構/邊界（含 `function_bool` 等
+   子型別、自動交易「第一次洗價控管」、盤中累計用 `intraBarPersist`），各類型挑一份範例（標出處）。
+4. **Phase 2 FBD**（函式層）收進 `architecture.md`。
+
+每個 reference 條目格式統一：`名稱 / 簽名 / 參數 / 回傳 / 範例 / 來源`（見 Naming Conventions）。
+冷門 / 無源者走 SKILL.md F3 線上查證，**不杜撰**（G1）。
 
 ### 後續流程（依全域工作慣例）
 

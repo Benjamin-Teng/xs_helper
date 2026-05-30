@@ -20,11 +20,15 @@ for _stream in (sys.stdout, sys.stderr):
     except (AttributeError, ValueError):
         pass
 
-# KNOWN_TOKENS：由 vscode-xs grammar(xs.tmLanguage.json) 的
-# keyword.control / bif / sysfnc / variable.builtin / .field / .constant 五類名單
-# 確定性生成（全部小寫；數字後綴如 Plot2 / OutputField12 在比對時正規化去尾數）。
+# KNOWN_TOKENS：由 vscode-xs grammar(xs.tmLanguage.json) 確定性生成（全部小寫）。
 # 來源為 2023 grammar 快照，定位是 Hook 的離線對照清單——刻意「寧放行不誤殺」：
-# 名單過時頂多漏報未知 token，不會誤殺合法腳本。重生方式見 docs（grammar → 此清單）。
+# 名單過時頂多漏報未知 token，不會誤殺合法腳本。比對時數字後綴（Plot2 / OutputField12）
+# 正規化去尾數（見 check_unknown_tokens）。
+#
+# 重生方式（grammar 更新時手動跑，無自動 build —— 依 SPEC Open Q3）：
+#   讀 grammar repository 的 keyword.control / functions[bif] / functions[sysfnc] /
+#   variables[builtin/field/constant] 各 "match" 正則，逐條：去 (?i)、去 \b 邊界、
+#   去 [0-9]{n,m} 數字後綴量詞，再 findall [A-Za-z_]\w+ 取識別字、轉小寫、去重排序。
 KNOWN_TOKENS: frozenset[str] = frozenset({
     "above", "absvalue", "acc", "addspread", "adi", "ado", "alert", "and", "angle", "ar",
     "arccosine", "arcsine", "arctangent", "array", "array_compare", "array_copy",
