@@ -1,0 +1,17 @@
+# VSCode
+.vscode/
+*.code-workspace
+
+# Claude Code
+.claude/
+
+# uv
+.python-version
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Reference 蒸餾來源：實作階段 clone 三個範例庫於此，不 ship
+sources/
