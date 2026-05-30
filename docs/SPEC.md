@@ -4,11 +4,11 @@
 
 | 欄位 | 內容 |
 |------|------|
-| 版本 | v1 |
-| 基於 | 初版（首次定義） |
+| 版本 | v1.1 |
+| 基於 | v1（首次定義） |
 | 建立日期 | 2026-05-30 |
 | 修改日期 | 2026-05-30 |
-| 動機 | 首次定義：一個 Claude Code plugin，讓 Claude 能依 XQ全球贏家的 XScript（XS）語言規範，協助使用者撰寫自動化腳本、回答 XS 用法問題 |
+| 動機 | v1 首次定義：一個 Claude Code plugin，讓 Claude 能依 XQ全球贏家的 XScript（XS）語言規範，協助使用者撰寫自動化腳本、回答 XS 用法問題。v1.1（實作 session）：收斂全部 Open Questions、折入來源探勘校正、建立 plugin 骨架，詳見文末「實作進度（Session 交接）」。 |
 | 前提 | Claude 模型本身不具備 XS 知識；XS 為 XQ 專屬 DSL，無公開編譯器 / LSP，知識來源為三個官方 GitHub 範例庫＋官方說明站 |
 
 ---
@@ -189,24 +189,53 @@ xs_helper/
 
 ---
 
-### Open Questions
+### Open Questions（✅ 全數收斂於 v1.1 實作 session）
 
-實作 session 開頭須先收斂下列項目（依序）：
-
-1. **知識交付機制**：確認採「內建 reference ＋ WebFetch fallback」混合制？（替代：純內建 / 純線上）
-2. **Hook 用途**：兩條路線（不衝突，可擇一或都做，都做會增加複雜度）：
-   - **路線 A（SPEC 預設）**：`PostToolUse` 掛 `Write|Edit` → `.xs` 編輯後啟發式驗證（未知函數 / 結構警示）。性質＝寫腳本時的品質防護。
-   - **路線 B**：`UserPromptSubmit` → 字面 / regex 偵測 `xs|xq` 關鍵字命中時，**確定性**注入 XS context 或提示走 `/xs`。性質＝啟動層保險，補足「自動觸發為語意判斷、非保證」的缺口（見 F1 啟動路徑）。
-   - 待你拍板要 A / B / A+B。
-3. **Reference 建置方式**：v1 採「Claude 讀 `sources/` 後人工蒸餾」（KISS，建議）vs. 寫一支自動 build 腳本（v2 再做）？
-4. **Hook 腳本語言**：Python 3 stdlib（跨平台、建議）vs. PowerShell（你主力環境，但綁 Windows）？
-5. **範例庫去留**：三個 repo 是 clone 進 `sources/` 當蒸餾輸入後即可（不 ship）vs. 直接 bundle 部分 `.xs` 進 plugin（注意體積與授權；XScript_Preset/XQStrategy 授權待查、vscode-xs 為 MIT）？
-6. **散佈方式**：自用 skills-dir / local plugin（建議起步）vs. 建 `marketplace.json` 供他人安裝？
+1. **知識交付機制** → ✅ **混合制**（內建 reference ＋ WebFetch fallback）。
+2. **Hook 用途** → ✅ **路線 A only**（`PostToolUse` 掛 `Write|Edit` → `.xs` 啟發式驗證）。路線 B（`UserPromptSubmit` 確定性注入）留 v2 視體感再加。
+3. **Reference 建置方式** → ✅ **Claude 讀來源後人工蒸餾**（KISS）；自動 build 腳本 v2 再說。
+4. **Hook 腳本語言** → ✅ **Python 3 stdlib**（跨平台）。附帶前提：使用者端需 `python` 在 PATH。ruff/ty 不裝（僅單支 stdlib 腳本）。
+5. **範例庫去留** → ✅ **只蒸餾不 ship**。授權實查：vscode-xs = MIT；**XScript_Preset / XQStrategy 無 LICENSE 檔** → 更不可 bundle 原始 `.xs`，只蒸餾「DSL 事實」。`sources/` 已在 `.gitignore`。
+6. **散佈方式** → ✅ **local plugin / skills-dir 自用優先**；`marketplace.json` 暫不做。
 
 ---
 
+### 實作進度（Session 交接）
+
+> v1.1 實作 session 進度快照，供下個 session 接手。細節不在此複製，指向對應檔案。
+
+#### 已完成
+
+- ✅ Open Questions 全收斂（見上）。
+- ✅ 三來源 clone 至 `sources/`（gitignored）：`vscode-xs`(MIT) / `XScript_Preset`(無授權) / `XQStrategy`(無授權)。
+- ✅ **Phase 1 FBD** → [architecture.md](architecture.md)（已 commit `5863d75`）。資料流閉合、無循環依賴。
+- ✅ **Plugin 骨架**（純新增，**尚未 commit**，待 `/plugin validate` 過再 commit）：
+  - `.claude-plugin/plugin.json`（name=`xs-helper`，version 省略＝dev 用 SHA）
+  - `skills/xs/SKILL.md`（`/xs` 入口，description 觸發詞 + 流程 + F3 fallback + 硬邊界）
+  - `skills/xs/reference/*.md` ×5 + `examples/*.md` ×5（**佔位**，各標蒸餾來源 + TODO）
+  - `hooks/hooks.json`（PostToolUse:Write|Edit → `python xs_lint.py`）
+  - `scripts/xs_lint.py`（結構檢查可用；`KNOWN_TOKENS` 為空＝未知函數檢查待蒸餾）
+
+#### 關鍵探勘校正（影響蒸餾策略，詳見 architecture.md 角色分層表）
+
+- **xshelp 為蒸餾主幹**（活的名單權威 + bif 簽名 + 三類欄位定義），且身兼 build-time 與 runtime。grammar 是 **2023 快照已落後**，降為 Hook 離線 token 清單。
+- **sysfnc 142/143 在 `XScript_Preset/函數` 有原始碼**（簽名+語意）；**bif 0 個有源**（引擎原語，簽名只能靠 xshelp）。
+- 腳本類型由 `{@type:}` **確定性**分類：autotrade / function / indicator / filter / sensor。
+- 選股欄位走 `GetField("中文")`，掃出 498+ 種。
+
+#### XS 語意地雷（生成正確性關鍵，已寫入 memory，蒸餾時務必納入 reference）
+
+- `intraBarPersist`：逐筆洗價時變數不回捲 → 見 memory `xs-intrabarpersist-semantics`。
+- 執行/觸發模型：歷史回放→即時、**換棒必觸發**、洗價模式×觸發設定 → 見 memory `xs-execution-trigger-model`。
+
+#### 下一步（依序）
+
+1. 待 `/plugin validate` 通過 → commit 骨架（訊息：`feat: plugin 骨架（manifest + /xs skill + hook + reference 佔位）`）。
+2. **蒸餾 reference**（核心工作）：xshelp 名單為主幹 × Preset sysfnc 用法 × Strategy 選股欄位交叉驗證 × grammar 生 `xs_lint.py` 的 `KNOWN_TOKENS`。
+3. 各類型挑一份 examples、補齊 `script-types.md` 邊界與第一次洗價慣例。
+4. Phase 2 FBD（函式層）收進 architecture.md。
+
 ### 後續流程（依全域工作慣例）
 
-- 本檔為 **SPEC session 產物**，至此 SPEC 階段告一段落。
-- 實作另開新 session，以本 `SPEC.md` 為輸入；開頭先收斂上方 Open Questions，再進入 coding。
-- 因含 skills / hooks / reference 多模組且有資料形狀轉換（範例庫 → 蒸餾 reference），實作前建議先畫一張 **Phase 1 FBD**（模組層）確認資料流閉合，再動工。
+- 本檔自 v1.1 起兼作 **session 交接介面**；接手 session 以本檔 + `architecture.md` + memory 為輸入，直接進「下一步」。
+- `sources/` 為 build-time 蒸餾輸入，不 ship、不進版。
