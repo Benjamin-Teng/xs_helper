@@ -160,10 +160,10 @@
 <section>
   <h2>核心結果<span class="sub">8 個真實 XS 任務 · 載入 skill vs 未載入（baseline）· 同一模型 Claude Opus 4.8</span></h2>
   <div class="cards">
-    <div class="card"><div class="num good">100%</div><div class="lbl">載 skill 通過率</div><div class="delta">vs baseline 75%　▲ +25pt</div></div>
-    <div class="card"><div class="num base">75%</div><div class="lbl">未載 skill 通過率</div></div>
+    <div class="card"><div class="num" style="font-size:1.85rem"><span style="color:var(--good)">100%</span> <span style="color:var(--muted);font-size:1.2rem">vs</span> <span style="color:var(--base)">75%</span></div><div class="lbl">通過率：載入 vs 未載 skill</div><div class="delta">▲ +25pt</div></div>
     <div class="card"><div class="num good">0</div><div class="lbl">載 skill 的幻覺 token</div><div class="delta">baseline 有 3/8 案例中招</div></div>
     <div class="card"><div class="num good">6/6</div><div class="lbl">正確標記 <code class="inl">{@type:}</code></div><div class="delta">baseline 0/6</div></div>
+    <div class="card"><div class="num good" style="font-size:1.5rem;line-height:1.3">不唬爛</div><div class="lbl">做不到就說做不到，不清楚就查官方站幫你查清楚——絕不杜撰不存在的函數</div></div>
   </div>
   <div class="method">
     <p style="margin:0"><b>怎麼測的？</b> 每個任務跑兩組獨立 agent：一組載入 <code class="inl">/xs</code> skill（含蒸餾後的 XS reference + F3 線上查證），
