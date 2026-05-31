@@ -52,7 +52,7 @@
 |------|------|
 | `SetPosition(n[, MARKET])` | 設定目標部位（n>0 多、n<0 空、0 平倉）；`MARKET` 市價 |
 | `Position` | 目前部位（口數，多正空負） |
-| `Filled` | 是否已成交（1=已成交） |
+| `Filled` | 目前**實際成交部位量**（多正空負，非布林）；`Position` 為目標部位、`Filled` 為實際庫存，`Filled = Position` 表示無未成交掛單 |
 | `FilledAvgPrice` | 成交均價（停損停利基準） |
 | `FilledRecord(...)` | 成交記錄查詢 |
 | `CancelAllOrders` | 刪單 |

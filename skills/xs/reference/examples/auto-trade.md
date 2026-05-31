@@ -31,7 +31,7 @@ input: profit_percent(2, "停利(%)"), loss_percent(2, "停損(%)");
 if Position = 0 and Average(Close,5) Cross Over Average(Close,20)
     then SetPosition(1, MARKET);                    // 市價進場
 
-if Position = 1 and Filled = 1 then begin           // 已成交才談停損停利
+if Position = 1 and Filled = Position then begin    // 實際部位已達目標（無未成交掛單）才談停損停利
     if Close >= FilledAvgPrice * (1 + 0.01*profit_percent) then SetPosition(0)   // 停利
     else if Close <= FilledAvgPrice * (1 - 0.01*loss_percent) then SetPosition(0); // 停損
 end;
