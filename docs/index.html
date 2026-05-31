@@ -338,7 +338,12 @@ if inSP500 and roe&gt;15 and pe&gt;0
       <div class="cmd"><pre>/plugin install xs-helper@xs-tools</pre><button class="copy" onclick="copyCmd(this)">複製</button></div>
     </div>
     <div class="step">
-      <h4>③ 確認裝好了</h4>
+      <h4>③ 重新整理 plugin</h4>
+      <p>讓剛裝好的 plugin 立即生效（不必重開 Claude Code）：</p>
+      <div class="cmd"><pre>/reload-plugins</pre><button class="copy" onclick="copyCmd(this)">複製</button></div>
+    </div>
+    <div class="step">
+      <h4>④ 確認裝好了</h4>
       <p>輸入下面這句，若 Claude 依 XS 規範回答 <code class="inl">Average</code> 用法即成功 🎉：</p>
       <div class="cmd"><pre>/xs Average 怎麼用？</pre><button class="copy" onclick="copyCmd(this)">複製</button></div>
       <div class="verdict" style="margin-top:12px">裝好後平常只要對話講到 XS / 選股 / 某函數怎麼用，Claude 會自動載入 XS 知識，不必每次打 <code class="inl">/xs</code>。</div>

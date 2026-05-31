@@ -38,7 +38,10 @@ XS 是 XQ全球贏家專屬、繁體中文、小眾的 DSL，沒有公開的編�
 ```shell
 /plugin marketplace add Benjamin-Teng/xs_helper
 /plugin install xs-helper@xs-tools
+/reload-plugins
 ```
+
+> `/reload-plugins` 讓剛裝好的 plugin 立即生效，不必重開 Claude Code。
 
 安裝後輸入 `/xs` 即進入 XS 專家模式。
 
