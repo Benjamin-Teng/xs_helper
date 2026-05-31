@@ -4,6 +4,22 @@
 
 開發迭代期（無 tag）以 commit SHA 作版本；自 v0.1.0 起正式起 semver。
 
+## [0.1.1] - 2026-05-31
+
+reference 校正與新手友善文件；新增對外量化報表（GitHub Pages）。
+
+### Fixed
+
+- **`fields.md` / `builtin-functions.md`** — 補正欄位/函數命名規則（經官方 xshelp 一手查證）：
+  - 欄位/資訊函數家族（`GetField` / `GetSymbolField` / `GetSymbolInfo` / `GetQuote` + `*Date`/`Check*`/`IsSupport*` 變體）欄位名**中文或英文皆可**，立為全家族通則（先前 reference 僅示中文，易誤導偏好中文）。
+  - 反例標注：`GetInfo` 只吃固定英文關鍵字、`GetSymbolGroup` 清單類型用中文名。
+  - `CallFunction` 標 `⚠️ 版本相關`：自 **v6.20** 起函數可用中文名，且中文名函數須透過 `CallFunction` 呼叫；並立「版本分水嶺以 `vX.XX` 標注」之 reference 慣例。
+
+### Added
+
+- **量化助益報表**（`docs/index.html`，GitHub Pages）：以 skill-creator 評測流程跑 8 個真實 XS 任務（載 skill vs baseline），呈現通過率、幻覺防護、腳本類型標記等差距。
+- **README 新手安裝指引** — 完全不會寫程式也能照著裝。
+
 ## [0.1.0] - 2026-05-31
 
 首個正式發行版本，plugin 達可散佈狀態。
@@ -20,4 +36,5 @@
 - **`.xs` 編輯驗證 Hook**（`PostToolUse: Write|Edit` → `xs_lint.py`）：對照 604 個 token（grammar 2023 快照 ∪ Preset 215 sysfnc ∪ xshelp 8 群組 bif）的啟發式檢查，對未收錄函數與明顯結構問題提出非阻斷式警示。
 - **散佈基礎建設**：`.claude-plugin/marketplace.json`（marketplace `xs-tools`）、`plugin.json` 起 semver `0.1.0`、MIT LICENSE。
 
+[0.1.1]: https://github.com/Benjamin-Teng/xs_helper/releases/tag/v0.1.1
 [0.1.0]: https://github.com/Benjamin-Teng/xs_helper/releases/tag/v0.1.0

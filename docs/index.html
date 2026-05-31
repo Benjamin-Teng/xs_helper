@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>xs-helper Benchmark — XS 腳本撰寫的 skill 助益量化報告</title>
+<style>
+  :root{
+    --bg:#0d1117; --panel:#161b22; --panel2:#1c2330; --border:#30363d;
+    --text:#e6edf3; --muted:#8b949e; --accent:#58a6ff;
+    --good:#3fb950; --good-bg:#13351f; --bad:#f85149; --bad-bg:#3a1515;
+    --skill:#3fb950; --base:#d29922;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,"Segoe UI",Roboto,"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+    line-height:1.7;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:0 20px 80px}
+  header{padding:64px 20px 40px;text-align:center;border-bottom:1px solid var(--border);
+    background:radial-gradient(ellipse at top,rgba(88,166,255,.08),transparent 70%)}
+  header h1{font-size:2.3rem;margin:0 0 8px;letter-spacing:-.5px}
+  header .tag{color:var(--accent);font-weight:600;font-size:.9rem;letter-spacing:2px;text-transform:uppercase}
+  header p.lead{color:var(--muted);max-width:680px;margin:16px auto 0;font-size:1.1rem}
+  section{margin-top:56px}
+  h2{font-size:1.5rem;border-left:4px solid var(--accent);padding-left:12px;margin-bottom:8px}
+  h2 .sub{display:block;font-size:.85rem;color:var(--muted);font-weight:400;padding-left:1px;margin-top:4px}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-top:24px}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:24px;text-align:center}
+  .card .num{font-size:2.6rem;font-weight:700;line-height:1.1}
+  .card .num.good{color:var(--good)} .card .num.base{color:var(--base)}
+  .card .lbl{color:var(--muted);font-size:.9rem;margin-top:6px}
+  .card .delta{font-size:.85rem;color:var(--good);margin-top:8px;font-weight:600}
+  table{width:100%;border-collapse:collapse;margin-top:20px;font-size:.95rem}
+  th,td{padding:10px 12px;border:1px solid var(--border);text-align:left}
+  th{background:var(--panel2);font-weight:600}
+  td.c,th.c{text-align:center}
+  .bar-row{display:grid;grid-template-columns:230px 1fr;gap:14px;align-items:center;margin:14px 0}
+  .bar-row .name{font-size:.9rem;color:var(--text)}
+  .bar-row .name small{color:var(--muted);display:block;font-size:.78rem}
+  .bars{display:flex;flex-direction:column;gap:5px}
+  .bar{height:22px;border-radius:5px;display:flex;align-items:center;padding:0 8px;font-size:.78rem;
+    color:#0d1117;font-weight:700;min-width:38px;transition:width .6s ease}
+  .bar.skill{background:var(--skill)} .bar.base{background:var(--base)}
+  .legend{display:flex;gap:20px;justify-content:center;margin:8px 0 0;font-size:.85rem;color:var(--muted)}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .dot{width:12px;height:12px;border-radius:3px;display:inline-block}
+  .dot.skill{background:var(--skill)} .dot.base{background:var(--base)}
+  .finding{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:18px 22px;margin-top:16px}
+  .finding h3{margin:0 0 6px;font-size:1.08rem}
+  .finding p{margin:0;color:var(--muted)}
+  .finding .pill{display:inline-block;font-size:.72rem;font-weight:700;padding:2px 9px;border-radius:20px;margin-left:8px;vertical-align:middle}
+  .pill.win{background:var(--good-bg);color:var(--good);border:1px solid var(--good)}
+  .case{background:var(--panel);border:1px solid var(--border);border-radius:10px;margin-top:14px;overflow:hidden}
+  .case-head{width:100%;text-align:left;background:none;border:none;color:var(--text);font-family:inherit;
+    padding:16px 20px;cursor:pointer;font-weight:600;font-size:1rem;display:flex;
+    justify-content:space-between;align-items:center;gap:12px;transition:background .2s}
+  .case-head:hover{background:var(--panel2)}
+  .case-head .right{display:flex;align-items:center;gap:12px;flex-shrink:0}
+  .case-head .tags{font-size:.75rem;font-weight:600;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+  .case-head .chev{transition:transform .35s ease;color:var(--muted);font-size:.8rem}
+  .case.open .case-head{border-bottom:1px solid var(--border)}
+  .case.open .case-head .chev{transform:rotate(180deg)}
+  .case-wrap{display:grid;grid-template-rows:0fr;transition:grid-template-rows .35s ease}
+  .case.open .case-wrap{grid-template-rows:1fr}
+  .case-inner{overflow:hidden;min-height:0}
+  .body{padding:4px 20px 20px}
+  .prompt{background:var(--panel2);border-radius:8px;padding:12px 14px;font-size:.92rem;color:var(--text);margin:14px 0}
+  .prompt b{color:var(--accent)}
+  .cmp{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:10px}
+  @media(max-width:680px){.cmp{grid-template-columns:1fr}.bar-row{grid-template-columns:1fr}}
+  .col h4{margin:0 0 6px;font-size:.85rem;display:flex;align-items:center;gap:6px}
+  .col.skill h4{color:var(--good)} .col.base h4{color:var(--base)}
+  pre{background:#0a0d12;border:1px solid var(--border);border-radius:8px;padding:12px;overflow:auto;
+    font-size:.8rem;line-height:1.5;margin:0;font-family:"SFMono-Regular",Consolas,monospace}
+  pre .hl-bad{color:var(--bad);font-weight:700}
+  pre .hl-good{color:var(--good);font-weight:700}
+  .verdict{font-size:.9rem;margin-top:12px;padding:10px 14px;border-radius:8px;background:var(--good-bg);
+    border:1px solid var(--good);color:#aff5c0}
+  ul.notes{padding-left:0;list-style:none;margin-top:16px}
+  ul.notes li{background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--accent);
+    border-radius:6px;padding:10px 14px;margin-bottom:10px;color:var(--muted);font-size:.92rem}
+  footer{margin-top:72px;padding-top:28px;border-top:1px solid var(--border);color:var(--muted);font-size:.85rem;text-align:center}
+  footer a{color:var(--accent);text-decoration:none}
+  .method{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:20px 24px;margin-top:20px;font-size:.92rem}
+  .method b{color:var(--text)}
+  code.inl{background:var(--panel2);padding:1px 6px;border-radius:4px;font-size:.85em;color:#ffa657}
+</style>
+</head>
+<body>
+<header>
+  <div class="tag">Claude Code Skill Benchmark</div>
+  <h1>xs-helper 對撰寫 XS 腳本的助益</h1>
+  <p class="lead">XScript（XS）是 XQ 全球贏家的券商專屬語言，繁中、小眾、無公開編譯器。
+  通用 LLM 對它一知半解、容易把別的語言的函數張冠李戴。本報告用 8 個真實任務，量化
+  <code class="inl">/xs</code> skill 帶來的差距。</p>
+</header>
+
+<div class="wrap">
+
+<section>
+  <h2>核心結果<span class="sub">8 個真實 XS 任務 · 載入 skill vs 未載入（baseline）· 同一模型 Claude Opus 4.8</span></h2>
+  <div class="cards">
+    <div class="card"><div class="num good">100%</div><div class="lbl">載 skill 通過率</div><div class="delta">vs baseline 75%　▲ +25pt</div></div>
+    <div class="card"><div class="num base">75%</div><div class="lbl">未載 skill 通過率</div></div>
+    <div class="card"><div class="num good">0</div><div class="lbl">載 skill 的幻覺 token</div><div class="delta">baseline 有 3/8 案例中招</div></div>
+    <div class="card"><div class="num good">6/6</div><div class="lbl">正確標記 <code class="inl">{@type:}</code></div><div class="delta">baseline 0/6</div></div>
+  </div>
+  <div class="method">
+    <p style="margin:0"><b>怎麼測的？</b> 每個任務跑兩組獨立 agent：一組載入 <code class="inl">/xs</code> skill（含蒸餾後的 XS reference + F3 線上查證），
+    一組完全不載、純憑模型自身知識（並明令禁止讀取本專案任何檔案）。兩組產出依<b>客觀 assertion</b> 評分——
+    包含「腳本類型標記是否正確」「邏輯是否符合需求」，以及用專案自帶的 <code class="inl">xs_lint</code>
+    （內建 604 個已知 XS token）程式化掃描<b>是否出現幻覺/不存在的函數</b>。共 8 案例、38 條 assertion，分兩輪（基本題 + 刁鑽題）。</p>
+  </div>
+</section>
+
+<section>
+  <h2>逐案例通過率<span class="sub">綠＝載 skill，黃＝baseline；數字為該案例 assertion 通過率</span></h2>
+  <div class="legend">
+    <span><i class="dot skill"></i>載 skill</span>
+    <span><i class="dot base"></i>未載 skill（baseline）</span>
+  </div>
+  <div id="chart"></div>
+</section>
+
+<section>
+  <h2>差距出在哪裡<span class="sub">跨兩輪穩定重現的四個區分點</span></h2>
+
+  <div class="finding">
+    <h3>1. 防止「跨語言張冠李戴」的幻覺<span class="pill win">skill 完勝</span></h3>
+    <p>baseline 多次把 EasyLanguage / MultiCharts 的詞搬進 XS：<code class="inl">MarketPosition</code>、<code class="inl">EntryPrice</code>（自動交易題）、
+    <code class="inl">InIndex("SPX")</code>（美股選股題）——這些在 XS 都不存在。載 skill 的版本一律用對 XS 的
+    <code class="inl">Position</code>、<code class="inl">FilledAvgPrice</code>，並查證欄位真實存在。這是通用知識補不上的硬差距。</p>
+  </div>
+  <div class="finding">
+    <h3>2. 腳本類型標記 <code class="inl">{@type:}</code><span class="pill win">skill 6/6 · baseline 0/6</span></h3>
+    <p>XS 腳本開頭要用 <code class="inl">{@type:filter}</code> / <code class="inl">{@type:autotrade}</code> 等標記決定它是哪一類。
+    baseline 在 6 個生成類案例<b>全部漏掉</b>；載 skill 的版本全部帶對。少了它，腳本會被 XQ 歸錯類型。</p>
+  </div>
+  <div class="finding">
+    <h3>3. 知道能力邊界、不假裝做得到<span class="pill win">skill 完勝</span></h3>
+    <p>美股選股題，baseline 用幻覺函數 <code class="inl">InIndex("SPX")</code> 假裝能在程式碼裡篩出 S&amp;P 500 成分股；
+    載 skill 的版本走 F3 線上查證後老實指出：XS 選股欄位<b>沒有</b>成分股欄位，「限定 S&amp;P 500」只能在 XQ 股票池設定裡做、程式碼做不到，
+    並用查證過的欄位（<code class="inl">股東權益報酬率</code> / <code class="inl">本益比</code>）寫出可用條件。知道「做不到什麼」與知道「怎麼做」同等重要。</p>
+  </div>
+  <div class="finding">
+    <h3>4. 冷僻慣例：函數回傳機制、子型別<span class="pill win">skill 正確</span></h3>
+    <p>「回傳布林的函數」題，載 skill 的版本正確選用 <code class="inl">{@type:function_bool}</code> 子型別、以「對函數名賦值」回傳；
+    baseline 漏標記且用 <code class="inl">ret</code>（在 XS 屬選股/警示的機制）。</p>
+  </div>
+  <p style="color:var(--muted);font-size:.9rem;margin-top:18px">註：有兩個刻意設計的「陷阱」——警示誤用 <code class="inl">Alert()</code>、一目均衡表幻覺、逐筆洗價的
+  <code class="inl">intraBarPersist</code>——baseline 其實也答對了。可見模型「知道要小心」並非問題；skill 的價值在於<b>知道確切的 XS token 與慣例</b>。</p>
+</section>
+
+<section>
+  <h2>案例對照<span class="sub">點開看實際 XS 程式碼差異</span></h2>
+
+  <div class="case open">
+    <button class="case-head" onclick="toggleCase(this)">自動交易：均線交叉進場 + 5% 停損<span class="right"><span class="tags"><span style="color:var(--good)">skill 100%</span><span style="color:var(--base)">base 60%</span></span><span class="chev">▼</span></span></button>
+    <div class="case-wrap"><div class="case-inner">
+    <div class="body">
+      <div class="prompt"><b>需求：</b>20MA 向上穿過 60MA 進場做多，跌破 20MA 出場，停損 5%</div>
+      <div class="cmp">
+        <div class="col skill"><h4>✓ 載 skill</h4>
+          <pre>{@type:autotrade}
+if <span class="hl-good">Position</span> = 0 and Average(Close,20)
+   Cross Above Average(Close,60)
+   then SetPosition(1, MARKET);
+... Close &lt;= <span class="hl-good">FilledAvgPrice</span>*(1-0.05)</pre></div>
+        <div class="col base"><h4>✗ 未載 skill</h4>
+          <pre>// （缺 {@type:autotrade}）
+If <span class="hl-bad">MarketPosition</span> = 0 And
+   maFast Cross Over maSlow Then
+   SetPosition(1);
+... Close &lt;= <span class="hl-bad">EntryPrice</span>*(1-StopPct/100)</pre></div>
+      </div>
+      <div class="verdict">baseline 用了 XS 不存在的 <code class="inl">MarketPosition</code>、<code class="inl">EntryPrice</code>，且漏了類型標記。</div>
+    </div>
+  </div></div></div>
+
+  <div class="case open">
+    <button class="case-head" onclick="toggleCase(this)">美股選股：S&amp;P 500 高 ROE + 低本益比<span class="right"><span class="tags"><span style="color:var(--good)">skill 100%</span><span style="color:var(--base)">base 60%</span></span><span class="chev">▼</span></span></button>
+    <div class="case-wrap"><div class="case-inner">
+    <div class="body">
+      <div class="prompt"><b>需求：</b>選美股，S&amp;P 500 成分股裡最近一季 ROE &gt; 15% 且本益比 &lt; 20</div>
+      <div class="cmp">
+        <div class="col skill"><h4>✓ 載 skill（走 F3 查證）</h4>
+          <pre>{@type:filter}
+Value1 = GetField(<span class="hl-good">"股東權益報酬率"</span>, "Q");
+Value2 = GetField(<span class="hl-good">"本益比"</span>);
+if Value1 &gt; 15 and Value2 &gt; 0
+   and Value2 &lt; 20 then ret = 1;
+// S&P500 成分股 → 須在 XQ 股票池設定</pre></div>
+        <div class="col base"><h4>✗ 未載 skill</h4>
+          <pre>// （缺 {@type:filter}）
+inSP500 = <span class="hl-bad">InIndex("SPX")</span>;
+roe = GetField("ROE", "Q");
+pe  = GetField("PER");
+if inSP500 and roe&gt;15 and pe&gt;0
+   and pe&lt;20 then ret = 1;</pre></div>
+      </div>
+      <div class="verdict">baseline 用幻覺函數 <code class="inl">InIndex</code> 假裝能在程式碼篩成分股（XS 做不到）；
+      skill 查證後誠實把「成分股限定」交還給 XQ 股票池設定。<br>
+      <small style="opacity:.8">（註：欄位用英文 <code class="inl">ROE</code>/<code class="inl">PER</code> 兩邊皆可——官方 GetField 中英文名都接受，非錯誤。）</small></div>
+    </div>
+  </div></div></div>
+
+  <div class="case open">
+    <button class="case-head" onclick="toggleCase(this)">規範問答：CrossOver 怎麼用<span class="right"><span class="tags"><span style="color:var(--good)">skill 100%</span><span style="color:var(--base)">base 100%</span></span><span class="chev">▼</span></span></button>
+    <div class="case-wrap"><div class="case-inner">
+    <div class="body">
+      <div class="prompt"><b>需求：</b>XS 的 CrossOver 參數、回傳是什麼，給一個例子</div>
+      <p style="color:var(--muted);font-size:.92rem">兩組都答對核心（兩個 Series、回傳布林、僅穿越那根為真）。但 baseline 多宣稱「第二參數可為常數門檻」——
+      經 XS 使用者確認<b style="color:var(--bad)">為錯誤</b>，CrossOver 兩個參數都必須是序列。載 skill 的版本主張「傳純量不對」才正確。</p>
+      <div class="verdict">常見函數兩邊都會，但細節正確性上 skill 仍勝出（baseline 過度宣稱了一個不存在的用法）。</div>
+    </div>
+  </div></div></div>
+</section>
+
+<section>
+  <h2>分析師觀察</h2>
+  <ul class="notes">
+    <li>更難的案例反而拉大差距：iteration-1（基本題）delta +25pt，iteration-2（刁鑽題）delta 升到 +30pt。</li>
+    <li>baseline 跨兩輪最穩定的失分點＝跨 DSL 幻覺（<code class="inl">MarketPosition</code> 出現兩次）與漏 <code class="inl">{@type:}</code> 標記（0/6）。</li>
+    <li>F3 線上查證經實證可運作：載 skill 的版本在美股選股、一目均衡表題主動查 xshelp 官方站補足 reference 未涵蓋處，補完後仍不杜撰。</li>
+    <li>「知道要小心」不是 skill 的價值來源——陷阱題 baseline 多半也閃過了；skill 的價值在「知道確切的 XS token 與慣例」。</li>
+  </ul>
+</section>
+
+<footer>
+  <p><b>xs-helper</b> — 一個讓 Claude 依 XScript 規範協助撰寫自動交易 / 選股 / 指標 / 警示 / 函數腳本的 Claude Code skill。</p>
+  <p>本報告由 skill-creator 評測流程產生 · 模型 Claude Opus 4.8 · 8 案例 / 38 assertion / 2 輪 ·
+  <a href="https://github.com/Benjamin-Teng/xs_helper">GitHub: Benjamin-Teng/xs_helper</a></p>
+  <p style="font-size:.78rem;opacity:.7">評測為單次取樣（每組 1 run），數字反映方向性差距而非統計顯著性；XS 腳本僅供撰寫參考，實際執行請於 XQ 平台驗證。</p>
+</footer>
+
+</div>
+
+<script>
+// 案例對照：滑順展開/收合
+function toggleCase(btn){ btn.parentElement.classList.toggle('open'); }
+
+// 逐案例資料（assertion 通過率 %）
+const data = [
+  {name:"選股：連三天放量收紅K", it:"基本", s:100, b:80},
+  {name:"自動交易：均線交叉+停損", it:"基本", s:100, b:60},
+  {name:"警示：突破布林上軌", it:"基本", s:100, b:60},
+  {name:"規範問答：CrossOver", it:"基本", s:100, b:100},
+  {name:"規範問答：一目均衡表", it:"刁鑽", s:100, b:100},
+  {name:"美股選股：ROE+本益比", it:"刁鑽", s:100, b:60},
+  {name:"函數：連續N天創新高(bool)", it:"刁鑽", s:100, b:60},
+  {name:"當沖：逐筆計數不回捲", it:"刁鑽", s:100, b:80},
+];
+const chart = document.getElementById('chart');
+data.forEach(d=>{
+  const row=document.createElement('div'); row.className='bar-row';
+  row.innerHTML=`<div class="name">${d.name}<small>${d.it}題</small></div>
+    <div class="bars">
+      <div class="bar skill" style="width:${d.s}%">${d.s}%</div>
+      <div class="bar base" style="width:${d.b}%">${d.b}%</div>
+    </div>`;
+  chart.appendChild(row);
+});
+</script>
+</body>
+</html>

@@ -21,6 +21,7 @@ XS 是 XQ全球贏家專屬、繁體中文、小眾的 DSL，沒有公開的編�
 | **內建 XS Reference** | 語法、內建函數、系統函數、欄位、腳本類型慣例，皆內建為 markdown |
 | **官方文件 Fallback** | 冷門函數 / 欄位以 WebFetch 查 [XS 線上說明](https://xshelp.xq.com.tw/XSHelp/) 後作答 |
 | **`.xs` 編輯驗證 Hook** | 編輯 `.xs` 檔時對未知函數 / 明顯結構問題提出非阻斷式警示 |
+| **新手友善安裝** | 不會寫程式也能裝：照著下方[新手安裝指引](#完全不會寫程式跟著做就能裝)三步完成 |
 
 ## 設計邊界（Out of Scope）
 
@@ -42,6 +43,47 @@ XS 是 XQ全球贏家專屬、繁體中文、小眾的 DSL，沒有公開的編�
 
 安裝後輸入 `/xs` 即進入 XS 專家模式。
 
+### 完全不會寫程式？跟著做就能裝
+
+不需要任何程式基礎，照下面三步就能裝好。你唯一要做的就是「複製指令、貼上、按 Enter」。
+
+**第 0 步：先有 Claude Code**
+
+你得先在電腦裝好 **Claude Code**（Anthropic 的官方工具，本 plugin 就跑在它裡面）。
+還沒有的話，到 [Claude Code 官方網站](https://www.claude.com/product/claude-code) 依指示安裝並登入。裝好後打開它，你會看到一個可以打字的對話框。
+
+**第 1 步：加入本 plugin 的來源（marketplace）**
+
+在 Claude Code 的對話框裡，把下面這行**整行複製貼上**，然後按 Enter：
+
+```text
+/plugin marketplace add Benjamin-Teng/xs_helper
+```
+
+這行的意思是「告訴 Claude Code 去 GitHub 上的 `Benjamin-Teng/xs_helper` 找這個 plugin」。成功的話它會回報已加入名為 `xs-tools` 的來源。
+
+**第 2 步：安裝 plugin**
+
+接著把下面這行整行貼上，再按 Enter：
+
+```text
+/plugin install xs-helper@xs-tools
+```
+
+看到安裝成功的訊息就完成了。（若它問你要不要信任 / 啟用，選同意即可。）
+
+**第 3 步：確認裝好了**
+
+在對話框輸入：
+
+```text
+/xs Average 怎麼用？
+```
+
+如果 Claude 開始依 XS 規範回答 `Average` 這個函數的用法，就代表安裝成功、可以開始用了 🎉。
+
+> 卡住了？最常見原因是第 0 步的 Claude Code 還沒登入，或指令沒整行貼上（少了開頭的 `/`）。重貼一次通常就好。
+
 ### 使用方式（兩條路徑）
 
 - **自動觸發（主要）**：不必打任何指令——只要對話講到 XS / 選股條件 / 某個函數怎麼用，Claude 會依 skill 的 `description` 自動載入 XS 知識再作答。
@@ -51,7 +93,11 @@ XS 是 XQ全球贏家專屬、繁體中文、小眾的 DSL，沒有公開的編�
 
 ## 狀態
 
-✅ **v0.1.0** —— reference 全數蒸餾完成、`/plugin validate` 通過、可散佈。功能仍在迭代，故版號自 v0.1.0 起。reference 進度：
+✅ **v0.1.1** —— reference 全數蒸餾完成、`/plugin validate` 通過、可散佈；v0.1.1 補正欄位/函數命名的中英文與版本規則。功能仍在迭代。
+
+📊 **成效**：[skill 助益量化報表](https://benjamin-teng.github.io/xs_helper/) —— 8 個真實 XS 任務「載 skill vs 未載」對照，通過率 100% vs 75%、零幻覺 token。
+
+reference 進度：
 
 | reference | 狀態 |
 |-----------|------|
