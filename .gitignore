@@ -15,3 +15,9 @@ __pycache__/
 
 # Reference 蒸餾來源：實作階段 clone 三個範例庫於此，不 ship
 sources/
+
+# Eval 開發機制：skill 評測的測試案例定義（evals/）與跑測產物 / 本機工具（xs-workspace/：
+# run outputs / grading / timing / benchmark / review.html / scan_tokens.py / make_review.py）。
+# 皆為開發輸入/產物、可重生、skill 執行時不依賴；評測「結果」另以 docs/ 報表呈現並 commit。
+skills/xs-workspace/
+skills/xs/evals/
