@@ -30,6 +30,11 @@
 
 4. **欄位名是字串**：`GetField("收盤價")` 的中文要逐字相符（含括號單位，如 `每股稅後淨利(元)`、
    `成交金額(億)`、`股本(元)` vs `股本(億)`）。括號 / 單位差一字就查不到 → 對不準時走 F3。
+   - **中文或英文皆可（欄位/資訊函數全家族通則）**：官方說明明載 `GetField` / `GetSymbolField` /
+     `GetSymbolInfo` 等的欄位名「**中文或是英文名稱**」都接受（例：`GetSymbolInfo("交易所")` ＝
+     `GetSymbolInfo("exchange")`）；`GetQuote` 英文用 `q_*`、中文用報價欄位名。詳見
+     [builtin-functions.md](builtin-functions.md) FIELDFUNC 區段。本檔欄位表以中文名為主（最穩、
+     官方範例慣用），英文代碼字串不確定時走 F3 查證，勿臆造。
 
 ---
 

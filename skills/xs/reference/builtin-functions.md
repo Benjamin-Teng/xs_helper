@@ -16,6 +16,9 @@
    （`x = AbsValue(y);`），少數為**指令式**無回傳（如 `Buy(1);`、`Print(...);`、`Plot(...);`）。
 2. **簽名標記**：本檔簽名沿用 xshelp 原始參數中文名（如 `AddSpread(基礎價格, 檔位)`）。
    `[...]` 表選填參數；`a | b` 表多載（同名不同參數組）。回傳型別在「說明」內描述。
+   - **版本分水嶺以 `vX.XX` 標注**：凡某特性自特定 XQ 版本起才支援者（如 `CallFunction` 中文函數名自
+     `v6.20` 起），在該條目標 `⚠️ 版本相關` 與版本號；生成/回答涉及此類特性時，提醒使用者確認 XQ 版本，
+     舊版可能不支援。
 3. **欄位 / 報價 / 交易函數的腳本邊界**（關鍵，違反會編譯/執行錯）：
    - `GetField` 系列 → 任何腳本皆可（含選股），讀**資料欄位**（見 [fields.md](fields.md)）。
    - `GetQuote` / `GetSymbolInfo` → **僅警示 / 自動交易**等即時腳本可用，讀**報價欄位**。
@@ -60,11 +63,11 @@
 | `Symbol` 相關 → 見「欄位函數」 | — | `Symbol`/`SymbolName` 歸 FIELDFUNC |
 | `SymbolExchange` | `(): Str` | 目前商品的交易所代碼 |
 | `SymbolType` | `(): Num` | 目前商品的型態 |
-| `GetSymbolGroup` | `(...)` | 取得執行/指定商品所屬的相關商品清單 |
+| `GetSymbolGroup` | `([商品,] "清單類型")` | 取相關商品清單；清單類型用**中文名**（如 `"成分股"`/`"權證"`），未載英文 |
 | `GroupSize` | `(group): Num` | 指定族群的商品數 |
-| `GetInfo` | `(infoName)` | 取執行環境資訊 |
+| `GetInfo` | `(infoName)` | 取執行環境資訊；`infoName` 為**固定英文關鍵字**（`"Instance"`/`"IsRealTime"`/`"IsTimerMode"`/`"FilterMode"`/`"TradeMode"`/`"AT_EnableTrade"`/`"AT_BID"`/`"AT_AccType"`/`"AT_AID"`）——非中英雙語、不可用中文 |
 | `GetTBMode` / `SetTBMode` | `(...)` | 取得 / 設定自訂指標繪圖模式 |
-| `CallFunction` | `(name, param1, param2, ...)` | 以名稱動態呼叫函數 |
+| `CallFunction` | `("函數名", param1, param2, ...)` | 以名稱動態呼叫函數；`callfunction("average",c,5)` ≡ `average(c,5)`。⚠️ **版本相關**：自 **v6.20** 起函數可用**中文名**，而中文名函數被其他腳本呼叫時**必須**透過 `CallFunction`（直接寫中文函數名呼叫不行） |
 | `Print` | `(values...) | (File(path), values...)` | 輸出值（除錯 / log） |
 | `File` | `(path)` | 指定 `Print` 輸出目的地：`Print(File(path), ...)` |
 | `RaiseRunTimeError` | `(errorMessage)` | 中斷執行並拋出錯誤訊息 |
@@ -199,6 +202,12 @@
 
 > 讀「資料欄位 / 報價欄位 / 商品資訊」的入口。⚠️ `GetQuote` / `GetSymbolInfo` 限即時腳本
 > （警示 / 自動交易），`GetField` 系列各腳本通用。欄位中文名清單見 [fields.md](fields.md)。
+>
+> **欄位名中英文皆可（全家族通則）**：官方說明明載 `GetField`、`GetSymbolField`、`GetSymbolInfo`
+> 的欄位/資訊名「**中文或是英文名稱**」都接受（例：`GetSymbolInfo("交易所")` ＝ `GetSymbolInfo("exchange")`；
+> `GetQuote` 英文用 `q_*` 名、中文用報價欄位名）。`*Date` / `Check*` / `IsSupport*` 變體官方註明
+> 「參數與 `GetField` 相同」，故一併適用。本檔欄位表以中文名為主（最穩、官方範例慣用）；
+> 英文代碼字串不確定時走 F3 查證，勿臆造。
 
 | 名稱 | 簽名 | 說明 |
 |------|------|------|
