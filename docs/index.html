@@ -219,11 +219,35 @@ if inSP500 and roe&gt;15 and pe&gt;0
 <section>
   <h2>分析師觀察</h2>
   <ul class="notes">
-    <li>更難的案例反而拉大差距：iteration-1（基本題）delta +25pt，iteration-2（刁鑽題）delta 升到 +30pt。</li>
+    <li>刁鑽題沒有縮小差距：兩輪 baseline 都落在 75%，載 skill 都 100%，delta 穩定維持 +25pt。</li>
     <li>baseline 跨兩輪最穩定的失分點＝跨 DSL 幻覺（<code class="inl">MarketPosition</code> 出現兩次）與漏 <code class="inl">{@type:}</code> 標記（0/6）。</li>
     <li>F3 線上查證經實證可運作：載 skill 的版本在美股選股、一目均衡表題主動查 xshelp 官方站補足 reference 未涵蓋處，補完後仍不杜撰。</li>
     <li>「知道要小心」不是 skill 的價值來源——陷阱題 baseline 多半也閃過了；skill 的價值在「知道確切的 XS token 與慣例」。</li>
   </ul>
+</section>
+
+<section>
+  <h2>怎麼安裝<span class="sub">在 Claude Code 裡三步完成 · 不需 git clone</span></h2>
+  <div class="method">
+    <p style="margin:0">大多數人<b>不需要</b>用 GitHub 連結 clone 原始碼。本 plugin 透過 marketplace <code class="inl">xs-tools</code> 散佈——
+    打開 <a href="https://www.claude.com/product/claude-code" style="color:var(--accent)">Claude Code</a>（裝好並登入後），照下面三步「複製指令 → 貼上 → 按 Enter」即可。</p>
+  </div>
+  <div class="finding">
+    <h3>① 加入來源（marketplace）</h3>
+    <p>在 Claude Code 對話框貼上這行並按 Enter——告訴它去 GitHub 上的 <code class="inl">Benjamin-Teng/xs_helper</code> 找這個 plugin：</p>
+    <pre>/plugin marketplace add Benjamin-Teng/xs_helper</pre>
+  </div>
+  <div class="finding">
+    <h3>② 安裝 plugin</h3>
+    <p>接著貼上這行並按 Enter（若被問要不要信任 / 啟用，選同意）：</p>
+    <pre>/plugin install xs-helper@xs-tools</pre>
+  </div>
+  <div class="finding">
+    <h3>③ 確認裝好了</h3>
+    <p>輸入下面這句，若 Claude 開始依 XS 規範回答 <code class="inl">Average</code> 的用法，就代表安裝成功 🎉：</p>
+    <pre>/xs Average 怎麼用？</pre>
+    <div class="verdict">裝好後，平常只要對話講到 XS / 選股 / 某個函數怎麼用，Claude 會自動載入 XS 知識作答，不必每次打 <code class="inl">/xs</code>。</div>
+  </div>
 </section>
 
 <footer>
