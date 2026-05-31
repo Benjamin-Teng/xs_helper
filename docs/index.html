@@ -84,6 +84,62 @@
   .method{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:20px 24px;margin-top:20px;font-size:.92rem}
   .method b{color:var(--text)}
   code.inl{background:var(--panel2);padding:1px 6px;border-radius:4px;font-size:.85em;color:#ffa657}
+  /* sticky 安裝按鈕 */
+  .install-bar{position:sticky;top:0;z-index:50;display:flex;justify-content:center;gap:10px;
+    padding:12px;background:#0d1117e6;backdrop-filter:blur(8px);border-bottom:1px solid var(--border)}
+  .install-btn{background:var(--accent);color:#0a0d12;border:none;font-family:inherit;font-weight:700;
+    font-size:1rem;padding:11px 26px;border-radius:30px;cursor:pointer;box-shadow:0 4px 16px rgba(88,166,255,.35);
+    transition:transform .15s,box-shadow .15s}
+  .install-btn:hover{transform:translateY(-2px);box-shadow:0 7px 22px rgba(88,166,255,.55)}
+  /* 安裝 modal */
+  .modal{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.72);backdrop-filter:blur(4px);
+    display:none;align-items:flex-start;justify-content:center;padding:6vh 16px;overflow-y:auto}
+  .modal.open{display:flex;animation:fade .2s ease}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  .modal-card{background:var(--panel);border:1px solid var(--border);border-radius:14px;max-width:660px;
+    width:100%;padding:28px 30px 30px;position:relative;animation:slideup .25s ease}
+  @keyframes slideup{from{transform:translateY(18px);opacity:.5}to{transform:translateY(0);opacity:1}}
+  .modal-card h2{margin:0;border:none;padding:0;font-size:1.5rem}
+  .modal-close{position:absolute;top:12px;right:16px;background:none;border:none;color:var(--muted);
+    font-size:1.8rem;line-height:1;cursor:pointer}
+  .modal-close:hover{color:var(--text)}
+  .step{margin-top:18px}
+  .step h4{margin:0 0 6px;color:var(--accent);font-size:1rem}
+  .step p{margin:0 0 8px;color:var(--muted);font-size:.92rem}
+  .modal-card pre{background:#0a0d12;border:1px solid var(--border);border-radius:8px;padding:12px 70px 12px 12px;
+    overflow-x:auto;font-size:.85rem;font-family:Consolas,monospace;margin:0}
+  .cmd{position:relative}
+  .copy{position:absolute;top:7px;right:7px;background:var(--panel2);border:1px solid var(--border);
+    color:var(--text);font-family:inherit;font-size:.75rem;font-weight:600;padding:5px 11px;border-radius:6px;
+    cursor:pointer;transition:background .15s,color .15s}
+  .copy:hover{background:var(--accent);color:#0a0d12;border-color:var(--accent)}
+  .copy.done{background:var(--good);color:#0a0d12;border-color:var(--good)}
+  /* 手機 RWD 收斂 */
+  @media(max-width:600px){
+    header{padding:40px 16px 30px}
+    header h1{font-size:1.7rem;letter-spacing:-.3px}
+    header .tag{font-size:.78rem;letter-spacing:1.5px}
+    header p.lead{font-size:1rem}
+    .wrap{padding:0 14px 56px}
+    section{margin-top:40px}
+    h2{font-size:1.28rem}
+    h2 .sub{font-size:.8rem}
+    .cards{gap:12px}
+    .card{padding:18px}
+    .card .num{font-size:2.1rem}
+    .finding{padding:16px}
+    .method{padding:16px 18px}
+    .body{padding:4px 14px 16px}
+    /* 案例標題：標題可換行、標籤縮成直排靠右、字級下修 */
+    .case-head{font-size:.9rem;padding:14px 16px;gap:10px;align-items:flex-start}
+    .case-head .right{align-items:flex-start}
+    .case-head .tags{flex-direction:column;align-items:flex-end;gap:3px}
+    ul.notes li{font-size:.88rem}
+    .modal{padding:4vh 12px}
+    .modal-card{padding:24px 18px}
+    .modal-card pre{padding-right:62px;font-size:.8rem}
+    .copy{font-size:.72rem;padding:5px 9px}
+  }
 </style>
 </head>
 <body>
@@ -94,6 +150,10 @@
   通用 LLM 對它一知半解、容易把別的語言的函數張冠李戴。本報告用 8 個真實任務，量化
   <code class="inl">/xs</code> skill 帶來的差距。</p>
 </header>
+
+<div class="install-bar">
+  <button class="install-btn" onclick="openInstall()">📥 如何安裝（點我）</button>
+</div>
 
 <div class="wrap">
 
@@ -226,30 +286,6 @@ if inSP500 and roe&gt;15 and pe&gt;0
   </ul>
 </section>
 
-<section>
-  <h2>怎麼安裝<span class="sub">在 Claude Code 裡三步完成 · 不需 git clone</span></h2>
-  <div class="method">
-    <p style="margin:0">大多數人<b>不需要</b>用 GitHub 連結 clone 原始碼。本 plugin 透過 marketplace <code class="inl">xs-tools</code> 散佈——
-    打開 <a href="https://www.claude.com/product/claude-code" style="color:var(--accent)">Claude Code</a>（裝好並登入後），照下面三步「複製指令 → 貼上 → 按 Enter」即可。</p>
-  </div>
-  <div class="finding">
-    <h3>① 加入來源（marketplace）</h3>
-    <p>在 Claude Code 對話框貼上這行並按 Enter——告訴它去 GitHub 上的 <code class="inl">Benjamin-Teng/xs_helper</code> 找這個 plugin：</p>
-    <pre>/plugin marketplace add Benjamin-Teng/xs_helper</pre>
-  </div>
-  <div class="finding">
-    <h3>② 安裝 plugin</h3>
-    <p>接著貼上這行並按 Enter（若被問要不要信任 / 啟用，選同意）：</p>
-    <pre>/plugin install xs-helper@xs-tools</pre>
-  </div>
-  <div class="finding">
-    <h3>③ 確認裝好了</h3>
-    <p>輸入下面這句，若 Claude 開始依 XS 規範回答 <code class="inl">Average</code> 的用法，就代表安裝成功 🎉：</p>
-    <pre>/xs Average 怎麼用？</pre>
-    <div class="verdict">裝好後，平常只要對話講到 XS / 選股 / 某個函數怎麼用，Claude 會自動載入 XS 知識作答，不必每次打 <code class="inl">/xs</code>。</div>
-  </div>
-</section>
-
 <footer>
   <p><b>xs-helper</b> — 一個讓 Claude 依 XScript 規範協助撰寫自動交易 / 選股 / 指標 / 警示 / 函數腳本的 Claude Code skill。</p>
   <p>本報告由 skill-creator 評測流程產生 · 模型 Claude Opus 4.8 · 8 案例 / 38 assertion / 2 輪 ·
@@ -259,7 +295,48 @@ if inSP500 and roe&gt;15 and pe&gt;0
 
 </div>
 
+<div class="modal" id="installModal" onclick="if(event.target===this)closeInstall()">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeInstall()" aria-label="關閉">&times;</button>
+    <h2>怎麼安裝</h2>
+    <p style="color:var(--muted);margin:8px 0 4px">不需 git clone。打開
+      <a href="https://www.claude.com/product/claude-code" style="color:var(--accent)">Claude Code</a>（裝好並登入後），
+      照三步「複製 → 貼上 → 按 Enter」即可。</p>
+    <div class="step">
+      <h4>① 加入來源（marketplace）</h4>
+      <p>告訴 Claude Code 去 GitHub 的 <code class="inl">Benjamin-Teng/xs_helper</code> 找這個 plugin：</p>
+      <div class="cmd"><pre>/plugin marketplace add Benjamin-Teng/xs_helper</pre><button class="copy" onclick="copyCmd(this)">複製</button></div>
+    </div>
+    <div class="step">
+      <h4>② 安裝 plugin</h4>
+      <p>貼上並按 Enter（若被問要不要信任 / 啟用，選同意）：</p>
+      <div class="cmd"><pre>/plugin install xs-helper@xs-tools</pre><button class="copy" onclick="copyCmd(this)">複製</button></div>
+    </div>
+    <div class="step">
+      <h4>③ 確認裝好了</h4>
+      <p>輸入下面這句，若 Claude 依 XS 規範回答 <code class="inl">Average</code> 用法即成功 🎉：</p>
+      <div class="cmd"><pre>/xs Average 怎麼用？</pre><button class="copy" onclick="copyCmd(this)">複製</button></div>
+      <div class="verdict" style="margin-top:12px">裝好後平常只要對話講到 XS / 選股 / 某函數怎麼用，Claude 會自動載入 XS 知識，不必每次打 <code class="inl">/xs</code>。</div>
+    </div>
+  </div>
+</div>
+
 <script>
+// 安裝 modal 開關
+function openInstall(){document.getElementById('installModal').classList.add('open');document.body.style.overflow='hidden';}
+function closeInstall(){document.getElementById('installModal').classList.remove('open');document.body.style.overflow='';}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeInstall();});
+// 一鍵複製指令
+function copyCmd(btn){
+  const txt=btn.previousElementSibling.textContent.trim();
+  const done=()=>{const o=btn.textContent;btn.textContent='已複製 ✓';btn.classList.add('done');
+    setTimeout(()=>{btn.textContent=o;btn.classList.remove('done');},1500);};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(done).catch(()=>fallback(txt,done));}
+  else fallback(txt,done);
+}
+function fallback(txt,done){const t=document.createElement('textarea');t.value=txt;document.body.appendChild(t);
+  t.select();try{document.execCommand('copy');done();}catch(e){}document.body.removeChild(t);}
+
 // 案例對照：滑順展開/收合
 function toggleCase(btn){ btn.parentElement.classList.toggle('open'); }
 
