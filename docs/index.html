@@ -299,6 +299,28 @@ if inSP500 and roe&gt;15 and pe&gt;0
       <div class="verdict">常見函數兩邊都會，但細節正確性上 skill 仍勝出（baseline 過度宣稱了一個不存在的用法）。</div>
     </div>
   </div></div></div>
+
+  <div class="case open">
+    <button class="case-head" onclick="toggleCase(this)"><code class="inl">Cross Over</code> 與 <code class="inl">CrossOver</code> 有差嗎<span class="right"><span class="tags"><span style="color:var(--accent)">補充示範</span></span><span class="chev">▼</span></span></button>
+    <div class="case-wrap"><div class="case-inner">
+    <div class="body">
+      <div class="prompt"><b>需求：</b>cross over 跟 CrossOver 有差嗎？</div>
+      <p style="color:var(--muted);font-size:.92rem">兩者語意相同（A 向上穿越 B，黃金交叉），但屬<b>不同語言層級</b>：<code class="inl">Cross Over</code>（中間有空格）是<b>中綴關係運算子</b>，<code class="inl">CrossOver</code>（連寫）是<b>系統函數</b>。寫法不能混——運算子要分兩個字、函數要連寫加括號，寫錯邊會被當成未知 token。</p>
+      <div class="cmp">
+        <div class="col skill"><h4>運算子寫法</h4>
+          <pre>if Average(Close,5)
+   <span class="hl-good">Cross Over</span> Average(Close,20)
+   then ...</pre></div>
+        <div class="col skill"><h4>函數寫法（完全等價）</h4>
+          <pre>if <span class="hl-good">CrossOver</span>(
+     Average(Close,5),
+     Average(Close,20))
+   then ...</pre></div>
+      </div>
+      <div class="verdict">通用模型容易把兩者當「只是空格差異」一語帶過，漏掉「一個是運算子、一個是函數、空格不能寫錯」這層 XS 專屬語法規則。
+      <br><small style="opacity:.8">（補充示範，非正式評分的 8 案例之一；此處對照的是同一語意的兩種正確寫法。）</small></div>
+    </div>
+  </div></div></div>
 </section>
 
 <section>
