@@ -20,14 +20,13 @@ XS 是 XQ全球贏家專屬、繁體中文、小眾的 DSL，沒有公開的編�
 | **`/xs` Skill** | 判定腳本類型 → 載入對應 reference → 產出 XS 程式碼或規範解說 |
 | **內建 XS Reference** | 語法、內建函數、系統函數、欄位、腳本類型慣例，皆內建為 markdown |
 | **官方文件 Fallback** | 冷門函數 / 欄位以 WebFetch 查 [XS 線上說明](https://xshelp.xq.com.tw/XSHelp/) 後作答 |
-| **`.xs` 編輯驗證 Hook** | 編輯 `.xs` 檔時對未知函數 / 明顯結構問題提出非阻斷式警示 |
 
 ## 設計邊界（Out of Scope）
 
 本 plugin **只生成與解說，不執行**。明確不做：
 
 - XS 腳本的實際執行 / 回測（不含 XS runtime）
-- 完整語法分析 / LSP / grammar（Hook 僅啟發式檢查）
+- 完整語法分析 / LSP / grammar（不重建編譯器級驗證）
 - 即時同步官方文件全量（reference 為人工蒸餾快照）
 - XQ 平台帳號 / API 整合（不連帳號、不下單、不取報價）
 
@@ -54,7 +53,7 @@ XS 是 XQ全球贏家專屬、繁體中文、小眾的 DSL，沒有公開的編�
 
 ## 狀態
 
-✅ **v0.1.1** —— reference 全數蒸餾完成、`/plugin validate` 通過、可散佈；v0.1.1 補正欄位/函數命名的中英文與版本規則。功能仍在迭代。
+✅ **v0.2.0** —— reference 全數蒸餾完成、`/plugin validate` 通過、可散佈。v0.2.0 移除 `.xs` 編輯驗證 Hook（避免 end-user 端需 `python` 在 PATH，否則每次存檔跳 PostToolUse 錯誤）；`xs_lint.py` 保留為獨立腳本。功能仍在迭代。
 
 📊 **成效**：[skill 助益量化報表](https://benjamin-teng.github.io/xs_helper/) —— 8 個真實 XS 任務「載 skill vs 未載」對照，通過率 100% vs 75%、零幻覺 token。
 
@@ -63,7 +62,7 @@ reference 進度：
 | reference | 狀態 |
 |-----------|------|
 | `language.md`（語法基礎） | ✅ 已蒸餾（grammar token × Preset 真實語法校對） |
-| `xs_lint.py` 已知 token 清單 | ✅ 啟用（604 個 token：grammar 2023 快照 ∪ Preset 215 sysfnc ∪ xshelp 8 群組 bif） |
+| `xs_lint.py` 已知 token 清單 | ✅ 內建（604 個 token：grammar 2023 快照 ∪ Preset 215 sysfnc ∪ xshelp 8 群組 bif）；供 benchmark 幻覺掃描與手動檢查的獨立腳本 |
 | `system-functions.md`（sysfnc） | ✅ 已蒸餾（Preset 224 函數 × 14 分類） |
 | `builtin-functions.md`（bif） | ✅ 已蒸餾（xshelp 8 分類） |
 | `fields.md`（三類欄位） | ✅ 已蒸餾（xshelp `Q*`/`T*`/`F*` × XQStrategy `GetField` 交叉驗證） |

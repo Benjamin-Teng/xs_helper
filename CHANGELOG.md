@@ -4,6 +4,14 @@
 
 開發迭代期（無 tag）以 commit SHA 作版本；自 v0.1.0 起正式起 semver。
 
+## [0.2.0] - 2026-06-02
+
+### Removed
+
+- **`.xs` 編輯驗證 Hook**（`PostToolUse: Write|Edit` → `xs_lint.py`）：移除自動觸發的 hook。
+  原因：hook 以 `python` 執行腳本，但目標使用者（XQ 全球贏家交易者，多為 Windows、非開發者）機器上常無 Python 或 `python` 不在 PATH；hook 掛 `Write|Edit` 不限副檔名，導致這些使用者**每次存檔都跳 PostToolUse 錯誤**，傷害遠大於離線 lint 的邊際價值。
+  `scripts/xs_lint.py`（604 token 啟發式檢查）保留為獨立腳本，供 benchmark 幻覺掃描與手動檢查使用，僅不再自動掛載。
+
 ## [0.1.1] - 2026-05-31
 
 reference 校正與新手友善文件；新增對外量化報表（GitHub Pages）。
@@ -36,5 +44,6 @@ reference 校正與新手友善文件；新增對外量化報表（GitHub Pages�
 - **`.xs` 編輯驗證 Hook**（`PostToolUse: Write|Edit` → `xs_lint.py`）：對照 604 個 token（grammar 2023 快照 ∪ Preset 215 sysfnc ∪ xshelp 8 群組 bif）的啟發式檢查，對未收錄函數與明顯結構問題提出非阻斷式警示。
 - **散佈基礎建設**：`.claude-plugin/marketplace.json`（marketplace `xs-tools`）、`plugin.json` 起 semver `0.1.0`、MIT LICENSE。
 
+[0.2.0]: https://github.com/Benjamin-Teng/xs_helper/releases/tag/v0.2.0
 [0.1.1]: https://github.com/Benjamin-Teng/xs_helper/releases/tag/v0.1.1
 [0.1.0]: https://github.com/Benjamin-Teng/xs_helper/releases/tag/v0.1.0

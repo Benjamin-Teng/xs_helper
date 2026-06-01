@@ -338,11 +338,12 @@
 ## 14. 跨頻率（跨頻率/）
 
 > 來源：`XScript_Preset/函數/跨頻率/*.xs`。第一個參數一律 `FreqType:Str`（引用頻率）。
+>
 > - **`xf_*`**：`FreqType` 支援 `"D"`/`"W"`/`"M"`。
 > - **`xfMin_*`**：`FreqType` 額外支援分鐘頻率（`"1"/"2"/"3"/"5"/"10"/"15"/"30"/"60"/"D"/"W"/"M"/"AD"/"AW"/"AM"`），但**不支援 XS 選股、自訂排行、選股回測**（呼叫會 runtime error）。
 > `xfMin_*` 與同名 `xf_*` 簽名相同，差別僅 `FreqType` 支援範圍與上述限制。
 
-| 名稱（xf_ / xfMin_） | 簽名 | 說明 |
+| 名稱（`xf_` / `xfMin_`） | 簽名 | 說明 |
 |------|------|------|
 | `xf_GetValue` / `xfMin_GetValue` | `(FreqType:Str, PriceSeries:Series, poi:Num): Num` | 取跨頻數值序列第 poi 筆 |
 | `xf_GetBoolean` / `xfMin_GetBoolean` | `(FreqType:Str, TFSeries:TFSeries, poi:Num): Bool` | 取跨頻布林序列第 poi 筆 |

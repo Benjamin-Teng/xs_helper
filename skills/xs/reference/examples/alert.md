@@ -2,7 +2,7 @@
 
 > 蒸餾自 `XScript_Preset/警示/!語法範例/`（`1.基本語法.xs`、`3.getquote.xs`）。
 > 型別 / 邊界見 `script-types.md §4`。
-
+>
 > ⚠️ **警示用 `ret = 1` 觸發，不是 `Alert()`**。實證 Preset 警示 359 檔有 333 檔用
 > `ret=1`、0 檔用 `Alert()`（`Alert()` 是自動交易的通知函數）。
 

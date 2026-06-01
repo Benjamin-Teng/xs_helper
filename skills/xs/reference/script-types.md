@@ -34,7 +34,7 @@
 
 > ⚠️ `ret = 1` 在 **filter** 與 **sensor** 意義不同（入選 vs 觸發），但寫法相同；
 > 由 `{@type:}` 區分用途。**indicator / autotrade / function 不用 `ret`**。
-
+>
 > ⚠️ **`Alert()` 不是警示腳本的觸發方式**。實證：Preset 警示資料夾 359 檔有 333 檔用
 > `ret=1`、**0 檔用 `Alert()`**。`Alert(訊息...)` 是**自動交易**的「通知」函數
 > （訊息送到自動交易中心 / 推播），與 sensor 的觸發判定無關。

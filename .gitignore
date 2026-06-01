@@ -13,6 +13,9 @@
 __pycache__/
 *.py[cod]
 
+# Markdown lint：本機 dev 工具設定，不隨 plugin 散佈
+.markdownlint-cli2.jsonc
+
 # Reference 蒸餾來源：實作階段 clone 三個範例庫於此，不 ship
 sources/
 

@@ -1,11 +1,14 @@
 # xs_helper — Architecture (FBD)
 
 > 本檔為 **常駐架構文件**，含兩階段 FBD：
+>
 > - **Phase 1（模組層）**：coding 前畫，驗證模組劃分完整、資料流閉合、無循環依賴。
 > - **Phase 2（函式層）**：coding 後畫，標 `/xs` Skill runtime 的程序步驟與 `xs_lint.py`
 >   的 public function 真實簽名/型別/資料流，供未來上手者參考。
 >
 > 對應 SPEC：[SPEC.md](SPEC.md) 的 Project Structure / Features。
+
+**狀態（v0.2.0）：** `PostToolUse: Write|Edit → xs_lint.py` 的**自動 hook 已移除**（見 [CHANGELOG](../CHANGELOG.md) / [SPEC F4](SPEC.md)）——目標使用者端常無 `python`，每次存檔會跳 PostToolUse 錯誤。`scripts/xs_lint.py` 保留為獨立腳本（benchmark 幻覺掃描 + 手動檢查）。下方圖中的 Hook 旁支/節點為**移除前的設計記錄**，保留供歷史對照；現況 runtime 僅 `/xs` Skill 一條路徑自動生效。
 
 ## 四來源的角色分層（探勘＋線上實證）
 

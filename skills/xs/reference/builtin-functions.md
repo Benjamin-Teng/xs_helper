@@ -56,9 +56,9 @@
 | `BarInterval` | `(): Num` | 分鐘頻率下的分鐘間隔 |
 | `SetBarFreq` | `(freq1, freq2, ...)` | 宣告腳本支援的頻率 |
 | `SetBarMode` | `(n)` | 設定函數計算（洗價）方式 |
-| `DataAlign` | `(0 | 1)` | 設定資料對齊方式 |
+| `DataAlign` | `(0 \| 1)` | 設定資料對齊方式 |
 | `SetAlign` | `(category, method)` | 設定指定類別的資料對齊 |
-| `SetRemoveOutlier` | `("zscore" | "IQR", value:=range)` | 排除離群值 |
+| `SetRemoveOutlier` | `("zscore" \| "IQR", value:=range)` | 排除離群值 |
 | `CurrentBar`／`GetTotalBar`… | — | （上列已含；Bar 控制族整組） |
 | `Symbol` 相關 → 見「欄位函數」 | — | `Symbol`/`SymbolName` 歸 FIELDFUNC |
 | `SymbolExchange` | `(): Str` | 目前商品的交易所代碼 |
@@ -68,7 +68,7 @@
 | `GetInfo` | `(infoName)` | 取執行環境資訊；`infoName` 為**固定英文關鍵字**（`"Instance"`/`"IsRealTime"`/`"IsTimerMode"`/`"FilterMode"`/`"TradeMode"`/`"AT_EnableTrade"`/`"AT_BID"`/`"AT_AccType"`/`"AT_AID"`）——非中英雙語、不可用中文 |
 | `GetTBMode` / `SetTBMode` | `(...)` | 取得 / 設定自訂指標繪圖模式 |
 | `CallFunction` | `("函數名", param1, param2, ...)` | 以名稱動態呼叫函數；`callfunction("average",c,5)` ≡ `average(c,5)`。⚠️ **版本相關**：自 **v6.20** 起函數可用**中文名**，而中文名函數被其他腳本呼叫時**必須**透過 `CallFunction`（直接寫中文函數名呼叫不行） |
-| `Print` | `(values...) | (File(path), values...)` | 輸出值（除錯 / log） |
+| `Print` | `(values...) \| (File(path), values...)` | 輸出值（除錯 / log） |
 | `File` | `(path)` | 指定 `Print` 輸出目的地：`Print(File(path), ...)` |
 | `RaiseRunTimeError` | `(errorMessage)` | 中斷執行並拋出錯誤訊息 |
 | `Playsound` | `(file)` | 播放指定音效檔（警示用） |
@@ -141,7 +141,7 @@
 | `LeftStr` | `(str, len): Str` | 取最左 `len` 字元 |
 | `RightStr` | `(str, len): Str` | 取最右 `len` 字元 |
 | `MidStr` | `(str, pos, len): Str` | 由 `pos` 取 `len` 長子字串 |
-| `InStr` | `(src, find) | (s1, s2, startPos): Num` | 子字串位置（找不到回 0） |
+| `InStr` | `(src, find) \| (s1, s2, startPos): Num` | 子字串位置（找不到回 0） |
 | `StrStartWith` | `(s1, s2, mode): Bool` | s1 是否以 s2 開頭 |
 | `StrEndWith` | `(s1, s2, mode): Bool` | s1 是否以 s2 結尾 |
 | `StrCompare` | `(s1, s2, ignoreCase): Num` | 比較兩字串是否相等（可不分大小寫） |
@@ -263,7 +263,7 @@
 | `Market` | `()` | 以當前市價下單（價格參數位置使用） |
 | `IsMarketPrice` | `(value): Bool` | 判斷某價格是否為市價 |
 | `AddSpread` | `(基礎價格, 檔位): Num` | 依跳動點(檔位)調整後的價格 |
-| `CancelAllOrders` | `() | (label)` | 取消委託單 |
+| `CancelAllOrders` | `() \| (label)` | 取消委託單 |
 | `DefaultBuyPrice` | `(): Num` | 自動交易預設買價 |
 | `DefaultSellPrice` | `(): Num` | 自動交易預設賣價 |
 | `IsListedSymbol` | `(): Bool` | 是否為上市(掛牌)商品 |
@@ -292,13 +292,14 @@
 
 | 名稱 | 簽名 | 說明 |
 |------|------|------|
-| `Alert` | `(str1) | (str1, num1, ...)` | 策略執行中產生**警示**紀錄（警示腳本核心） |
+| `Alert` | `(str1) \| (str1, num1, ...)` | 策略執行中產生**警示**紀錄（警示腳本核心） |
 
 > `Playsound`（音效）歸一般函數；`Alert` 才是文字警示輸出。
 
 ---
 
 > **待補 / 邊界（build-time，非 F3 回寫）：**
+>
 > - 各 bif 的多載細節（如 `Buy` 的 `price`/`label` 完整位置語意）以 xshelp 個別函數頁
 >   （`/XSHelp/?HelpName=<名稱>&group=<分類碼>`）為準，本檔只收一行語意；需要精確語意時 build-time 補。
 > - `keyword.bif`（grammar 2023 快照）與本檔若有名單差異，以本檔（xshelp 現況）為準。

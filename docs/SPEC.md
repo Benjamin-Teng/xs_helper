@@ -65,7 +65,9 @@
 
 當需求涉及 reference 未涵蓋的冷門函數 / 欄位，SKILL.md 指示 Claude 以 WebFetch 查詢 `https://xshelp.xq.com.tw/XSHelp/` 對應子頁，再作答；查得後在回覆中標明「此為線上查詢結果」。
 
-#### F4. `.xs` 編輯驗證 Hook
+#### F4. `.xs` 編輯驗證 Hook（已於 v0.2.0 移除）
+
+> **狀態（v0.2.0）：** 此 hook 已移除。原因：以 `python` 執行腳本，但目標使用者端常無 Python / `python` 不在 PATH，hook 掛 `Write|Edit` 不限副檔名，導致每次存檔跳 PostToolUse 錯誤。`scripts/xs_lint.py` 保留為獨立腳本（benchmark 幻覺掃描 + 手動檢查），僅不再自動掛載。以下為原始設計記錄，保留供歷史對照。
 
 - `PostToolUse` 掛在 `Write|Edit`，比對被編輯檔名是否為 `*.xs`；
 - 命中時執行驗證腳本，對照內建「已知 token 清單」，對**未知函數名**與**明顯結構問題**（如 `if` 缺 `then`、`begin/end` 不成對）提出非阻斷式警示。
@@ -125,7 +127,7 @@
 
 ### Project Structure
 
-```
+```text
 xs_helper/
 ├── .claude-plugin/
 │   └── plugin.json              # manifest（唯一放這層的檔）
@@ -239,8 +241,8 @@ xs_helper/
     （`function`/`function_bool`/`function_string`）回傳型別對應；autotrade 第一次洗價控管
     （`intraBarPersist` 旗標 + 換 Bar 重設）；末附「選哪個 `{@type:}`」速查表。
   - `examples/*.md` ×5 各一份精選範例（標 Preset/Strategy 原始檔出處）：autotrade（均線交叉
-    +停利停損%）/ function（CountIF + CrossOver bool + FormatMQY string）/ indicator（BBand 主圖
-    + Aroon 副圖）/ filter（GetField 基本 + 輸出欄 + 美股跨市場）/ sensor（技術條件 + GetQuote 即時）。
+    +停利停損%）/ function（CountIF + CrossOver bool + FormatMQY string）/ indicator（BBand 主圖 +
+    Aroon 副圖）/ filter（GetField 基本 + 輸出欄 + 美股跨市場）/ sensor（技術條件 + GetQuote 即時）。
   - ⚠️ **校正既有佔位假設**：警示**用 `ret=1` 觸發、非 `Alert()`**（Preset 警示 359 檔 333 用
     `ret=1`、0 用 `Alert()`；`Alert()` 實為 autotrade 通知函數）。佔位檔誤標 `Alert(...)` 已修正。
   - 型別分佈實證：autotrade 64 / filter 324 / indicator 395 / sensor 359 / function 207 /

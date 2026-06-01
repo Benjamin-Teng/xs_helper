@@ -91,8 +91,8 @@ end;
 
 | 關鍵字 | 用途 |
 |--------|------|
-| `if` / `then` / `else` | 條件；**`if` 必有 `then`**（Hook 會檢查 if/then 配對） |
-| `begin` / `end` | 區塊；**成對**（Hook 會檢查配對） |
+| `if` / `then` / `else` | 條件；**`if` 必有 `then`**（務必配對） |
+| `begin` / `end` | 區塊；**務必成對** |
 | `for` / `to` / `downto` | 計數迴圈；`to` 遞增、`downto` 遞減 |
 | `while` | 條件迴圈 |
 | `repeat` / `until` | 後測迴圈 |

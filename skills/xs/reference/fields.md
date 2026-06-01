@@ -209,6 +209,7 @@
 ---
 
 > **待補 / 邊界（build-time，非 F3 回寫）：**
+>
 > - 報價 `QPRICE/QVOLUME/QFINANCE/QMARKET/QOPTION/QFIVE`、資料 `TPRICE/TVOLUME/TCHIP/TBASIC/…`
 >   各子類的完整中文清單未逐一收錄（量大、與選股欄位高度重疊）；需要時 build-time 抓對應 `a=` 頁。
 > - 選股 `FFINANCE` 200+ 欄位本檔僅收高頻子集；冷門財務 / 因子欄位走 SKILL.md F3（不杜撰，G1）。
