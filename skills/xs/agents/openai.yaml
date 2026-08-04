@@ -1,0 +1,7 @@
+interface:
+  display_name: "XS Helper"
+  short_description: "依 XQ 規範撰寫、修改與解說 XScript（XS）腳本"
+  default_prompt: "Use $xs to write, revise, or explain an XQ XScript (XS) script."
+
+policy:
+  allow_implicit_invocation: true

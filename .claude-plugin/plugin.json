@@ -1,6 +1,6 @@
 {
   "name": "xs-helper",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "XScript (XS) 專家模式：依 XQ 全球贏家的 XScript 語言規範，協助撰寫/修改五類 XS 腳本並回答 XS 函數、欄位、關鍵字的用法。",
   "author": {
     "name": "benjamin31588",

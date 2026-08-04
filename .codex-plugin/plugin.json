@@ -1,0 +1,28 @@
+{
+  "name": "xs-helper",
+  "version": "0.3.0",
+  "description": "依 XQ 全球贏家的 XScript 規範撰寫、修改與解說 XS 腳本。",
+  "author": {
+    "name": "benjamin31588",
+    "email": "benjamin31588@gmail.com",
+    "url": "https://github.com/Benjamin-Teng"
+  },
+  "homepage": "https://benjamin-teng.github.io/xs_helper/",
+  "repository": "https://github.com/Benjamin-Teng/xs_helper",
+  "license": "MIT",
+  "keywords": ["xscript", "xs", "xq", "全球贏家", "選股", "自動交易", "技術指標", "量化交易"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "XS Helper",
+    "shortDescription": "依 XQ 規範撰寫與解說 XScript 腳本",
+    "longDescription": "使用內建 XS 語法、函數、欄位與腳本類型 reference，協助撰寫、修改及解說 XQ 全球贏家的 XScript 腳本。",
+    "developerName": "benjamin31588",
+    "category": "Productivity",
+    "capabilities": ["Read", "Write"],
+    "websiteURL": "https://benjamin-teng.github.io/xs_helper/",
+    "defaultPrompt": [
+      "用 XS 寫一個台股選股條件。",
+      "解釋這段 XScript 並檢查函數與欄位。"
+    ]
+  }
+}

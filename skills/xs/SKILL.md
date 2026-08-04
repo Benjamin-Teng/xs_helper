@@ -44,7 +44,7 @@ description: >-
 
 ## F3 Fallback（冷門查詢）
 
-reference 未涵蓋的函數 / 欄位 → 以 WebFetch 查 XSHelp 官方站，查得後在回覆標明「此為線上查詢結果」：
+reference 未涵蓋的函數 / 欄位 → 使用目前環境可用的網頁查詢或瀏覽工具查 XSHelp 官方站；查得後在回覆標明「此為線上查詢結果」：
 
 - 清單頁：`https://xshelp.xq.com.tw/XSHelp/lists?a=<代碼>`
   （函數：`GENERALFUNC` 等；資料欄位：`TBASIC`/`TPRICE`/`TVOLUME`/`TCHIP`…；選股欄位：`FBASIC`/`FFINANCE`/`FOFTEN`…）
