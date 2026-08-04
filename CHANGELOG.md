@@ -4,6 +4,18 @@
 
 開發迭代期（無 tag）以 commit SHA 作版本；自 v0.1.0 起正式起 semver。
 
+## [0.3.0] - 2026-08-04
+
+### Added
+
+- **Codex 原生 plugin 支援**：新增 `.codex-plugin/plugin.json`、`.agents/plugins/marketplace.json` 與 `$xs` skill UI metadata；Claude Code 與 Codex 共用同一份 `skills/xs/`。
+- **Codex 安裝**：`codex plugin marketplace add Benjamin-Teng/xs_helper` → `codex plugin add xs-helper@xs-tools`。
+
+### Changed
+
+- **Claude Code 安裝維持相容**：`/plugin marketplace add Benjamin-Teng/xs_helper` → `/plugin install xs-helper@xs-tools` → `/reload-plugins`，並以 `/xs` 手動觸發。
+- F3 fallback 改為平台中立的網頁查詢指示；README、GitHub Pages、SPEC 與架構文件加入雙平台說明。
+
 ## [0.2.0] - 2026-06-02
 
 ### Removed
@@ -44,6 +56,7 @@ reference 校正與新手友善文件；新增對外量化報表（GitHub Pages�
 - **`.xs` 編輯驗證 Hook**（`PostToolUse: Write|Edit` → `xs_lint.py`）：對照 604 個 token（grammar 2023 快照 ∪ Preset 215 sysfnc ∪ xshelp 8 群組 bif）的啟發式檢查，對未收錄函數與明顯結構問題提出非阻斷式警示。
 - **散佈基礎建設**：`.claude-plugin/marketplace.json`（marketplace `xs-tools`）、`plugin.json` 起 semver `0.1.0`、MIT LICENSE。
 
+[0.3.0]: https://github.com/Benjamin-Teng/xs_helper/releases/tag/v0.3.0
 [0.2.0]: https://github.com/Benjamin-Teng/xs_helper/releases/tag/v0.2.0
 [0.1.1]: https://github.com/Benjamin-Teng/xs_helper/releases/tag/v0.1.1
 [0.1.0]: https://github.com/Benjamin-Teng/xs_helper/releases/tag/v0.1.0

@@ -3,12 +3,41 @@
 > 本檔為 **常駐架構文件**，含兩階段 FBD：
 >
 > - **Phase 1（模組層）**：coding 前畫，驗證模組劃分完整、資料流閉合、無循環依賴。
-> - **Phase 2（函式層）**：coding 後畫，標 `/xs` Skill runtime 的程序步驟與 `xs_lint.py`
+> - **Phase 2（函式層）**：coding 後畫，標共享 XS Skill runtime（Claude Code `/xs`、Codex `$xs`）的程序步驟與 `xs_lint.py`
 >   的 public function 真實簽名/型別/資料流，供未來上手者參考。
 >
 > 對應 SPEC：[SPEC.md](SPEC.md) 的 Project Structure / Features。
 
-**狀態（v0.2.0）：** `PostToolUse: Write|Edit → xs_lint.py` 的**自動 hook 已移除**（見 [CHANGELOG](../CHANGELOG.md) / [SPEC F4](SPEC.md)）——目標使用者端常無 `python`，每次存檔會跳 PostToolUse 錯誤。`scripts/xs_lint.py` 保留為獨立腳本（benchmark 幻覺掃描 + 手動檢查）。下方圖中的 Hook 旁支/節點為**移除前的設計記錄**，保留供歷史對照；現況 runtime 僅 `/xs` Skill 一條路徑自動生效。
+**狀態（v0.3.0）：** `skills/xs/` 是唯一 runtime 知識來源，Claude Code 以 `/xs`、Codex 以 `$xs` 使用；兩端也可依 skill description 自動載入。`PostToolUse: Write|Edit → xs_lint.py` 的**自動 hook 已於 v0.2.0 移除**（見 [CHANGELOG](../CHANGELOG.md) / [SPEC F4](SPEC.md)）。`scripts/xs_lint.py` 保留為 benchmark 與手動檢查工具；下方 Hook 旁支/節點只保留為移除前的歷史設計記錄。
+
+## 雙平台封裝與安裝
+
+```text
+xs_helper/
+├── .claude-plugin/              # Claude Code manifest + marketplace
+├── .codex-plugin/plugin.json    # Codex 原生 manifest
+├── .agents/plugins/marketplace.json
+└── skills/xs/                   # 兩端共用的唯一 skill/reference
+```
+
+Claude Code：
+
+```text
+/plugin marketplace add Benjamin-Teng/xs_helper
+/plugin install xs-helper@xs-tools
+/reload-plugins
+```
+
+安裝後以 `/xs <需求>` 明確觸發。
+
+Codex：
+
+```shell
+codex plugin marketplace add Benjamin-Teng/xs_helper
+codex plugin add xs-helper@xs-tools
+```
+
+安裝後開新對話，以 `$xs <需求>` 明確觸發。兩種封裝都只指向根目錄的 `skills/`，不複製 reference。
 
 ## 四來源的角色分層（探勘＋線上實證）
 
@@ -63,11 +92,11 @@ flowchart TD
             TYPES["script-types.md<br/>5 類 {@type:} 結構/邊界"]
             EX["examples/*.md<br/>每類型 1 份(標出處)"]
         end
-        SKILL["SKILL.md<br/>/xs 入口：判類型→載 ref→生成/解說→fallback 指示"]
-        HOOK["hooks.json + scripts/xs_lint.py<br/>PostToolUse:Write|Edit → .xs 啟發式驗證"]
+        SKILL["SKILL.md<br/>/xs 或 $xs：判類型→載 ref→生成/解說→fallback 指示"]
+        HOOK["[歷史] hooks.json + scripts/xs_lint.py<br/>PostToolUse:Write|Edit → .xs 啟發式驗證"]
     end
 
-    USER(["使用者 /xs &lt;需求&gt;"])
+    USER(["使用者 /xs 或 $xs &lt;需求&gt;"])
     XSFILE(["被編輯的 *.xs 檔"])
 
     %% ===== 蒸餾資料流（實線：傳什麼）=====
@@ -85,7 +114,7 @@ flowchart TD
 
     %% ===== runtime 載入（實線）/ fallback（虛線）=====
     REF -->|"markdown 依需求載入"| SKILL
-    XSHELP -.->|"WebFetch 冷門查詢(runtime)"| SKILL
+    XSHELP -.->|"可用網頁工具：冷門查詢(runtime)"| SKILL
     USER -->|"自然語言需求/提問"| SKILL
     SKILL -->|"XS 程式碼 / 規範解說"| USER
 
@@ -124,17 +153,17 @@ flowchart TD
 
 ## Phase 2 — 函式層資料流
 
-runtime 有兩條互不耦合的路徑：**`/xs` Skill**（SKILL.md 的程序：判類型 → 選擇性載 reference → 產出）與 **`xs_lint.py`**（PostToolUse 觸發的純函式管線）。兩者共用知識來源 grammar 的事實（KNOWN_TOKENS 嵌自同一 grammar），但 runtime 不互相呼叫。節點 label 標真實簽名與型別，邊標傳遞的資料。
+目前只有一條自動載入路徑：共享 **XS Skill**（Claude Code `/xs`、Codex `$xs`；程序為判類型 → 選擇性載 reference → 產出）。圖中的 `xs_lint.py` PostToolUse 管線是 v0.2.0 移除前的歷史設計；獨立 lint 腳本仍可手動執行，且與 skill 不互相呼叫。節點 label 標真實簽名與型別，邊標傳遞的資料。
 
 ```mermaid
 flowchart TD
     %% ===== I/O 邊界 =====
-    USER(["使用者 /xs &lt;需求 / 提問&gt;"])
+    USER(["使用者 /xs 或 $xs &lt;需求 / 提問&gt;"])
     XSFILE(["*.xs 檔被 Write / Edit"])
     HOOKCFG["hooks.json<br/>PostToolUse: Write / Edit<br/>→ python xs_lint.py"]
 
-    %% ===== /xs Skill runtime（SKILL.md 程序）=====
-    subgraph SKILLRT["📦 /xs Skill runtime（SKILL.md）"]
+    %% ===== 共享 XS Skill runtime（SKILL.md 程序）=====
+    subgraph SKILLRT["📦 XS Skill runtime（/xs 或 $xs）"]
         S1["① 判定腳本類型<br/>autotrade / function / indicator / filter / sensor<br/>★ 不明確→反問；選股再問市場"]
         S2["② 選擇性載入 reference<br/>★ 只讀需要的檔，不一次全載"]
         S3["③ 產出<br/>腳本生成(帶 {@type:}) 或 規範問答(簽名+範例)"]
@@ -180,7 +209,7 @@ flowchart TD
     EX -->|"markdown 知識"| S2
     S2 -->|"已載入的 reference 上下文"| S3
     S3 -->|"XS 程式碼 / 規範解說"| USER
-    XSHELP -.->|"WebFetch 冷門 token(標線上結果)"| S3
+    XSHELP -.->|"可用網頁工具：冷門 token(標線上結果)"| S3
 
     %% ----- xs_lint 資料流（實線：傳什麼 / 虛線：事件）-----
     XSFILE -.->|"觸發 PostToolUse 事件"| HOOKCFG
@@ -235,5 +264,5 @@ flowchart TD
 - **校正 1**：知識來源是**分層互補**不是一對一。
 - **校正 2**：xshelp 不只 runtime fallback，**蒸餾期就是主幹**（抓名單、123+ bif 簽名、三類欄位定義）→ build-time 也依賴網路（一次性）。
 - **校正 3（本次新增）**：grammar 是 **2023 快照、已落後**（xshelp 一般函數清單含多個 grammar 沒有的函數如 `CallFunction`/`GetInfo`/`IsLastBar`/`PlotFill`/`SetAlign`）。故 **xshelp 升為名單權威，grammar 降為 Hook 離線 token 清單**（過時可容忍：寧放行不誤殺）。
-- 線上實測已通過：導覽目錄、清單頁（`TBASIC` 資料欄位/基本、`GENERALFUNC`）、細節頁（`CurrentBar` 簽名+範例）皆可 WebFetch。
+- 線上實測已通過：導覽目錄、清單頁（`TBASIC` 資料欄位/基本、`GENERALFUNC`）、細節頁（`CurrentBar` 簽名+範例）皆可由網頁工具取得。
 - 無新增模組需求；模組劃分維持 SPEC 不變。

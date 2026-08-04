@@ -4,50 +4,51 @@
 
 | 欄位 | 內容 |
 |------|------|
-| 版本 | v1.1 |
-| 基於 | v1（首次定義） |
+| 版本 | v1.2 |
+| 基於 | v1.1 |
 | 建立日期 | 2026-05-30 |
-| 修改日期 | 2026-05-30 |
-| 動機 | v1 首次定義：一個 Claude Code plugin，讓 Claude 能依 XQ全球贏家的 XScript（XS）語言規範，協助使用者撰寫自動化腳本、回答 XS 用法問題。v1.1（實作 session）：收斂全部 Open Questions、折入來源探勘校正、建立 plugin 骨架，詳見文末「實作進度（Session 交接）」。 |
-| 前提 | Claude 模型本身不具備 XS 知識；XS 為 XQ 專屬 DSL，無公開編譯器 / LSP，知識來源為三個官方 GitHub 範例庫＋官方說明站 |
+| 修改日期 | 2026-08-04 |
+| 動機 | v1 首次定義 Claude Code plugin；v1.1 收斂 reference 與 Claude 封裝；v1.2 新增 Codex 原生 manifest、marketplace、skill metadata 與完整雙平台文件，兩端共用同一份 XS knowledge base。 |
+| 前提 | 通用模型本身不具備完整 XS 知識；XS 為 XQ 專屬 DSL，無公開編譯器 / LSP，知識來源為三個官方 GitHub 範例庫＋官方說明站 |
 
 ---
 
 ### Overview
 
-`xs_helper` 是一個 **Claude Code plugin**。使用者在 Claude Code 輸入 `/xs`，即進入「XS 專家模式」：Claude 會依據 XQ全球贏家自行開發的 **XScript（XS）** 語言規範，協助使用者
+`xs_helper` 是一個同時支援 **Claude Code 與 Codex** 的 plugin。使用者在 Claude Code 輸入 `/xs`，或在 Codex 使用 `$xs`，即可載入「XS 專家模式」：AI agent 會依據 XQ全球贏家自行開發的 **XScript（XS）** 語言規範，協助使用者
 
 1. 撰寫 / 修改 XS 自動化腳本（自動交易、選股、指標、警示、函數五大類型其一）；
 2. 回答「某個 XS 函數 / 欄位 / 關鍵字怎麼用」這類規範性問題。
 
-核心難點：Claude 原生不認識 XS（小眾、繁中、券商專屬 DSL）。因此本 plugin 的本質是**把 XS 的語法、內建函數、欄位、各腳本類型慣例，以蒸餾後的 reference 形式內建進 skill**，讓 Claude 在被呼叫時載入正確知識後再作答，避免幻覺出不存在的函數。
+核心難點：通用模型原生不熟悉 XS（小眾、繁中、券商專屬 DSL）。因此本 plugin 的本質是**把 XS 的語法、內建函數、欄位、各腳本類型慣例，以蒸餾後的 reference 形式內建進 skill**，讓 Claude Code 與 Codex 載入相同的正確知識後再作答，避免幻覺出不存在的函數。
 
-**使用對象**：使用 XQ全球贏家、需要撰寫 / 維護 XS 腳本，且在 Claude Code 環境工作的量化 / 程式交易使用者（即本專案作者本人為首要使用者）。
+**使用對象**：使用 XQ全球贏家、需要撰寫 / 維護 XS 腳本，且在 Claude Code 或 Codex 環境工作的量化 / 程式交易使用者。
 
 ---
 
 ### Goals
 
-- **G1（不幻覺）**：`/xs` 產生或引用的 XS 函數 / 欄位 / 關鍵字，**100% 存在於內建 reference 清單**，不得編造。
+- **G1（不幻覺）**：XS Skill 產生或引用的 XS 函數 / 欄位 / 關鍵字，**100% 存在於內建 reference 清單或經官方站查證**，不得編造。
 - **G2（類型正確）**：產出的腳本符合「使用者指定腳本類型」的結構與可用函數限制（例：選股腳本不得用自動交易專屬的下單函數）。
-- **G3（規範問答）**：使用者問「XX 函數怎麼用」時，Claude 能依官方定義回答簽名、參數、回傳與一個可用範例。
-- **G4（低摩擦）**：使用者只需 `/xs` 一個入口，不需要記得貼語法手冊；冷門查詢由 plugin 自動 fallback 到官方文件。
-- **G5（可驗證）**：編輯 `.xs` 檔時，hook 能對未知函數 / 明顯語法問題提出警示。
+- **G3（規範問答）**：使用者問「XX 函數怎麼用」時，AI agent 能依官方定義回答簽名、參數、回傳與一個可用範例。
+- **G4（低摩擦）**：Claude Code 以 `/xs`、Codex 以 `$xs` 明確觸發，也能由 description 自動觸發；使用者不需要重貼語法手冊。
+- **G5（可驗證）**：雙平台 manifest、marketplace、skill metadata 與文件由 stdlib 測試及 Codex validator 驗證；`xs_lint.py` 維持可手動執行。
 
 ---
 
 ### Features
 
-#### F1. `/xs` Skill — XS 專家模式（核心）
+#### F1. XS Skill — XS 專家模式（核心）
 
-- 使用者輸入 `/xs <自然語言需求>`，Claude：
+- 使用者輸入 Claude Code `/xs <自然語言需求>`、Codex `$xs <自然語言需求>`，或提出可自動匹配的 XS 請求後，AI agent：
   1. 判定使用者要的**腳本類型**（自動交易 / 函數 / 指標 / 選股 / 警示），不明確時反問；
   2. 載入對應的 reference（語法 + 該類型可用函數 + 範例）；
   3. 產出 XS 程式碼，或回答規範問題。
 - **行為契約**：使用者做 A（描述需求或提問）→ 系統做 B（載入 reference、依規範生成 / 解說）→ 結果 C（一段可貼回 XQ Script Editor 的 XS 程式碼，或一段帶官方定義與範例的解說）。
-- **啟動路徑（雙路徑）**：
-  1. **手動**：使用者輸入 `/xs`，確定性觸發。
-  2. **自動**：Claude 依 SKILL.md 的 `description` 作**語意判斷**自行載入——非字面 keyword 比對。因此 `description` 必須明確列出觸發詞（`XS / XScript / XQ / 全球贏家 / .xs / 選股條件 / 自動交易腳本…`），這是自動觸發命中率的關鍵，也是整個 skill 最重要的一行。
+- **啟動路徑**：
+  1. **Claude Code 手動**：使用者輸入 `/xs`。
+  2. **Codex 手動**：使用者輸入 `$xs`。
+  3. **自動**：兩端依 SKILL.md 的 `description` 作**語意判斷**自行載入——非字面 keyword 比對。因此 `description` 必須明確列出觸發詞（`XS / XScript / XQ / 全球贏家 / .xs / 選股條件 / 自動交易腳本…`）。
   - 注意：自動觸發為**機率性**，description 寫好命中率高但非 100% 保證；若需「保證觸發」須改用 Hook（見 Open Q2 路線 B）。
 
 #### F2. 內建 XS Reference（knowledge base）
@@ -63,7 +64,7 @@
 
 #### F3. 官方文件 Fallback
 
-當需求涉及 reference 未涵蓋的冷門函數 / 欄位，SKILL.md 指示 Claude 以 WebFetch 查詢 `https://xshelp.xq.com.tw/XSHelp/` 對應子頁，再作答；查得後在回覆中標明「此為線上查詢結果」。
+當需求涉及 reference 未涵蓋的冷門函數 / 欄位，SKILL.md 指示 AI agent 使用目前環境可用的網頁查詢或瀏覽工具查詢 `https://xshelp.xq.com.tw/XSHelp/` 對應子頁，再作答；查得後在回覆中標明「此為線上查詢結果」。
 
 #### F4. `.xs` 編輯驗證 Hook（已於 v0.2.0 移除）
 
@@ -81,16 +82,16 @@
 
 | 欄位 | 型別 | 必填 | 備註 |
 |------|------|------|------|
-| `/xs` 後的自然語言需求 | string | 是 | 撰寫需求或規範問題 |
-| 腳本類型 | enum(自動交易/函數/指標/選股/警示) | 否 | 未提供時由 Claude 推斷或反問 |
+| `/xs` 或 `$xs` 後的自然語言需求 | string | 是 | 撰寫需求或規範問題 |
+| 腳本類型 | enum(自動交易/函數/指標/選股/警示) | 否 | 未提供時由 AI agent 推斷或反問 |
 | 目標市場（選股情境） | enum(台股/陸股/港股/美股) | 否 | 影響可用選股欄位與範例選取 |
-| 被編輯的 `.xs` 檔（Hook 觸發） | file path | — | 由 PostToolUse 事件提供，非使用者手動輸入 |
+| 待檢查的 `.xs` 檔 | file path | 否 | 僅供手動執行 `scripts/xs_lint.py`；不再由 Hook 自動觸發 |
 
 #### Output
 
 - **腳本生成**：一段 XS 程式碼（可直接貼回 XQ Script Editor），附簡短說明使用了哪些函數 / 欄位。
 - **規範問答**：函數 / 欄位的官方定義（簽名、參數、回傳）＋ 一個最小可用範例。
-- **Hook 警示**：在 PostToolUse 後輸出警示文字，列出未知 token / 結構疑點；無問題則靜默。
+- **手動 lint 警示**：獨立執行 `xs_lint.py` 時列出未知 token / 結構疑點；plugin 不自動掛載 Hook。
 - **錯誤狀態**：需求類型無法判定 → 反問；查詢的函數連官方文件都查無 → 明確告知「查無此函數，可能為版本差異或拼寫」，不杜撰。
 
 ---
@@ -105,7 +106,7 @@
 - **超出三個來源庫範圍的市場 / 功能**：來源未涵蓋者不臆測補完。
 - **XQ 平台帳號 / API 整合**：本 plugin 不連 XQ 帳號、不下單、不取即時報價。
 
-> **AI Agentic Dev 注意：** 以上為 Claude 的硬邊界。凡未列在 Features 且落在此節者，即使看似合理也不得自行實作。
+> **AI Agentic Dev 注意：** 以上為兩端共用 skill 的硬邊界。凡未列在 Features 且落在此節者，即使看似合理也不得自行實作。
 
 ---
 
@@ -113,13 +114,13 @@
 
 | 層級 | 選擇 | 備註 |
 |------|------|------|
-| Plugin 形態 | Claude Code 官方 plugin | manifest 在 `.claude-plugin/plugin.json` |
-| 知識交付 | 內建 markdown reference ＋ WebFetch fallback（混合制） | 核心架構；非 RAG、非外部 DB |
+| Plugin 形態 | Claude Code + Codex 雙原生封裝 | manifest 在 `.claude-plugin/plugin.json` 與 `.codex-plugin/plugin.json` |
+| 知識交付 | 內建 markdown reference ＋可用網頁工具 fallback（混合制） | 核心架構；非 RAG、非外部 DB |
 | Skill 內容 | 純 markdown（SKILL.md + reference/*.md） | 無 runtime 相依 |
-| Hook 腳本 | Python 3 stdlib（零第三方相依）**（待確認，見 Open Q4）** | 以 `${CLAUDE_PLUGIN_ROOT}` 定位；跨平台 |
+| Lint 腳本 | Python 3 stdlib（零第三方相依） | 獨立手動工具；不由 Claude Code 或 Codex plugin 自動掛載 |
 | Reference 來源 | XScript_Preset / XQStrategy / vscode-xs / xshelp 官方站 | 實作階段 clone 到 `sources/` 後蒸餾 |
 | Docker | **否** | plugin 為 markdown + 輕量腳本，無容器化需求（已依規則評估） |
-| 散佈方式 | local plugin / skills-dir（自用過渡）→ **`marketplace.json`（確定要做，本版完成後製作）** | 未來確定散佈，見 Open Q6 |
+| 散佈方式 | Claude marketplace + Codex repo marketplace | marketplace 名稱皆為 `xs-tools`，共用 repository-root plugin |
 
 > **AI Agentic Dev 注意：** Tech Stack 在第一個檔案產生前定案；標「待確認」者須在實作 session 開頭先收斂，不得逕自選擇。
 
@@ -130,11 +131,18 @@
 ```text
 xs_helper/
 ├── .claude-plugin/
-│   └── plugin.json              # manifest（唯一放這層的檔）
+│   ├── plugin.json              # Claude Code manifest
+│   └── marketplace.json         # Claude Code marketplace
+├── .codex-plugin/
+│   └── plugin.json              # Codex 原生 manifest
+├── .agents/plugins/
+│   └── marketplace.json         # Codex repo marketplace
 ├── skills/
 │   └── xs/
-│       ├── SKILL.md             # /xs 入口：判類型、載 reference、生成/解說、fallback 指示
-│       └── reference/
+│       ├── SKILL.md             # 共用入口：判類型、載 reference、生成/解說、fallback 指示
+│       ├── agents/
+│       │   └── openai.yaml      # Codex UI metadata；$xs + implicit invocation
+│       └── reference/           # 兩端共用的唯一 knowledge base
 │           ├── language.md
 │           ├── builtin-functions.md
 │           ├── system-functions.md
@@ -146,10 +154,8 @@ xs_helper/
 │               ├── indicator.md    # 指標
 │               ├── screening.md    # 選股
 │               └── alert.md        # 警示
-├── hooks/
-│   └── hooks.json               # PostToolUse: Write|Edit → xs_lint
 ├── scripts/
-│   └── xs_lint.py               # .xs 啟發式驗證（對照已知 token 清單）
+│   └── xs_lint.py               # 獨立 .xs 啟發式驗證（不掛 hook）
 ├── sources/                     # 實作階段 clone 三個範例庫於此（蒸餾輸入，gitignore）
 ├── docs/
 │   └── SPEC.md                  # 本檔
@@ -158,7 +164,28 @@ xs_helper/
 └── LICENSE
 ```
 
-> **AI Agentic Dev 注意：** 元件目錄（skills/、hooks/、scripts/）一律放 plugin 根目錄，**不得**放進 `.claude-plugin/`，否則載入不到。
+> **AI Agentic Dev 注意：** `skills/` 與 `scripts/` 一律放 plugin 根目錄；兩份 manifest 都指向同一個 `skills/`，不得複製 reference 或放進 host-specific manifest 目錄。
+
+### 安裝與啟動
+
+Claude Code：
+
+```text
+/plugin marketplace add Benjamin-Teng/xs_helper
+/plugin install xs-helper@xs-tools
+/reload-plugins
+```
+
+以 `/xs <需求>` 明確觸發。
+
+Codex：
+
+```shell
+codex plugin marketplace add Benjamin-Teng/xs_helper
+codex plugin add xs-helper@xs-tools
+```
+
+安裝後開新對話，以 `$xs <需求>` 明確觸發。兩端也能依 `description` 自動觸發。
 
 ---
 
@@ -173,11 +200,11 @@ xs_helper/
 
 ### Acceptance Criteria
 
-- **AC1**：安裝後輸入 `/xs`，skill 被觸發且 XS context 被載入（`/plugin validate` 通過、`plugin.json` 含必填 `name`）。
+- **AC1**：Claude Code 安裝後可用 `/xs`，Codex 安裝後可用 `$xs`；兩個 manifest 皆識別 `xs-helper@0.3.0` 並載入同一份 `skills/xs/`。
 - **AC2**：輸入「幫我寫一個『連續三天放量上漲』的台股選股條件」，產出的 XS 只使用 reference 中存在的選股欄位 / 函數，結構符合「選股」類型慣例。
 - **AC3**：輸入「`Average` 怎麼用？」能回出官方定義（參數、回傳）＋ 一個最小範例。
-- **AC4**：產出腳本中若出現 reference 未收錄之函數，Claude 必須走 F3 fallback 或明示不確定，**不得**直接杜撰（抽查 10 個生成案例，幻覺函數數 = 0）。
-- **AC5**：對一個含未知函數的 `.xs` 檔執行 Edit，Hook 輸出該未知函數的警示；對乾淨檔則靜默。
+- **AC4**：產出腳本中若出現 reference 未收錄之函數，AI agent 必須走 F3 fallback 或明示不確定，**不得**直接杜撰（抽查 10 個生成案例，幻覺函數數 = 0）。
+- **AC5**：stdlib 相容性測試驗證雙 manifest、雙 marketplace、Codex metadata、平台中立 fallback 與所有雙平台安裝文件；Codex plugin/skill validator 通過。
 - **AC6**：五種腳本類型各至少有一份可用範例存在於 `examples/`。
 
 ---
@@ -186,14 +213,14 @@ xs_helper/
 
 - **可維護性**：reference 為快照，須在 SKILL.md 標注蒸餾自哪個來源 commit / 文件版本，便於日後比對更新。
 - **離線可用**：核心問答與生成只依賴內建 reference，無網路時仍可運作；僅冷門 fallback 需網路。
-- **零重型相依**：Hook 腳本只用 Python stdlib，避免使用者端額外安裝。
-- **版本策略**：開發迭代期 `plugin.json` 的 `version` 留空（用 git commit SHA 當版本），穩定後再起 semver；一旦設了 `version` 就須每次改動進版，否則使用者收不到更新。**現況：已於 `v0.1.0` 起版**（`plugin.json` 為權威，marketplace entry 不重複設），自此每次對外改動須進版。
+- **零重型相依**：skill runtime 為 Markdown；獨立 lint 腳本只用 Python stdlib，終端使用者不需安裝 Python 才能載入 plugin。
+- **版本策略**：自 `v0.1.0` 起採 semver；對外變動同步更新兩份 `plugin.json`。**現況：v0.3.0**，marketplace entry 不重複設 version，以 manifest 為權威。
 
 ---
 
 ### Open Questions（✅ 全數收斂於 v1.1 實作 session）
 
-1. **知識交付機制** → ✅ **混合制**（內建 reference ＋ WebFetch fallback）。
+1. **知識交付機制** → ✅ **混合制**（內建 reference ＋環境可用的網頁工具 fallback）。
 2. **Hook 用途** → ✅ **路線 A only**（`PostToolUse` 掛 `Write|Edit` → `.xs` 啟發式驗證）。路線 B（`UserPromptSubmit` 確定性注入）留 v2 視體感再加。
 3. **Reference 建置方式** → ✅ **Claude 讀來源後人工蒸餾**（KISS）；自動 build 腳本 v2 再說。
 4. **Hook 腳本語言** → ✅ **Python 3 stdlib**（跨平台）。附帶前提：使用者端需 `python` 在 PATH。ruff/ty 不裝（僅單支 stdlib 腳本）。

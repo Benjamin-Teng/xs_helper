@@ -65,5 +65,35 @@ class TestCodexSkillMetadata(unittest.TestCase):
         self.assertIn("網頁", skill)
 
 
+class TestMarkdownDocumentation(unittest.TestCase):
+    DOCUMENTS = (
+        "README.md",
+        "CHANGELOG.md",
+        "docs/SPEC.md",
+        "docs/architecture.md",
+        "docs/superpowers/specs/2026-08-04-codex-plugin-compatibility-design.md",
+    )
+
+    def test_all_product_docs_cover_both_installation_paths(self) -> None:
+        required = (
+            "Claude Code",
+            "Codex",
+            "/plugin marketplace add Benjamin-Teng/xs_helper",
+            "/plugin install xs-helper@xs-tools",
+            "codex plugin marketplace add Benjamin-Teng/xs_helper",
+            "codex plugin add xs-helper@xs-tools",
+        )
+        for relative_path in self.DOCUMENTS:
+            with self.subTest(path=relative_path):
+                text = (ROOT / relative_path).read_text(encoding="utf-8")
+                for expected in required:
+                    self.assertIn(expected, text)
+
+    def test_manual_invocation_is_host_specific(self) -> None:
+        readme = (ROOT / "README.md").read_text(encoding="utf-8")
+        self.assertIn("`/xs", readme)
+        self.assertIn("`$xs", readme)
+
+
 if __name__ == "__main__":
     unittest.main()
