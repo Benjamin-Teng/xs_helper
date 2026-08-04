@@ -66,12 +66,18 @@ class TestCodexSkillMetadata(unittest.TestCase):
 
 
 class TestMarkdownDocumentation(unittest.TestCase):
+    IDE_INSTALL_PROMPT = (
+        "$skill-installer 請從 "
+        "https://github.com/Benjamin-Teng/xs_helper/tree/main/skills/xs "
+        "安裝 xs skill"
+    )
     DOCUMENTS = (
         "README.md",
         "CHANGELOG.md",
         "docs/SPEC.md",
         "docs/architecture.md",
         "docs/superpowers/specs/2026-08-04-codex-plugin-compatibility-design.md",
+        "docs/superpowers/specs/2026-08-04-codex-conversation-install-design.md",
     )
 
     def test_all_product_docs_cover_both_installation_paths(self) -> None:
@@ -93,6 +99,20 @@ class TestMarkdownDocumentation(unittest.TestCase):
         readme = (ROOT / "README.md").read_text(encoding="utf-8")
         self.assertIn("`/xs", readme)
         self.assertIn("`$xs", readme)
+
+    def test_all_product_docs_cover_codex_ide_installation(self) -> None:
+        required = (
+            "VS Code",
+            "Codex IDE",
+            self.IDE_INSTALL_PROMPT,
+            "/plugins",
+            "不支援",
+        )
+        for relative_path in self.DOCUMENTS:
+            with self.subTest(path=relative_path):
+                text = (ROOT / relative_path).read_text(encoding="utf-8")
+                for expected in required:
+                    self.assertIn(expected, text)
 
 
 class TestPublishedPage(unittest.TestCase):
@@ -126,6 +146,19 @@ class TestPublishedPage(unittest.TestCase):
         self.assertIn("--claude:#d97757", self.html)
         self.assertIn('class="platform-install platform-claude"', self.html)
         self.assertIn(".platform-claude h3::before", self.html)
+
+    def test_codex_install_card_prioritizes_ide_chat(self) -> None:
+        required = (
+            "VS Code／Codex IDE（推薦）",
+            "$skill-installer 請從 https://github.com/Benjamin-Teng/"
+            "xs_helper/tree/main/skills/xs 安裝 xs skill",
+            "Codex CLI 對話介面",
+            "/plugins",
+            "終端機進階安裝",
+            "IDE extension 目前不支援完整 plugin",
+        )
+        for expected in required:
+            self.assertIn(expected, self.html)
 
 
 if __name__ == "__main__":

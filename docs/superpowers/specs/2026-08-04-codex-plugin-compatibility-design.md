@@ -66,7 +66,9 @@ Every current product-facing or maintainer-facing documentation surface must des
 Use one shared installation matrix throughout the documentation:
 
 - Claude Code marketplace: `/plugin marketplace add Benjamin-Teng/xs_helper`, `/plugin install xs-helper@xs-tools`, then `/reload-plugins`; explicitly invoke with `/xs`.
-- Codex marketplace: `codex plugin marketplace add Benjamin-Teng/xs_helper`, then `codex plugin add xs-helper@xs-tools`; explicitly invoke with `$xs` and start a new conversation after installation when necessary.
+- VS Code／Codex IDE: the IDE extension does not support full plugins（`IDE extension 目前不支援完整 plugin`）. In the conversation, use `$skill-installer 請從 https://github.com/Benjamin-Teng/xs_helper/tree/main/skills/xs 安裝 xs skill`, then explicitly invoke with `$xs`. This is feature-equivalent while the plugin contains no MCP server, connector, or hook.
+- Codex CLI conversation: run `codex plugin marketplace add Benjamin-Teng/xs_helper` once, start `codex`, enter `/plugins`, and install `xs-helper` from `xs-tools`.
+- Codex terminal: `codex plugin marketplace add Benjamin-Teng/xs_helper`, then `codex plugin add xs-helper@xs-tools`; explicitly invoke with `$xs` and start a new conversation after installation when necessary.
 
 Apply that matrix to all current documentation surfaces:
 
@@ -89,7 +91,7 @@ Add a standard-library Python test module for packaging compatibility. It verifi
 4. `skills/xs/agents/openai.yaml` exists and supplies required interface metadata.
 5. `SKILL.md` retains valid frontmatter and no longer depends on the Claude-only `WebFetch` name.
 6. The existing XS lint test suite still passes.
-7. Each product-facing documentation file names both Claude Code and Codex and contains the appropriate installation commands.
+7. Each product-facing documentation file names Claude Code, VS Code／Codex IDE, and Codex CLI; it contains the conversational `$skill-installer` path, CLI `/plugins` path, and full plugin commands without claiming the IDE supports plugins.
 
 Run the repository tests, Codex plugin validation, Codex skill validation, HTML structural checks for the published page, and any locally available Claude plugin validation. If the Claude CLI validator is unavailable, the structural tests protect the unchanged Claude schema and the handoff states that limitation explicitly.
 
@@ -107,5 +109,5 @@ Run the repository tests, Codex plugin validation, Codex skill validation, HTML 
 - Codex recognizes the repository as a native plugin package and can expose the shared skill as `$xs`.
 - Implicit XS-related prompts remain eligible to activate the shared skill.
 - There is exactly one authoritative copy of the skill instructions and references.
-- README, the published GitHub Pages page, SPEC, architecture documentation, and changelog all cover Codex installation alongside Claude Code.
+- README, the published GitHub Pages page, SPEC, architecture documentation, and changelog all cover Claude Code installation plus the VS Code／Codex IDE skill path and Codex CLI plugin paths.
 - All automated packaging and lint tests pass.

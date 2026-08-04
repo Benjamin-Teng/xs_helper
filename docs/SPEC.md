@@ -178,14 +178,30 @@ Claude Code：
 
 以 `/xs <需求>` 明確觸發。
 
-Codex：
+Codex 依使用介面分流。**VS Code／Codex IDE（推薦）**在對話框輸入：
+
+```text
+$skill-installer 請從 https://github.com/Benjamin-Teng/xs_helper/tree/main/skills/xs 安裝 xs skill
+```
+
+IDE extension 目前不支援完整 plugin；由於本 plugin 現階段沒有 MCP、connector 或 hook，獨立安裝 `xs` skill 可取得目前全部功能。核准下載後開新對話；若 `$xs` 未出現，重新載入 VS Code。
+
+**Codex CLI 對話介面**先註冊 marketplace：
+
+```shell
+codex plugin marketplace add Benjamin-Teng/xs_helper
+```
+
+啟動 `codex` 後輸入 `/plugins`，從 `xs-tools` 安裝 `xs-helper`，再開始新 session。
+
+**終端機進階安裝**完整 plugin：
 
 ```shell
 codex plugin marketplace add Benjamin-Teng/xs_helper
 codex plugin add xs-helper@xs-tools
 ```
 
-安裝後開新對話，以 `$xs <需求>` 明確觸發。兩端也能依 `description` 自動觸發。
+安裝後開新對話，以 `$xs <需求>` 明確觸發。兩端也能依 `description` 自動觸發。完整 plugin 安裝適用於 Codex CLI 與支援 Plugins Directory 的桌面介面，不會把 plugin 安裝進 IDE extension。
 
 ---
 
@@ -200,11 +216,11 @@ codex plugin add xs-helper@xs-tools
 
 ### Acceptance Criteria
 
-- **AC1**：Claude Code 安裝後可用 `/xs`，Codex 安裝後可用 `$xs`；兩個 manifest 皆識別 `xs-helper@0.3.0` 並載入同一份 `skills/xs/`。
+- **AC1**：Claude Code 安裝後可用 `/xs`；VS Code／Codex IDE 可用 `$skill-installer` 從 `skills/xs` 安裝後以 `$xs` 使用；Codex CLI 可從 `/plugins` 或直接命令安裝完整 plugin。兩個 manifest 皆識別 `xs-helper@0.3.0` 並載入同一份 `skills/xs/`。
 - **AC2**：輸入「幫我寫一個『連續三天放量上漲』的台股選股條件」，產出的 XS 只使用 reference 中存在的選股欄位 / 函數，結構符合「選股」類型慣例。
 - **AC3**：輸入「`Average` 怎麼用？」能回出官方定義（參數、回傳）＋ 一個最小範例。
 - **AC4**：產出腳本中若出現 reference 未收錄之函數，AI agent 必須走 F3 fallback 或明示不確定，**不得**直接杜撰（抽查 10 個生成案例，幻覺函數數 = 0）。
-- **AC5**：stdlib 相容性測試驗證雙 manifest、雙 marketplace、Codex metadata、平台中立 fallback 與所有雙平台安裝文件；Codex plugin/skill validator 通過。
+- **AC5**：stdlib 相容性測試驗證雙 manifest、雙 marketplace、Codex metadata、平台中立 fallback，以及所有文件中的 IDE 對話式、CLI `/plugins` 與終端機安裝路徑；Codex plugin/skill validator 通過。
 - **AC6**：五種腳本類型各至少有一份可用範例存在於 `examples/`。
 
 ---

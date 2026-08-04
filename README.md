@@ -48,14 +48,36 @@ XS 是 XQ全球贏家專屬、繁體中文、小眾的 DSL，沒有公開的編�
 
 ### Codex
 
-在終端機執行：
+#### VS Code／Codex IDE（推薦）
+
+Codex IDE extension 目前不支援完整 plugin，但支援獨立 skill。`xs-helper` 現階段沒有 MCP、connector 或 hook，因此用這條路可取得目前全部功能。在 Codex 對話框貼上：
+
+```text
+$skill-installer 請從 https://github.com/Benjamin-Teng/xs_helper/tree/main/skills/xs 安裝 xs skill
+```
+
+同意下載後開啟新對話，以 `$xs Average 怎麼用？` 驗證；若 `$xs` 未出現，重新載入 VS Code。
+
+#### Codex CLI 對話介面
+
+先在終端機註冊一次 marketplace：
+
+```shell
+codex plugin marketplace add Benjamin-Teng/xs_helper
+```
+
+接著啟動 `codex`，在對話介面輸入 `/plugins`，切換到 `xs-tools` marketplace、開啟 `xs-helper` 並選擇安裝。安裝後開始新 session。
+
+#### 終端機進階安裝
+
+若偏好完全使用命令列，執行：
 
 ```shell
 codex plugin marketplace add Benjamin-Teng/xs_helper
 codex plugin add xs-helper@xs-tools
 ```
 
-安裝後開啟新的 Codex 對話，輸入 `$xs <需求>` 明確觸發。Codex CLI 或 IDE 也可先輸入 `/skills` 查看已載入的 skill。
+安裝後開啟新的 Codex session，輸入 `$xs <需求>` 明確觸發。完整 plugin 流程適用於 Codex CLI 與支援 Plugins Directory 的桌面介面，不會把 plugin 安裝進 VS Code IDE extension。
 
 ### 使用方式（兩條路徑）
 

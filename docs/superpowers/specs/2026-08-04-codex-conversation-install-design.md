@@ -16,6 +16,14 @@
 
 ## 安裝入口
 
+Claude Code 的既有完整 plugin 安裝保持不變：
+
+```text
+/plugin marketplace add Benjamin-Teng/xs_helper
+/plugin install xs-helper@xs-tools
+/reload-plugins
+```
+
 ### 1. VS Code／Codex IDE（推薦）
 
 文件首先呈現可直接貼入 Codex 對話框的提示：

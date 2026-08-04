@@ -17,7 +17,7 @@ xs_helper/
 ├── .claude-plugin/              # Claude Code manifest + marketplace
 ├── .codex-plugin/plugin.json    # Codex 原生 manifest
 ├── .agents/plugins/marketplace.json
-└── skills/xs/                   # 兩端共用的唯一 skill/reference
+└── skills/xs/                   # plugin 共用來源，也是 Codex IDE 可獨立安裝的 skill
 ```
 
 Claude Code：
@@ -30,14 +30,36 @@ Claude Code：
 
 安裝後以 `/xs <需求>` 明確觸發。
 
-Codex：
+Codex surface 支援：
+
+| 使用介面 | 安裝產物 | 入口 |
+| --- | --- | --- |
+| VS Code／Codex IDE（推薦） | 獨立 `xs` skill | 對話框 `$skill-installer` |
+| Codex CLI 對話介面 | 完整 plugin | 註冊 marketplace 後輸入 `/plugins` |
+| 支援 Plugins Directory 的桌面介面 | 完整 plugin | Plugins Directory |
+
+IDE extension 目前不支援完整 plugin，但 `xs-helper` 現階段沒有 MCP、connector 或 hook，因此獨立 skill 可取得目前全部功能。在 VS Code／Codex IDE 對話框輸入：
+
+```text
+$skill-installer 請從 https://github.com/Benjamin-Teng/xs_helper/tree/main/skills/xs 安裝 xs skill
+```
+
+核准下載後開新對話；若 `$xs` 未出現，重新載入 VS Code。
+
+Codex CLI 對話介面先註冊 marketplace：
+
+```shell
+codex plugin marketplace add Benjamin-Teng/xs_helper
+```
+
+再啟動 `codex`、輸入 `/plugins`，從 `xs-tools` 安裝 `xs-helper`。終端機進階安裝可直接執行：
 
 ```shell
 codex plugin marketplace add Benjamin-Teng/xs_helper
 codex plugin add xs-helper@xs-tools
 ```
 
-安裝後開新對話，以 `$xs <需求>` 明確觸發。兩種封裝都只指向根目錄的 `skills/`，不複製 reference。
+安裝後開新 session，以 `$xs <需求>` 明確觸發。兩種封裝與 IDE 獨立安裝都使用根目錄的 `skills/xs/`，不複製 reference。
 
 ## 四來源的角色分層（探勘＋線上實證）
 

@@ -247,6 +247,17 @@
   .platform-claude h3::before{background:var(--claude);box-shadow:0 0 14px rgba(217,119,87,.65)}
   .platform-claude .step h4{color:var(--claude)}
   .platform-claude .copy:hover{background:var(--claude);border-color:var(--claude)}
+  .codex-route{margin-top:18px;padding-top:18px;border-top:1px solid var(--border)}
+  .codex-route:first-of-type{border-top:0}
+  .codex-route--recommended{padding:16px;border:1px solid rgba(63,208,224,.35);border-radius:10px;
+    background:linear-gradient(135deg,rgba(63,208,224,.10),rgba(7,10,15,.34) 58%)}
+  .codex-route--recommended+.codex-route{margin-top:14px}
+  .codex-route h4{margin:0 0 7px;color:var(--accent);font-family:var(--mono);font-size:.96rem}
+  .codex-route p{margin:0 0 9px;color:var(--muted);font-size:.9rem}
+  .route-kicker{display:inline-block;margin-bottom:7px;padding:2px 8px;border-radius:20px;
+    background:rgba(63,208,224,.12);color:var(--accent);font-family:var(--mono);font-size:.68rem;
+    font-weight:600;letter-spacing:.08em}
+  .cmd--wrap pre{white-space:pre-wrap;overflow-wrap:anywhere}
   .modal-close{position:absolute;top:14px;right:18px;background:none;border:none;color:var(--muted);
     font-size:1.8rem;line-height:1;cursor:pointer}
   .modal-close:hover{color:var(--text)}
@@ -294,6 +305,7 @@
     ul.notes li{font-size:.88rem}
     .modal{padding:4vh 12px}
     .modal-card{padding:26px 18px}
+    .platform-install{padding:16px}
     .modal-card pre{padding-right:62px;font-size:.8rem;white-space:pre-wrap;overflow-wrap:anywhere}
     .copy{font-size:.72rem;padding:5px 9px}
   }
@@ -507,19 +519,40 @@ if inSP500 and roe&gt;15 and pe&gt;0
 
     <section class="platform-install" aria-labelledby="install-codex">
       <h3 id="install-codex">Codex 安裝</h3>
-      <p>在終端機依序執行兩個指令，安裝後開啟新的 Codex 對話。</p>
-      <div class="step">
-        <h4>① 加入 marketplace</h4>
-        <div class="cmd"><pre>codex plugin marketplace add Benjamin-Teng/xs_helper</pre><button class="copy" onclick="copyCmd(this)">複製</button></div>
+      <p>依你使用的 Codex 介面選擇安裝方式；VS Code 使用者可直接從對話框開始。</p>
+
+      <div class="codex-route codex-route--recommended">
+        <span class="route-kicker">直接貼到對話框</span>
+        <h4>VS Code／Codex IDE（推薦）</h4>
+        <p>IDE extension 目前不支援完整 plugin；但本專案目前只有 skill，沒有 MCP、connector 或 hook，因此功能相同。</p>
+        <div class="cmd cmd--wrap"><pre>$skill-installer 請從 https://github.com/Benjamin-Teng/xs_helper/tree/main/skills/xs 安裝 xs skill</pre><button class="copy" onclick="copyCmd(this)">複製</button></div>
+        <p style="margin-top:9px">同意下載後開新對話。若 <code class="inl">$xs</code> 沒出現，請重新載入 VS Code。</p>
       </div>
-      <div class="step">
-        <h4>② 安裝並驗證</h4>
-        <div class="cmd"><pre>codex plugin add xs-helper@xs-tools</pre><button class="copy" onclick="copyCmd(this)">複製</button></div>
-        <div class="cmd" style="margin-top:8px"><pre>$xs Average 怎麼用？</pre><button class="copy" onclick="copyCmd(this)">複製</button></div>
+
+      <div class="codex-route">
+        <h4>Codex CLI 對話介面</h4>
+        <p>自訂 marketplace 需先在終端機註冊一次：</p>
+        <div class="cmd"><pre>codex plugin marketplace add Benjamin-Teng/xs_helper</pre><button class="copy" onclick="copyCmd(this)">複製</button></div>
+        <p style="margin-top:9px">接著啟動 <code class="inl">codex</code>，在對話介面輸入：</p>
+        <div class="cmd"><pre>/plugins</pre><button class="copy" onclick="copyCmd(this)">複製</button></div>
+        <p style="margin-top:9px">切換到 <code class="inl">xs-tools</code>，開啟 <code class="inl">xs-helper</code> 並選擇安裝，再開始新 session。</p>
+      </div>
+
+      <div class="codex-route">
+        <h4>終端機進階安裝</h4>
+        <p>偏好完全使用命令列時，依序執行：</p>
+        <div class="cmd"><pre>codex plugin marketplace add Benjamin-Teng/xs_helper</pre><button class="copy" onclick="copyCmd(this)">複製</button></div>
+        <div class="cmd" style="margin-top:8px"><pre>codex plugin add xs-helper@xs-tools</pre><button class="copy" onclick="copyCmd(this)">複製</button></div>
+      </div>
+
+      <div class="codex-route">
+        <h4>驗證安裝</h4>
+        <p>上方 plugin 或 skill 安裝完成後，開啟新對話並輸入：</p>
+        <div class="cmd"><pre>$xs Average 怎麼用？</pre><button class="copy" onclick="copyCmd(this)">複製</button></div>
       </div>
     </section>
 
-    <div class="verdict" style="margin-top:16px">兩個平台都支援自動觸發：平常只要直接談 XS、選股條件或某個函數，plugin 也能自行載入 XS 知識。</div>
+    <div class="verdict" style="margin-top:16px">兩個平台都支援自動觸發：平常只要直接談 XS、選股條件或某個函數，skill 也能自行載入 XS 知識。</div>
   </div>
 </div>
 

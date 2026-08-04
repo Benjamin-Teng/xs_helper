@@ -10,6 +10,8 @@
 
 - **Codex 原生 plugin 支援**：新增 `.codex-plugin/plugin.json`、`.agents/plugins/marketplace.json` 與 `$xs` skill UI metadata；Claude Code 與 Codex 共用同一份 `skills/xs/`。
 - **Codex 安裝**：`codex plugin marketplace add Benjamin-Teng/xs_helper` → `codex plugin add xs-helper@xs-tools`。
+- **VS Code／Codex IDE 對話式安裝**：IDE extension 目前不支援完整 plugin；在對話框輸入 `$skill-installer 請從 https://github.com/Benjamin-Teng/xs_helper/tree/main/skills/xs 安裝 xs skill` 即可安裝目前功能等價的獨立 skill。
+- **Codex CLI 對話介面**：註冊 marketplace 後啟動 `codex`，輸入 `/plugins` 並從 `xs-tools` 安裝 `xs-helper`。
 
 ### Changed
 
