@@ -61,12 +61,23 @@ The XS safety boundaries remain unchanged: do not invent tokens, do not execute 
 
 ## Documentation
 
-Update `README.md` so the project is described as a Claude Code and Codex plugin. Keep separate installation subsections:
+Every current product-facing or maintainer-facing documentation surface must describe both supported hosts and show how to install the plugin. The XS reference files under `skills/xs/reference/` are runtime knowledge rather than product documentation and remain unchanged.
 
-- Claude Code: preserve the current marketplace commands and `/xs` behavior.
-- Codex: document adding the repository marketplace, installing the plugin through supported Codex surfaces, explicit `$xs` invocation, and implicit activation.
+Use one shared installation matrix throughout the documentation:
 
-Update project status and compatibility wording where it would otherwise claim Claude-only support. Record the `0.3.0` change in `CHANGELOG.md`. Historical sections in `docs/SPEC.md` remain historical; only current overview, target-user, structure, acceptance, and platform descriptions are updated where necessary.
+- Claude Code marketplace: `/plugin marketplace add Benjamin-Teng/xs_helper`, `/plugin install xs-helper@xs-tools`, then `/reload-plugins`; explicitly invoke with `/xs`.
+- Codex marketplace: `codex plugin marketplace add Benjamin-Teng/xs_helper`, then `codex plugin add xs-helper@xs-tools`; explicitly invoke with `$xs` and start a new conversation after installation when necessary.
+
+Apply that matrix to all current documentation surfaces:
+
+- `README.md`: describe the project as a Claude Code and Codex plugin and provide separate, complete installation and usage subsections.
+- `docs/index.html`: update the published GitHub Pages title, social metadata, hero, footer, and installation modal for dual-host support. The installation modal presents separate Claude Code and Codex paths instead of mixing their commands.
+- `docs/SPEC.md`: advance the maintained spec to v1.2, update current goals, structure, runtime wording, acceptance criteria, and add a dual-host installation section. Preserve explicitly historical implementation records as historical facts.
+- `docs/architecture.md`: add the dual-manifest/package discovery path and a concise installation section for both hosts; replace current runtime labels that incorrectly imply Claude-only tooling.
+- `CHANGELOG.md`: add the `0.3.0` release entry, including both installation command paths and the Codex packaging files introduced by the release.
+- This design document: retain the canonical command matrix above so future documentation changes have one reviewable source.
+
+Benchmark facts in `docs/index.html` remain labeled with the Claude model and harness actually used. Platform compatibility copy must not rewrite historical benchmark provenance as though Codex had been evaluated.
 
 ## Validation
 
@@ -78,8 +89,9 @@ Add a standard-library Python test module for packaging compatibility. It verifi
 4. `skills/xs/agents/openai.yaml` exists and supplies required interface metadata.
 5. `SKILL.md` retains valid frontmatter and no longer depends on the Claude-only `WebFetch` name.
 6. The existing XS lint test suite still passes.
+7. Each product-facing documentation file names both Claude Code and Codex and contains the appropriate installation commands.
 
-Run the repository tests, Codex plugin validation, Codex skill validation, and any locally available Claude plugin validation. If the Claude CLI validator is unavailable, the structural tests protect the unchanged Claude schema and the handoff states that limitation explicitly.
+Run the repository tests, Codex plugin validation, Codex skill validation, HTML structural checks for the published page, and any locally available Claude plugin validation. If the Claude CLI validator is unavailable, the structural tests protect the unchanged Claude schema and the handoff states that limitation explicitly.
 
 ## Error Handling and Compatibility
 
@@ -95,4 +107,5 @@ Run the repository tests, Codex plugin validation, Codex skill validation, and a
 - Codex recognizes the repository as a native plugin package and can expose the shared skill as `$xs`.
 - Implicit XS-related prompts remain eligible to activate the shared skill.
 - There is exactly one authoritative copy of the skill instructions and references.
+- README, the published GitHub Pages page, SPEC, architecture documentation, and changelog all cover Codex installation alongside Claude Code.
 - All automated packaging and lint tests pass.
