@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>xs-helper — 與 Claude 一起輕鬆寫 XS</title>
-<meta name="description" content="XScript（XS）專屬撰寫 skill。8 個真實任務 benchmark：載 skill 通過率 100% vs baseline 75%，0 幻覺 token。">
+<title>xs-helper — Claude Code 與 Codex 的 XS 助手</title>
+<meta name="description" content="Claude Code 與 Codex 共用的 XScript（XS）專屬 skill。8 個真實任務 benchmark：載 skill 通過率 100% vs baseline 75%，0 幻覺 token。">
 
 <!-- Favicon -->
 <link rel="icon" href="/xs_helper/favicon.ico" sizes="any">
@@ -15,8 +15,8 @@
 
 <!-- Open Graph（LINE / FB / Slack 等預覽用） -->
 <meta property="og:type" content="website">
-<meta property="og:title" content="xs-helper — 與 Claude 一起輕鬆寫 XS">
-<meta property="og:description" content="XScript（XS）專屬撰寫 skill。8 個真實任務 benchmark：載 skill 通過率 100% vs baseline 75%，0 幻覺 token。">
+<meta property="og:title" content="xs-helper — Claude Code 與 Codex 的 XS 助手">
+<meta property="og:description" content="Claude Code 與 Codex 共用的 XScript（XS）專屬 skill。8 個真實任務 benchmark：載 skill 通過率 100% vs baseline 75%，0 幻覺 token。">
 <meta property="og:url" content="https://benjamin-teng.github.io/xs_helper/">
 <meta property="og:image" content="https://benjamin-teng.github.io/xs_helper/og-image.png">
 <meta property="og:image:type" content="image/png">
@@ -25,8 +25,8 @@
 
 <!-- Twitter（X / 部分平台會用到） -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="xs-helper — 與 Claude 一起輕鬆寫 XS">
-<meta name="twitter:description" content="XScript（XS）專屬撰寫 skill。載 skill 通過率 100% vs baseline 75%，0 幻覺 token。">
+<meta name="twitter:title" content="xs-helper — Claude Code 與 Codex 的 XS 助手">
+<meta name="twitter:description" content="Claude Code 與 Codex 共用的 XScript（XS）專屬 skill。載 skill 通過率 100% vs baseline 75%，0 幻覺 token。">
 <meta name="twitter:image" content="https://benjamin-teng.github.io/xs_helper/og-image.png">
 
 <!-- Fonts -->
@@ -41,7 +41,7 @@
     --border:#1f2937; --border-lit:#334458;
     --text:#e9eff7; --muted:#8a97a8; --faint:#586473;
     /* 訊號燈三色：青 chrome / 綠 skill / 琥珀 baseline */
-    --accent:#3fd0e0; --accent-deep:#1f93a6;
+    --accent:#3fd0e0; --accent-deep:#1f93a6; --claude:#d97757;
     --good:#46d17e; --good-bg:#0e2c1d; --bad:#ff6b62; --bad-bg:#321519;
     --skill:#46d17e; --base:#e0a430;
     --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Consolas,monospace;
@@ -231,9 +231,22 @@
   .modal.open{display:flex;animation:fade .2s ease}
   @keyframes fade{from{opacity:0}to{opacity:1}}
   .modal-card{background:linear-gradient(180deg,var(--panel),var(--bg-soft));border:1px solid var(--border-lit);
-    border-radius:16px;max-width:660px;width:100%;padding:30px 32px 32px;position:relative;animation:slideup .25s ease}
+    border-radius:16px;max-width:720px;width:100%;padding:30px 32px 32px;position:relative;animation:slideup .25s ease}
   @keyframes slideup{from{transform:translateY(18px);opacity:.5}to{transform:translateY(0);opacity:1}}
   .modal-card h2{margin:0;border:none;padding:0;font-size:1.5rem;font-family:var(--serif);font-weight:700}
+  .platform-install{counter-increment:none;margin-top:20px;padding:20px;border:1px solid var(--border);
+    border-radius:12px;background:rgba(7,10,15,.46)}
+  .platform-install+.platform-install{margin-top:14px}
+  .platform-install h3{display:flex;align-items:center;gap:9px;margin:0 0 5px;font-family:var(--mono);
+    font-size:1rem;color:var(--text)}
+  .platform-install h3::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--accent);
+    box-shadow:0 0 14px rgba(63,208,224,.65)}
+  .platform-install>p{margin:0;color:var(--muted);font-size:.9rem}
+  .platform-claude{border-color:rgba(217,119,87,.42);
+    background:linear-gradient(135deg,rgba(217,119,87,.12),rgba(7,10,15,.46) 55%)}
+  .platform-claude h3::before{background:var(--claude);box-shadow:0 0 14px rgba(217,119,87,.65)}
+  .platform-claude .step h4{color:var(--claude)}
+  .platform-claude .copy:hover{background:var(--claude);border-color:var(--claude)}
   .modal-close{position:absolute;top:14px;right:18px;background:none;border:none;color:var(--muted);
     font-size:1.8rem;line-height:1;cursor:pointer}
   .modal-close:hover{color:var(--text)}
@@ -281,7 +294,7 @@
     ul.notes li{font-size:.88rem}
     .modal{padding:4vh 12px}
     .modal-card{padding:26px 18px}
-    .modal-card pre{padding-right:62px;font-size:.8rem}
+    .modal-card pre{padding-right:62px;font-size:.8rem;white-space:pre-wrap;overflow-wrap:anywhere}
     .copy{font-size:.72rem;padding:5px 9px}
   }
 </style>
@@ -289,11 +302,11 @@
 <body>
 <header>
   <div class="tag">Claude Code Skill Benchmark</div>
-  <h1>xs-helper 與 Claude 一起輕鬆寫 XS</h1>
-  <div class="ver">目前最新版本 <b>v0.2.0</b></div>
+  <h1>xs-helper：Claude Code 與 Codex 的 XS 助手</h1>
+  <div class="ver">目前最新版本 <b>v0.3.0</b></div>
   <p class="lead">XScript（XS）是 XQ 全球贏家的券商專屬語言，繁中、小眾、無公開編譯器。
-  通用 LLM 對它一知半解、容易把別的語言的函數張冠李戴。本報告用 8 個真實任務，量化
-  <code class="inl">/xs</code> skill 帶來的差距。</p>
+  同一份 XS skill 可在 Claude Code 用 <code class="inl">/xs</code>、在 Codex 用 <code class="inl">$xs</code>。
+  下方以 Claude Opus 4.8 跑 8 個真實任務，量化載入 skill 帶來的差距。</p>
 </header>
 
 <div class="install-bar">
@@ -460,7 +473,7 @@ if inSP500 and roe&gt;15 and pe&gt;0
 </section>
 
 <footer>
-  <p><b>xs-helper</b> — 一個讓 Claude 依 XScript 規範協助撰寫自動交易 / 選股 / 指標 / 警示 / 函數腳本的 Claude Code skill。</p>
+  <p><b>xs-helper</b> — 讓 Claude Code 與 Codex 依 XScript 規範協助撰寫自動交易 / 選股 / 指標 / 警示 / 函數腳本的共享 skill。</p>
   <p class="meta">本報告由 skill-creator 評測流程產生 · 模型 Claude Opus 4.8 · 8 案例 / 38 assertion / 2 輪 ·
   <a href="https://github.com/Benjamin-Teng/xs_helper">GitHub: Benjamin-Teng/xs_helper</a></p>
   <p style="font-size:.78rem;opacity:.7">評測為單次取樣（每組 1 run），數字反映方向性差距而非統計顯著性；XS 腳本僅供撰寫參考，實際執行請於 XQ 平台驗證。</p>
@@ -472,30 +485,41 @@ if inSP500 and roe&gt;15 and pe&gt;0
   <div class="modal-card">
     <button class="modal-close" onclick="closeInstall()" aria-label="關閉">&times;</button>
     <h2>怎麼安裝</h2>
-    <p style="color:var(--muted);margin:8px 0 4px">不需 git clone。打開
-      <a href="https://www.claude.com/product/claude-code" style="color:var(--accent)">Claude Code</a>（裝好並登入後），
-      照三步「複製 → 貼上 → 按 Enter」即可。</p>
-    <div class="step">
-      <h4>① 加入來源（marketplace）</h4>
-      <p>告訴 Claude Code 去 GitHub 的 <code class="inl">Benjamin-Teng/xs_helper</code> 找這個 plugin：</p>
-      <div class="cmd"><pre>/plugin marketplace add Benjamin-Teng/xs_helper</pre><button class="copy" onclick="copyCmd(this)">複製</button></div>
-    </div>
-    <div class="step">
-      <h4>② 安裝 plugin</h4>
-      <p>貼上並按 Enter（若被問要不要信任 / 啟用，選同意）：</p>
-      <div class="cmd"><pre>/plugin install xs-helper@xs-tools</pre><button class="copy" onclick="copyCmd(this)">複製</button></div>
-    </div>
-    <div class="step">
-      <h4>③ 重新整理 plugin</h4>
-      <p>讓剛裝好的 plugin 立即生效（不必重開 Claude Code）：</p>
-      <div class="cmd"><pre>/reload-plugins</pre><button class="copy" onclick="copyCmd(this)">複製</button></div>
-    </div>
-    <div class="step">
-      <h4>④ 確認裝好了</h4>
-      <p>輸入下面這句，若 Claude 依 XS 規範回答 <code class="inl">Average</code> 用法即成功 🎉：</p>
-      <div class="cmd"><pre>/xs Average 怎麼用？</pre><button class="copy" onclick="copyCmd(this)">複製</button></div>
-      <div class="verdict" style="margin-top:12px">裝好後平常只要對話講到 XS / 選股 / 某函數怎麼用，Claude 會自動載入 XS 知識，不必每次打 <code class="inl">/xs</code>。</div>
-    </div>
+    <p style="color:var(--muted);margin:8px 0 4px">不需 git clone。選擇你使用的平台，依序複製指令即可。</p>
+
+    <section class="platform-install platform-claude" aria-labelledby="install-claude">
+      <h3 id="install-claude">Claude Code 安裝</h3>
+      <p>在 Claude Code 依序貼上三個指令；若被詢問是否信任或啟用，請確認同意。</p>
+      <div class="step">
+        <h4>① 加入 marketplace</h4>
+        <div class="cmd"><pre>/plugin marketplace add Benjamin-Teng/xs_helper</pre><button class="copy" onclick="copyCmd(this)">複製</button></div>
+      </div>
+      <div class="step">
+        <h4>② 安裝 plugin</h4>
+        <div class="cmd"><pre>/plugin install xs-helper@xs-tools</pre><button class="copy" onclick="copyCmd(this)">複製</button></div>
+      </div>
+      <div class="step">
+        <h4>③ 重新整理並驗證</h4>
+        <div class="cmd"><pre>/reload-plugins</pre><button class="copy" onclick="copyCmd(this)">複製</button></div>
+        <div class="cmd" style="margin-top:8px"><pre>/xs Average 怎麼用？</pre><button class="copy" onclick="copyCmd(this)">複製</button></div>
+      </div>
+    </section>
+
+    <section class="platform-install" aria-labelledby="install-codex">
+      <h3 id="install-codex">Codex 安裝</h3>
+      <p>在終端機依序執行兩個指令，安裝後開啟新的 Codex 對話。</p>
+      <div class="step">
+        <h4>① 加入 marketplace</h4>
+        <div class="cmd"><pre>codex plugin marketplace add Benjamin-Teng/xs_helper</pre><button class="copy" onclick="copyCmd(this)">複製</button></div>
+      </div>
+      <div class="step">
+        <h4>② 安裝並驗證</h4>
+        <div class="cmd"><pre>codex plugin add xs-helper@xs-tools</pre><button class="copy" onclick="copyCmd(this)">複製</button></div>
+        <div class="cmd" style="margin-top:8px"><pre>$xs Average 怎麼用？</pre><button class="copy" onclick="copyCmd(this)">複製</button></div>
+      </div>
+    </section>
+
+    <div class="verdict" style="margin-top:16px">兩個平台都支援自動觸發：平常只要直接談 XS、選股條件或某個函數，plugin 也能自行載入 XS 知識。</div>
   </div>
 </div>
 

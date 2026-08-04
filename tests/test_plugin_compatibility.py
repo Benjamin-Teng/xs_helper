@@ -95,5 +95,38 @@ class TestMarkdownDocumentation(unittest.TestCase):
         self.assertIn("`$xs", readme)
 
 
+class TestPublishedPage(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.html = (ROOT / "docs/index.html").read_text(encoding="utf-8")
+
+    def test_page_metadata_and_release_are_dual_host(self) -> None:
+        self.assertIn("Claude Code 與 Codex", self.html)
+        self.assertIn("v0.3.0", self.html)
+
+    def test_install_modal_contains_separate_host_commands(self) -> None:
+        required = (
+            "Claude Code 安裝",
+            "Codex 安裝",
+            "/plugin marketplace add Benjamin-Teng/xs_helper",
+            "/plugin install xs-helper@xs-tools",
+            "codex plugin marketplace add Benjamin-Teng/xs_helper",
+            "codex plugin add xs-helper@xs-tools",
+            "/xs Average 怎麼用？",
+            "$xs Average 怎麼用？",
+        )
+        for expected in required:
+            self.assertIn(expected, self.html)
+
+    def test_benchmark_provenance_remains_claude_opus(self) -> None:
+        self.assertIn("Claude Opus 4.8", self.html)
+        self.assertIn("Claude Code Skill Benchmark", self.html)
+
+    def test_claude_install_card_uses_orange_platform_theme(self) -> None:
+        self.assertIn("--claude:#d97757", self.html)
+        self.assertIn('class="platform-install platform-claude"', self.html)
+        self.assertIn(".platform-claude h3::before", self.html)
+
+
 if __name__ == "__main__":
     unittest.main()
