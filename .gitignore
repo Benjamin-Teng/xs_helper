@@ -5,6 +5,9 @@
 # Claude Code
 .claude/
 
+# Local git worktrees
+.worktrees/
+
 # uv
 .python-version
 .venv/
