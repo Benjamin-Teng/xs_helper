@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import re
 import unittest
+from html.parser import HTMLParser
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -10,6 +11,64 @@ ROOT = Path(__file__).resolve().parent.parent
 
 def load_json(relative_path: str) -> dict:
     return json.loads((ROOT / relative_path).read_text(encoding="utf-8"))
+
+
+class _InstallCardParser(HTMLParser):
+    """Collect every `section.platform-install` card: heading, text, and (pre, copy-onclick) pairs."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.cards: list[dict] = []
+        self._card: dict | None = None
+        self._depth = 0
+        self._in_heading = False
+        self._in_pre = False
+        self._pending_pre: str | None = None
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        a = dict(attrs)
+        if tag == "section" and "platform-install" in (a.get("class") or ""):
+            self._card = {"labelledby": a.get("aria-labelledby"), "heading": "", "text": "", "commands": []}
+            self._depth = 0
+        if self._card is None:
+            return
+        self._depth += 1
+        if tag == "h3" and a.get("id") == self._card["labelledby"]:
+            self._in_heading = True
+        elif tag == "pre":
+            self._in_pre = True
+            self._pending_pre = ""
+        elif tag == "button" and self._pending_pre is not None:
+            if "copy" in (a.get("class") or ""):
+                self._card["commands"].append((self._pending_pre, a.get("onclick")))
+            self._pending_pre = None
+
+    def handle_endtag(self, tag: str) -> None:
+        if self._card is None:
+            return
+        if tag == "h3":
+            self._in_heading = False
+        elif tag == "pre":
+            self._in_pre = False
+        self._depth -= 1
+        if self._depth <= 0:
+            self.cards.append(self._card)
+            self._card = None
+
+    def handle_data(self, data: str) -> None:
+        if self._card is None:
+            return
+        self._card["text"] += data
+        if self._in_heading:
+            self._card["heading"] += data
+        if self._in_pre and self._pending_pre is not None:
+            self._pending_pre += data
+
+
+def _install_cards(html: str) -> list[dict]:
+    parser = _InstallCardParser()
+    parser.feed(html)
+    return parser.cards
 
 
 class TestPluginManifests(unittest.TestCase):
@@ -122,7 +181,18 @@ class TestPublishedPage(unittest.TestCase):
 
     def test_page_metadata_and_release_are_dual_host(self) -> None:
         self.assertIn("Claude Code 與 Codex", self.html)
-        self.assertIn("v0.4.0", self.html)
+
+    def test_latest_version_follows_github_releases_not_hardcoded(self) -> None:
+        # The page must never pin a version string: it fetches releases/latest at runtime
+        # and keeps a link to the Releases page as the no-JS / rate-limited fallback.
+        self.assertIn('id="latest-ver"', self.html)
+        self.assertIn(
+            'data-release-api="https://api.github.com/repos/Benjamin-Teng/xs_helper/releases/latest"',
+            self.html,
+        )
+        self.assertIn('href="https://github.com/Benjamin-Teng/xs_helper/releases/latest"', self.html)
+        self.assertIn("fetch(el.dataset.releaseApi", self.html)
+        self.assertIsNone(re.search(r"目前最新版本 <b>v\d", self.html))
 
     def test_install_modal_contains_separate_host_commands(self) -> None:
         required = (
@@ -137,6 +207,16 @@ class TestPublishedPage(unittest.TestCase):
         )
         for expected in required:
             self.assertIn(expected, self.html)
+
+    def test_shioaji_pro_install_card_follows_codex(self) -> None:
+        cards = _install_cards(self.html)
+        labels = [card["labelledby"] for card in cards]
+        self.assertEqual(labels, ["install-claude", "install-codex", "install-shioaji"])
+        shioaji = cards[2]
+        self.assertEqual(shioaji["heading"], "Shioaji Pro 安裝")
+        self.assertIn("AI Agent 面板的技能區", shioaji["text"])
+        self.assertIn("v0.4.0（含）以上", shioaji["text"])
+        self.assertEqual(shioaji["commands"], [("Benjamin-Teng/xs_helper", "copyCmd(this)")])
 
     def test_benchmark_provenance_remains_claude_opus(self) -> None:
         self.assertIn("Claude Opus 4.8", self.html)

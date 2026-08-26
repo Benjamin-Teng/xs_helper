@@ -4,6 +4,16 @@
 
 開發迭代期（無 tag）以 commit SHA 作版本；自 v0.1.0 起正式起 semver。
 
+## [Unreleased]
+
+### Added
+
+- **GitHub Pages 新增 Shioaji Pro 安裝卡**：在 Codex 安裝卡之後說明「AI Agent 面板技能區貼上 `Benjamin-Teng/xs_helper` 後按安裝」。
+
+### Changed
+
+- **頁面「目前最新版本」改為即時抓 GitHub Releases**（`releases/latest`），發版後不必再改 `index.html`；抓不到時保留「見 Releases」連結。
+
 ## [0.4.0] - 2026-08-26
 
 ### Fixed
@@ -71,6 +81,7 @@ reference 校正與新手友善文件；新增對外量化報表（GitHub Pages�
 - **`.xs` 編輯驗證 Hook**（`PostToolUse: Write|Edit` → `xs_lint.py`）：對照 604 個 token（grammar 2023 快照 ∪ Preset 215 sysfnc ∪ xshelp 8 群組 bif）的啟發式檢查，對未收錄函數與明顯結構問題提出非阻斷式警示。
 - **散佈基礎建設**：`.claude-plugin/marketplace.json`（marketplace `xs-tools`）、`plugin.json` 起 semver `0.1.0`、MIT LICENSE。
 
+[Unreleased]: https://github.com/Benjamin-Teng/xs_helper/compare/v0.4.0...HEAD
 [0.4.0]: https://github.com/Benjamin-Teng/xs_helper/releases/tag/v0.4.0
 [0.3.0]: https://github.com/Benjamin-Teng/xs_helper/releases/tag/v0.3.0
 [0.2.0]: https://github.com/Benjamin-Teng/xs_helper/releases/tag/v0.2.0

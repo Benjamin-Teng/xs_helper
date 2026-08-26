@@ -315,7 +315,7 @@
 <header>
   <div class="tag">Claude Code Skill Benchmark</div>
   <h1>xs-helper：Claude Code 與 Codex 的 XS 助手</h1>
-  <div class="ver">目前最新版本 <b>v0.4.0</b></div>
+  <div class="ver">目前最新版本 <b id="latest-ver" data-release-api="https://api.github.com/repos/Benjamin-Teng/xs_helper/releases/latest"><a href="https://github.com/Benjamin-Teng/xs_helper/releases/latest" style="color:inherit">見 Releases</a></b></div>
   <p class="lead">XScript（XS）是 XQ 全球贏家的券商專屬語言，繁中、小眾、無公開編譯器。
   同一份 XS skill 可在 Claude Code 用 <code class="inl">/xs</code>、在 Codex 用 <code class="inl">$xs</code>。
   下方以 Claude Opus 4.8 跑 8 個真實任務，量化載入 skill 帶來的差距。</p>
@@ -552,7 +552,17 @@ if inSP500 and roe&gt;15 and pe&gt;0
       </div>
     </section>
 
-    <div class="verdict" style="margin-top:16px">兩個平台都支援自動觸發：平常只要直接談 XS、選股條件或某個函數，skill 也能自行載入 XS 知識。</div>
+    <section class="platform-install" aria-labelledby="install-shioaji">
+      <h3 id="install-shioaji">Shioaji Pro 安裝</h3>
+      <p>在 AI Agent 面板的技能區貼上 repo 名稱，然後按安裝即可。</p>
+      <div class="step">
+        <h4>貼上並安裝</h4>
+        <div class="cmd"><pre>Benjamin-Teng/xs_helper</pre><button class="copy" onclick="copyCmd(this)">複製</button></div>
+        <p style="margin-top:9px">安裝後技能會列出 10 份參考文件（語法、函數、欄位、腳本類型與五類範例）；若顯示「可用參考文件：無」，請移除後重新安裝，取得 v0.4.0（含）以上的版本。</p>
+      </div>
+    </section>
+
+    <div class="verdict" style="margin-top:16px">Claude Code 與 Codex 都支援自動觸發：平常只要直接談 XS、選股條件或某個函數，skill 也能自行載入 XS 知識。</div>
   </div>
 </div>
 
@@ -562,6 +572,22 @@ function openInstall(){document.getElementById('installModal').classList.add('op
 function closeInstall(){document.getElementById('installModal').classList.remove('open');document.body.style.overflow='';}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeInstall();});
 // 一鍵複製指令
+// 目前最新版本：追 GitHub Releases，發版不必再改本頁；抓不到就保留「見 Releases」連結
+(function showLatestRelease(){
+  var el=document.getElementById('latest-ver');
+  if(!el||!window.fetch)return;
+  fetch(el.dataset.releaseApi,{headers:{Accept:'application/vnd.github+json'}})
+    .then(function(r){return r.ok?r.json():Promise.reject(r.status)})
+    .then(function(rel){
+      if(rel&&rel.tag_name){
+        var a=document.createElement('a');
+        a.href=rel.html_url||'https://github.com/Benjamin-Teng/xs_helper/releases/latest';
+        a.style.color='inherit';a.textContent=rel.tag_name;
+        el.replaceChildren(a);
+      }
+    })
+    .catch(function(){});
+})();
 function copyCmd(btn){
   const txt=btn.previousElementSibling.textContent.trim();
   const done=()=>{const o=btn.textContent;btn.textContent='已複製 ✓';btn.classList.add('done');
