@@ -60,7 +60,7 @@
 - `system-functions.md`：系統函數（價格、技術指標、統計、趨勢、邏輯判斷、選擇權、跨週期、成交量…）。
 - `fields.md`：三類欄位（報價欄位 / 資料欄位 / 選股欄位）及其適用情境。
 - `script-types.md`：五種腳本類型各自的結構慣例、可用 / 禁用函數邊界。
-- `examples/`：每類型一份精選範例（自動交易 / 函數 / 指標 / 選股 / 警示），標註出處。
+- `example-*.md`：每類型一份精選範例（自動交易 / 函數 / 指標 / 選股 / 警示），標註出處。
 
 #### F3. 官方文件 Fallback
 
@@ -116,7 +116,7 @@
 |------|------|------|
 | Plugin 形態 | Claude Code + Codex 雙原生封裝 | manifest 在 `.claude-plugin/plugin.json` 與 `.codex-plugin/plugin.json` |
 | 知識交付 | 內建 markdown reference ＋可用網頁工具 fallback（混合制） | 核心架構；非 RAG、非外部 DB |
-| Skill 內容 | 純 markdown（SKILL.md + reference/*.md） | 無 runtime 相依 |
+| Skill 內容 | 純 markdown（SKILL.md + references/*.md） | 無 runtime 相依 |
 | Lint 腳本 | Python 3 stdlib（零第三方相依） | 獨立手動工具；不由 Claude Code 或 Codex plugin 自動掛載 |
 | Reference 來源 | XScript_Preset / XQStrategy / vscode-xs / xshelp 官方站 | 實作階段 clone 到 `sources/` 後蒸餾 |
 | Docker | **否** | plugin 為 markdown + 輕量腳本，無容器化需求（已依規則評估） |
@@ -142,17 +142,16 @@ xs_helper/
 │       ├── SKILL.md             # 共用入口：判類型、載 reference、生成/解說、fallback 指示
 │       ├── agents/
 │       │   └── openai.yaml      # Codex UI metadata；$xs + implicit invocation
-│       └── reference/           # 兩端共用的唯一 knowledge base
+│       └── references/          # 兩端共用的唯一 knowledge base（Agent Skills 規範目錄名；扁平、不巢狀）
 │           ├── language.md
 │           ├── builtin-functions.md
 │           ├── system-functions.md
 │           ├── fields.md
 │           ├── script-types.md
-│           └── examples/
-│               ├── auto-trade.md   # 自動交易
-│               ├── function.md     # 函數
-│               ├── indicator.md    # 指標
-│               ├── screening.md    # 選股
+│           ├── example-auto-trade.md   # 自動交易
+│           ├── example-function.md     # 函數
+│           ├── example-indicator.md    # 指標
+│           ├── example-screening.md    # 選股
 │               └── alert.md        # 警示
 ├── scripts/
 │   └── xs_lint.py               # 獨立 .xs 啟發式驗證（不掛 hook）
@@ -207,7 +206,7 @@ codex plugin add xs-helper@xs-tools
 
 ### Naming Conventions
 
-- 檔案：`kebab-case.md`（reference 與 examples）、`snake_case.py`（腳本）。
+- 檔案：`kebab-case.md`（references，含 `example-*.md`）、`snake_case.py`（腳本）。
 - Skill 目錄：小寫（`xs/`）；skill 名取自 SKILL.md frontmatter `name`。
 - XS 範例檔內容：保留 XS 原生大小寫慣例（如 `Average`、`CurrentBar`），不改寫。
 - reference 內函數條目格式統一：`名稱 / 簽名 / 參數 / 回傳 / 範例 / 來源`。
@@ -216,12 +215,13 @@ codex plugin add xs-helper@xs-tools
 
 ### Acceptance Criteria
 
-- **AC1**：Claude Code 安裝後可用 `/xs`；VS Code／Codex IDE 可用 `$skill-installer` 從 `skills/xs` 安裝後以 `$xs` 使用；Codex CLI 可從 `/plugins` 或直接命令安裝完整 plugin。兩個 manifest 皆識別 `xs-helper@0.3.0` 並載入同一份 `skills/xs/`。
+- **AC1**：Claude Code 安裝後可用 `/xs`；VS Code／Codex IDE 可用 `$skill-installer` 從 `skills/xs` 安裝後以 `$xs` 使用；Codex CLI 可從 `/plugins` 或直接命令安裝完整 plugin。兩個 manifest 皆識別 `xs-helper@0.4.0` 並載入同一份 `skills/xs/`。
 - **AC2**：輸入「幫我寫一個『連續三天放量上漲』的台股選股條件」，產出的 XS 只使用 reference 中存在的選股欄位 / 函數，結構符合「選股」類型慣例。
 - **AC3**：輸入「`Average` 怎麼用？」能回出官方定義（參數、回傳）＋ 一個最小範例。
 - **AC4**：產出腳本中若出現 reference 未收錄之函數，AI agent 必須走 F3 fallback 或明示不確定，**不得**直接杜撰（抽查 10 個生成案例，幻覺函數數 = 0）。
 - **AC5**：stdlib 相容性測試驗證雙 manifest、雙 marketplace、Codex metadata、平台中立 fallback，以及所有文件中的 IDE 對話式、CLI `/plugins` 與終端機安裝路徑；Codex plugin/skill validator 通過。
-- **AC6**：五種腳本類型各至少有一份可用範例存在於 `examples/`。
+- **AC6**：五種腳本類型各至少有一份可用範例存在於 `references/example-*.md`。
+- **AC7**：`skills/xs/` 只含 `SKILL.md`、`agents/`、`references/`（扁平、無子目錄），SKILL.md 連結一律 `references/<file>`，frontmatter `description` 為單行純量——確保只索引固定目錄名的技能安裝器（如 Shioaji Pro）能讀到全部 reference。
 
 ---
 
@@ -230,7 +230,7 @@ codex plugin add xs-helper@xs-tools
 - **可維護性**：reference 為快照，須在 SKILL.md 標注蒸餾自哪個來源 commit / 文件版本，便於日後比對更新。
 - **離線可用**：核心問答與生成只依賴內建 reference，無網路時仍可運作；僅冷門 fallback 需網路。
 - **零重型相依**：skill runtime 為 Markdown；獨立 lint 腳本只用 Python stdlib，終端使用者不需安裝 Python 才能載入 plugin。
-- **版本策略**：自 `v0.1.0` 起採 semver；對外變動同步更新兩份 `plugin.json`。**現況：v0.3.0**，marketplace entry 不重複設 version，以 manifest 為權威。
+- **版本策略**：自 `v0.1.0` 起採 semver；對外變動同步更新兩份 `plugin.json`。**現況：v0.4.0**；`.claude-plugin/marketplace.json` 的 entry 亦同步設 `version`（部分安裝器只讀 marketplace entry 的版本，不讀 manifest；Codex marketplace schema 未查證有此欄位，故 `.agents/plugins/marketplace.json` 不設）。
 
 ---
 
@@ -259,7 +259,7 @@ codex plugin add xs-helper@xs-tools
   - `skills/xs/SKILL.md`（`/xs` 入口，description 觸發詞 + 流程 + F3 fallback + 硬邊界）
   - `hooks/hooks.json`（PostToolUse:Write|Edit → `python xs_lint.py`）
 - ✅ **語法錨點（離線、grammar 確定性）已蒸餾**（commit `47a24de`）：
-  - `reference/language.md`：grammar 五類 token × Preset 真實語法校對；`intraBarPersist`
+  - `references/language.md`：grammar 五類 token × Preset 真實語法校對；`intraBarPersist`
     列一級概念（回捲對比表 + `IsXLOrder.xs` 換 Bar 重設慣例）。
   - `scripts/xs_lint.py`：`KNOWN_TOKENS` 已嵌入 **604 個 token**（grammar 2023 快照 ∪ Preset 215 sysfnc ∪ xshelp 8 群組 bif，小寫）+ 數字後綴
     正規化 + 字串字面量 strip + 警示改「未收錄(可能自訂函數)」→ **達成 AC5**。
@@ -278,12 +278,12 @@ codex plugin add xs-helper@xs-tools
 - ✅ **`fields.md`（三類欄位）已蒸餾**（「下一步」第 2 項之二）：報價`Q*`（含 grammar `q_*`
   全名單錨定）/ 資料`T*` / 選股`F*` 七子類；選股欄位以 `XQStrategy` `GetField` 實際用例
   **交叉驗證**（高頻標 ✅）。立三類欄位×入口×腳本邊界表。`FFINANCE` 200+ 僅收高頻子集，餘走 F3。
-- ✅ **`script-types.md` + `examples/*.md` ×5 已蒸餾**（「下一步」第 3 項完成）：
+- ✅ **`script-types.md` + `example-*.md` ×5 已蒸餾**（「下一步」第 3 項完成）：
   - `script-types.md`：5 類 `{@type:}` 結構/觸發模型/邊界；立**跨類型回傳機制表**
     （`ret=1` 在 filter=入選 vs sensor=觸發，寫法同義不同）；`function` 家族三子型別
     （`function`/`function_bool`/`function_string`）回傳型別對應；autotrade 第一次洗價控管
     （`intraBarPersist` 旗標 + 換 Bar 重設）；末附「選哪個 `{@type:}`」速查表。
-  - `examples/*.md` ×5 各一份精選範例（標 Preset/Strategy 原始檔出處）：autotrade（均線交叉
+  - `example-*.md` ×5 各一份精選範例（標 Preset/Strategy 原始檔出處）：autotrade（均線交叉
     +停利停損%）/ function（CountIF + CrossOver bool + FormatMQY string）/ indicator（BBand 主圖 +
     Aroon 副圖）/ filter（GetField 基本 + 輸出欄 + 美股跨市場）/ sensor（技術條件 + GetQuote 即時）。
   - ⚠️ **校正既有佔位假設**：警示**用 `ret=1` 觸發、非 `Alert()`**（Preset 警示 359 檔 333 用
@@ -313,7 +313,7 @@ codex plugin add xs-helper@xs-tools
 
 1. ~~**`system-functions.md`（sysfnc）**~~ → ✅ **已完成**（見上「已完成」節）。
 2. ~~**`builtin-functions.md`（bif）+ `fields.md`（三類欄位）**~~ → ✅ **已完成**（見上「已完成」節）。
-3. ~~**`script-types.md` + `examples/*.md`**~~ → ✅ **已完成**（見上「已完成」節）。
+3. ~~**`script-types.md` + `example-*.md`**~~ → ✅ **已完成**（見上「已完成」節）。
 4. ~~**Phase 2 FBD**（函式層）收進 `architecture.md`~~ → ✅ **已完成**：`architecture.md`
    新增「Phase 2 — 函式層資料流」（`xs_lint.py` 6 個 public function 真實簽名 + `/xs` Skill
    程序步驟 + reference 載入 + F3 fallback + tests 消費關係），含 Phase 2 閉合性檢查表；

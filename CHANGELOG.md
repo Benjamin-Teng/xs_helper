@@ -4,6 +4,19 @@
 
 開發迭代期（無 tag）以 commit SHA 作版本；自 v0.1.0 起正式起 semver。
 
+## [0.4.0] - 2026-08-26
+
+### Fixed
+
+- **第三方技能安裝器讀不到 reference**：Shioaji Pro 之類的 agent 產品安裝 GitHub skill 時，只用 Agent Skills 規範的固定目錄名 `references/` 建索引（實測其技能紀錄 `references: []`，agent 端顯示「可用參考文件：無」）。`skills/xs/reference/`（單數）改名為 **`references/`**，SKILL.md 連結同步更新。
+- **範例攤平**：`references/examples/*.md` 改為 `references/example-*.md`，避免只索引單層的安裝器漏掉巢狀檔案。
+- **frontmatter `description` 改單行純量**：原 `>-` block scalar 會被逐行硬切的解析器存成字面值 `">-"`，導致自動觸發描述消失。
+- **marketplace entry 補 `version`**：部分安裝器只讀 marketplace entry 的版本，不讀 `plugin.json`；`.claude-plugin/marketplace.json` 補上 `version`，與兩份 manifest 同步為 `0.4.0`。
+
+### Changed
+
+- 新增 AC7（skill 目錄佈局規範）與對應 stdlib 測試；SPEC、架構圖、README 路徑同步更新。
+
 ## [0.3.0] - 2026-08-04
 
 ### Added
@@ -58,6 +71,7 @@ reference 校正與新手友善文件；新增對外量化報表（GitHub Pages�
 - **`.xs` 編輯驗證 Hook**（`PostToolUse: Write|Edit` → `xs_lint.py`）：對照 604 個 token（grammar 2023 快照 ∪ Preset 215 sysfnc ∪ xshelp 8 群組 bif）的啟發式檢查，對未收錄函數與明顯結構問題提出非阻斷式警示。
 - **散佈基礎建設**：`.claude-plugin/marketplace.json`（marketplace `xs-tools`）、`plugin.json` 起 semver `0.1.0`、MIT LICENSE。
 
+[0.4.0]: https://github.com/Benjamin-Teng/xs_helper/releases/tag/v0.4.0
 [0.3.0]: https://github.com/Benjamin-Teng/xs_helper/releases/tag/v0.3.0
 [0.2.0]: https://github.com/Benjamin-Teng/xs_helper/releases/tag/v0.2.0
 [0.1.1]: https://github.com/Benjamin-Teng/xs_helper/releases/tag/v0.1.1

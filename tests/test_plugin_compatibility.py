@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import json
+import re
 import unittest
 from pathlib import Path
-
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -13,13 +13,13 @@ def load_json(relative_path: str) -> dict:
 
 
 class TestPluginManifests(unittest.TestCase):
-    def test_both_hosts_publish_version_0_3_0(self) -> None:
+    def test_both_hosts_publish_version_0_4_0(self) -> None:
         claude = load_json(".claude-plugin/plugin.json")
         codex = load_json(".codex-plugin/plugin.json")
         self.assertEqual(claude["name"], "xs-helper")
         self.assertEqual(codex["name"], "xs-helper")
-        self.assertEqual(claude["version"], "0.3.0")
-        self.assertEqual(codex["version"], "0.3.0")
+        self.assertEqual(claude["version"], "0.4.0")
+        self.assertEqual(codex["version"], "0.4.0")
 
     def test_codex_manifest_points_to_shared_skill_only(self) -> None:
         manifest = load_json(".codex-plugin/plugin.json")
@@ -122,7 +122,7 @@ class TestPublishedPage(unittest.TestCase):
 
     def test_page_metadata_and_release_are_dual_host(self) -> None:
         self.assertIn("Claude Code 與 Codex", self.html)
-        self.assertIn("v0.3.0", self.html)
+        self.assertIn("v0.4.0", self.html)
 
     def test_install_modal_contains_separate_host_commands(self) -> None:
         required = (
@@ -150,8 +150,10 @@ class TestPublishedPage(unittest.TestCase):
     def test_codex_install_card_prioritizes_ide_chat(self) -> None:
         required = (
             "VS Code／Codex IDE（推薦）",
-            "$skill-installer 請從 https://github.com/Benjamin-Teng/"
-            "xs_helper/tree/main/skills/xs 安裝 xs skill",
+            (
+                "$skill-installer 請從 https://github.com/Benjamin-Teng/"
+                "xs_helper/tree/main/skills/xs 安裝 xs skill"
+            ),
             "Codex CLI 對話介面",
             "/plugins",
             "終端機進階安裝",
@@ -159,6 +161,83 @@ class TestPublishedPage(unittest.TestCase):
         )
         for expected in required:
             self.assertIn(expected, self.html)
+
+
+class TestSkillLayoutForFixedDirInstallers(unittest.TestCase):
+    """AC7: installers that only index the spec directory name must see every reference.
+
+    Shioaji Pro (and any Agent Skills-spec loader) lists ``<skill>/references`` by that
+    exact name, flat, and parses frontmatter line-by-line. A singular ``reference/``,
+    a nested ``references/examples/``, or a ``>-`` block-scalar description all end up
+    silently dropped (observed as ``references: []`` in the installed package record).
+    """
+
+    SKILL_DIR = ROOT / "skills/xs"
+    EXPECTED_REFERENCES = frozenset(
+        {
+            "language.md",
+            "builtin-functions.md",
+            "system-functions.md",
+            "fields.md",
+            "script-types.md",
+            "example-auto-trade.md",
+            "example-function.md",
+            "example-indicator.md",
+            "example-screening.md",
+            "example-alert.md",
+        }
+    )
+
+    def test_skill_dir_uses_spec_directory_names_only(self) -> None:
+        entries = {p.name for p in self.SKILL_DIR.iterdir()}
+        self.assertEqual(entries, {"SKILL.md", "agents", "references"})
+        self.assertFalse((self.SKILL_DIR / "reference").exists())
+
+    def test_references_dir_is_flat_markdown(self) -> None:
+        refs = self.SKILL_DIR / "references"
+        names = {p.name for p in refs.iterdir()}
+        self.assertEqual(names, self.EXPECTED_REFERENCES)
+        for p in refs.iterdir():
+            with self.subTest(path=p.name):
+                self.assertTrue(p.is_file())
+                self.assertEqual(p.suffix, ".md")
+
+    def test_skill_md_links_only_to_flat_references(self) -> None:
+        text = (self.SKILL_DIR / "SKILL.md").read_text(encoding="utf-8")
+        self.assertNotIn("](reference/", text)
+        self.assertNotIn("examples/", text)
+        linked = set(re.findall(r"\]\(references/([^)]+)\)", text))
+        self.assertEqual(linked, self.EXPECTED_REFERENCES)
+
+    def test_frontmatter_description_is_single_line_scalar(self) -> None:
+        text = (self.SKILL_DIR / "SKILL.md").read_text(encoding="utf-8")
+        frontmatter = text.split("---", 2)[1]
+        lines = [line for line in frontmatter.splitlines() if line.strip()]
+        keys = {line.split(":", 1)[0] for line in lines}
+        self.assertEqual(keys, {"name", "description"}, "every frontmatter line must be key: value")
+        description = next(line for line in lines if line.startswith("description:"))
+        value = description.split(":", 1)[1].strip()
+        self.assertNotIn(value, {"|", ">", ">-", "|-"})
+        self.assertGreater(len(value), 50)
+
+    def test_claude_marketplace_entry_publishes_version(self) -> None:
+        # Installers that read the Claude marketplace take the version from the entry,
+        # not from plugin.json (Sinotrade's shioaji entry carries one; the Codex
+        # marketplace schema is unverified for this field, so it stays manifest-only).
+        entry = next(p for p in load_json(".claude-plugin/marketplace.json")["plugins"] if p["name"] == "xs-helper")
+        self.assertEqual(entry["version"], "0.4.0")
+
+    def test_maintained_docs_contain_no_obsolete_singular_reference_path(self) -> None:
+        stale = re.compile(r"skills/xs/reference/|\]\(reference/|reference/examples/")
+        # CHANGELOG is history and legitimately names the old path when describing the rename.
+        maintained = (
+            *(d for d in TestMarkdownDocumentation.DOCUMENTS if d != "CHANGELOG.md"),
+            "skills/xs/SKILL.md",
+        )
+        for relative_path in maintained:
+            with self.subTest(path=relative_path):
+                text = (ROOT / relative_path).read_text(encoding="utf-8")
+                self.assertIsNone(stale.search(text), f"obsolete reference/ path in {relative_path}")
 
 
 if __name__ == "__main__":

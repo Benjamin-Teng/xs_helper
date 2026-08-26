@@ -89,7 +89,7 @@ codex plugin add xs-helper@xs-tools
 
 ## 狀態
 
-✅ **v0.3.0** —— 同時提供 Claude Code 與 Codex 原生 manifest / marketplace，兩端共用同一份 skill；Codex plugin 與 skill validator 通過。v0.2.0 移除的 `.xs` 編輯驗證 Hook 維持不掛載，`xs_lint.py` 保留為獨立腳本。功能仍在迭代。
+✅ **v0.4.0** —— skill 目錄改為 Agent Skills 規範的 `references/`（扁平、單層），Shioaji Pro 等只索引固定目錄名的技能安裝器也能讀到 reference；同時提供 Claude Code 與 Codex 原生 manifest / marketplace，兩端共用同一份 skill；Codex plugin 與 skill validator 通過。v0.2.0 移除的 `.xs` 編輯驗證 Hook 維持不掛載，`xs_lint.py` 保留為獨立腳本。功能仍在迭代。
 
 📊 **成效**：[skill 助益量化報表](https://benjamin-teng.github.io/xs_helper/) —— 8 個真實 XS 任務「載 skill vs 未載」對照，通過率 100% vs 75%、零幻覺 token。
 
@@ -102,7 +102,7 @@ reference 進度：
 | `system-functions.md`（sysfnc） | ✅ 已蒸餾（Preset 224 函數 × 14 分類） |
 | `builtin-functions.md`（bif） | ✅ 已蒸餾（xshelp 8 分類） |
 | `fields.md`（三類欄位） | ✅ 已蒸餾（xshelp `Q*`/`T*`/`F*` × XQStrategy `GetField` 交叉驗證） |
-| `script-types.md` + `examples/` ×5 | ✅ 已蒸餾（5 類 `{@type:}` 結構/邊界 + 各一份精選範例） |
+| `script-types.md` + `example-*.md` ×5 | ✅ 已蒸餾（5 類 `{@type:}` 結構/邊界 + 各一份精選範例） |
 
 完整規格與交接見 [docs/SPEC.md](docs/SPEC.md)，版本變動見 [CHANGELOG.md](CHANGELOG.md)。
 

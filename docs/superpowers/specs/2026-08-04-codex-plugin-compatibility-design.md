@@ -26,7 +26,7 @@ xs_helper/
 └── skills/xs/
     ├── SKILL.md
     ├── agents/openai.yaml
-    └── reference/
+    └── references/
 ```
 
 - Claude Code continues to discover the package through `.claude-plugin/`.
@@ -61,7 +61,7 @@ The XS safety boundaries remain unchanged: do not invent tokens, do not execute 
 
 ## Documentation
 
-Every current product-facing or maintainer-facing documentation surface must describe both supported hosts and show how to install the plugin. The XS reference files under `skills/xs/reference/` are runtime knowledge rather than product documentation and remain unchanged.
+Every current product-facing or maintainer-facing documentation surface must describe both supported hosts and show how to install the plugin. The XS reference files under `skills/xs/references/` are runtime knowledge rather than product documentation and remain unchanged.
 
 Use one shared installation matrix throughout the documentation:
 

@@ -13,7 +13,7 @@ from pathlib import Path
 # 讓 import 找得到 scripts/xs_lint.py
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 
-import xs_lint  # noqa: E402
+import xs_lint
 
 
 class TestStripComments(unittest.TestCase):

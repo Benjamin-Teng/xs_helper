@@ -1,17 +1,12 @@
 ---
 name: xs
-description: >-
-  XScript (XS) 專家模式 — 依 XQ 全球贏家自行開發的 XScript 語言規範，協助使用者撰寫或修改
-  自動交易、函數、指標、選股、警示這五類 XS 腳本，並回答「某個 XS 函數 / 欄位 / 關鍵字怎麼用」。
-  當對話出現以下任一情境時使用本 skill：提到 XS、XScript、XQ、全球贏家、.xs 檔；要寫
-  選股條件 / 自動交易腳本 / 技術指標腳本 / 警示條件；問到 XS 的函數、欄位、關鍵字、語法；
-  出現 SetPosition、GetField、Plot、ret=1、洗價、intraBarPersist、{@type:} 等 XS 專屬語彙。
+description: "XScript (XS) 專家模式 — 依 XQ 全球贏家自行開發的 XScript 語言規範，協助使用者撰寫或修改自動交易、函數、指標、選股、警示這五類 XS 腳本，並回答「某個 XS 函數 / 欄位 / 關鍵字怎麼用」。當對話出現以下任一情境時使用本 skill：提到 XS、XScript、XQ、全球贏家、.xs 檔；要寫選股條件 / 自動交易腳本 / 技術指標腳本 / 警示條件；問到 XS 的函數、欄位、關鍵字、語法；出現 SetPosition、GetField、Plot、ret=1、洗價、intraBarPersist、{@type:} 等 XS 專屬語彙。"
 ---
 
 # XS 專家模式
 
 > reference 已全數蒸餾完成（`language` / `builtin-functions` / `system-functions` / `fields` /
-> `script-types` + `examples/` ×5）。**優先用內建 reference 作答**；僅 reference 未涵蓋的冷門
+> `script-types` + `example-*` ×5）。**優先用內建 reference 作答**；僅 reference 未涵蓋的冷門
 > 函數 / 欄位才走 F3 線上查證。任何情況都不得憑記憶杜撰不存在的 token。
 
 依 XQ 全球贏家的 **XScript（XS）** 規範作答。XS 是券商專屬 DSL，**不得**用你對其他語言的直覺臆測函數名或欄位名——只用 reference 收錄、或經 F3 線上查證確認存在的 token。
@@ -31,12 +26,12 @@ description: >-
    類型不明確時**反問**，不要猜。選股情境再問目標市場（台股/陸股/港股/美股），影響可用欄位。
 
 2. **載入對應 reference**（依需求只讀需要的檔，避免一次全載）：
-   - [language.md](reference/language.md) — 關鍵字、流程控制、運算子、內建變數
-   - [builtin-functions.md](reference/builtin-functions.md) — 內建函數（bif）
-   - [system-functions.md](reference/system-functions.md) — 系統函數（sysfnc）
-   - [fields.md](reference/fields.md) — 報價 / 資料 / 選股 三類欄位
-   - [script-types.md](reference/script-types.md) — 5 類結構與可用 / 禁用函數邊界
-   - [examples/](reference/examples/) — 每類型一份精選範例
+   - [language.md](references/language.md) — 關鍵字、流程控制、運算子、內建變數
+   - [builtin-functions.md](references/builtin-functions.md) — 內建函數（bif）
+   - [system-functions.md](references/system-functions.md) — 系統函數（sysfnc）
+   - [fields.md](references/fields.md) — 報價 / 資料 / 選股 三類欄位
+   - [script-types.md](references/script-types.md) — 5 類結構與可用 / 禁用函數邊界
+   - [example-auto-trade.md](references/example-auto-trade.md) / [example-function.md](references/example-function.md) / [example-indicator.md](references/example-indicator.md) / [example-screening.md](references/example-screening.md) / [example-alert.md](references/example-alert.md) — 每類型一份精選範例
 
 3. **產出**：
    - **腳本生成**：可直接貼回 XQ Script Editor 的 XS 程式碼，開頭帶正確 `{@type:}`，附簡短說明用到哪些函數 / 欄位。

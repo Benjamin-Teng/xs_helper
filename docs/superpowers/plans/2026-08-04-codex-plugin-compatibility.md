@@ -12,12 +12,12 @@
 
 - Preserve `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`, and Claude Code `/xs` installation behavior.
 - Add `.codex-plugin/plugin.json`, `.agents/plugins/marketplace.json`, and `skills/xs/agents/openai.yaml` for native Codex support.
-- Both hosts consume the existing `skills/xs/`; do not duplicate `SKILL.md` or `reference/`.
+- Both hosts consume the existing `skills/xs/`; do not duplicate `SKILL.md` or `references/`.
 - Set both plugin manifests to strict semver `0.3.0`.
 - Codex explicit invocation is `$xs`; Claude Code explicit invocation is `/xs`; implicit invocation remains enabled.
 - The shared skill must not name Claude-only `WebFetch` or Codex-internal tool identifiers.
 - Keep the existing XS boundaries: no invented tokens, runtime execution, backtesting, account connection, order placement, or live quotes.
-- Add both installation paths to `README.md`, `docs/index.html`, `docs/SPEC.md`, `docs/architecture.md`, `CHANGELOG.md`, and the design documentation; do not add installation prose to `skills/xs/reference/`.
+- Add both installation paths to `README.md`, `docs/index.html`, `docs/SPEC.md`, `docs/architecture.md`, `CHANGELOG.md`, and the design documentation; do not add installation prose to `skills/xs/references/`.
 - Preserve the published benchmark's historical Claude Opus 4.8 provenance; do not imply it was rerun with Codex.
 - Use only Python standard-library modules in repository tests.
 
@@ -26,6 +26,7 @@
 ### Task 1: Add the dual-host packaging contract
 
 **Files:**
+
 - Create: `tests/test_plugin_compatibility.py`
 - Create: `.codex-plugin/plugin.json`
 - Create: `.agents/plugins/marketplace.json`
@@ -34,6 +35,7 @@
 - Modify: `skills/xs/SKILL.md`
 
 **Interfaces:**
+
 - Consumes: existing Claude manifest, marketplace `xs-tools`, and shared `skills/xs/` directory.
 - Produces: Codex manifest `name=xs-helper`, `version=0.3.0`, `skills=./skills/`; Codex marketplace entry `xs-helper@xs-tools`; skill UI name `XS Helper`; platform-neutral F3 fallback.
 
@@ -235,6 +237,7 @@ git commit -m "feat: add native Codex plugin packaging"
 ### Task 2: Document both installation paths in every Markdown surface
 
 **Files:**
+
 - Modify: `tests/test_plugin_compatibility.py`
 - Modify: `README.md`
 - Modify: `docs/SPEC.md`
@@ -242,6 +245,7 @@ git commit -m "feat: add native Codex plugin packaging"
 - Modify: `CHANGELOG.md`
 
 **Interfaces:**
+
 - Consumes: canonical marketplace name `xs-tools`, plugin name `xs-helper`, Claude command `/xs`, Codex command `$xs`.
 - Produces: consistent dual-host installation guidance in every current product-facing Markdown document.
 
@@ -371,10 +375,12 @@ git commit -m "docs: add Claude Code and Codex installation guides"
 ### Task 3: Update and verify the published GitHub Pages installation experience
 
 **Files:**
+
 - Modify: `tests/test_plugin_compatibility.py`
 - Modify: `docs/index.html`
 
 **Interfaces:**
+
 - Consumes: the same canonical installation commands and invocation names used by Markdown documentation.
 - Produces: dual-host page metadata, hero copy, footer copy, and an installation modal with separate Claude Code and Codex sections.
 
@@ -471,6 +477,7 @@ git commit -m "docs: add Codex install flow to published page"
 ### Task 4: Run final cross-host validation
 
 **Files:**
+
 - Verify: `.claude-plugin/plugin.json`
 - Verify: `.claude-plugin/marketplace.json`
 - Verify: `.codex-plugin/plugin.json`
@@ -480,6 +487,7 @@ git commit -m "docs: add Codex install flow to published page"
 - Verify: all documentation and tests changed above.
 
 **Interfaces:**
+
 - Consumes: complete dual-host package and documentation.
 - Produces: evidence that static tests, Codex validators, and available Claude validation succeed without uncommitted accidental changes.
 

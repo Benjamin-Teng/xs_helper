@@ -8,7 +8,7 @@
 >
 > 對應 SPEC：[SPEC.md](SPEC.md) 的 Project Structure / Features。
 
-**狀態（v0.3.0）：** `skills/xs/` 是唯一 runtime 知識來源，Claude Code 以 `/xs`、Codex 以 `$xs` 使用；兩端也可依 skill description 自動載入。`PostToolUse: Write|Edit → xs_lint.py` 的**自動 hook 已於 v0.2.0 移除**（見 [CHANGELOG](../CHANGELOG.md) / [SPEC F4](SPEC.md)）。`scripts/xs_lint.py` 保留為 benchmark 與手動檢查工具；下方 Hook 旁支/節點只保留為移除前的歷史設計記錄。
+**狀態（v0.4.0）：** `skills/xs/` 是唯一 runtime 知識來源，Claude Code 以 `/xs`、Codex 以 `$xs` 使用；兩端也可依 skill description 自動載入。`PostToolUse: Write|Edit → xs_lint.py` 的**自動 hook 已於 v0.2.0 移除**（見 [CHANGELOG](../CHANGELOG.md) / [SPEC F4](SPEC.md)）。`scripts/xs_lint.py` 保留為 benchmark 與手動檢查工具；下方 Hook 旁支/節點只保留為移除前的歷史設計記錄。
 
 ## 雙平台封裝與安裝
 
@@ -106,13 +106,13 @@ flowchart TD
 
     %% ===== Plugin runtime =====
     subgraph PLUGIN["📦 plugin（runtime）"]
-        subgraph REF["skills/xs/reference/*.md（knowledge base）"]
+        subgraph REF["skills/xs/references/*.md（knowledge base）"]
             LANG["language.md<br/>關鍵字/流程/運算子/內建變數"]
             BIF["builtin-functions.md<br/>bif（簽名來自 xshelp）"]
             SYS["system-functions.md<br/>sysfnc（用法來自 Preset, xshelp校對）"]
             FIELDS["fields.md<br/>報價/資料/選股 三類欄位"]
             TYPES["script-types.md<br/>5 類 {@type:} 結構/邊界"]
-            EX["examples/*.md<br/>每類型 1 份(標出處)"]
+            EX["example-*.md<br/>每類型 1 份(標出處)"]
         end
         SKILL["SKILL.md<br/>/xs 或 $xs：判類型→載 ref→生成/解說→fallback 指示"]
         HOOK["[歷史] hooks.json + scripts/xs_lint.py<br/>PostToolUse:Write|Edit → .xs 啟發式驗證"]
@@ -168,7 +168,7 @@ flowchart TD
 | bif 簽名有來源？ | ✅ xshelp build-time 抓（細節頁含簽名/參數/回傳/範例，已實測） |
 | sysfnc 用法有來源？ | ✅ 142/143 來自 Preset/函數 原始碼，xshelp 校對 |
 | 三類欄位有來源？ | ✅ xshelp 清單（報價/資料/選股），選股欄位再以 Strategy GetField 交叉驗證 |
-| SKILL.md 知識來源閉合？ | ✅ 離線走 `reference/*`，冷門走 `xshelp` fallback |
+| SKILL.md 知識來源閉合？ | ✅ 離線走 `references/*`，冷門走 `xshelp` fallback |
 | Hook token 來源？ | ✅ grammar（建置期嵌入，runtime 不依賴 sources/） |
 | 有無循環依賴？ | ✅ 無，資料單向：xshelp/sources→distill→reference→skill |
 | sources/ 是否進 runtime？ | ❌ 僅 build-time 輸入，gitignored、不打包（授權+體積） |
@@ -191,14 +191,14 @@ flowchart TD
         S3["③ 產出<br/>腳本生成(帶 {@type:}) 或 規範問答(簽名+範例)"]
     end
 
-    %% ===== knowledge base（reference/*.md，資料）=====
-    subgraph REF["skills/xs/reference/*.md（knowledge base · 資料）"]
+    %% ===== knowledge base（references/*.md，資料）=====
+    subgraph REF["skills/xs/references/*.md（knowledge base · 資料）"]
         LANG["language.md<br/>關鍵字 / 流程 / 運算子 / 內建變數"]
         BIF["builtin-functions.md<br/>bif 8 類 · 簽名+語意"]
         SYS["system-functions.md<br/>224 sysfnc · 14 分類"]
         FIELDS["fields.md<br/>報價 q_* / 資料 T* / 選股 F*"]
         TYPES["script-types.md<br/>5 類 {@type:} 結構 / 邊界 / 回傳機制"]
-        EX["examples/*.md ×5<br/>每類型 1 份(標出處)"]
+        EX["example-*.md ×5<br/>每類型 1 份(標出處)"]
     end
 
     subgraph WEB["🌐 F3 Fallback（runtime · 冷門查詢）"]
