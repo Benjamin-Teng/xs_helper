@@ -161,17 +161,20 @@ end;
 
 **`switch (變數) begin case 值: … ; case N to M: … ; default: … ; end;`**：`case`
 支援 `N to M` 數值範圍，且 `switch` 可以巢狀。xshelp 條目
-（[HelpName=switch&group=CONTROLFLOW](https://xshelp.xq.com.tw/XSHelp/?HelpName=switch&group=CONTROLFLOW)）範例（摘錄，原文含 `Case 1` 到 `Case 5` 五段，此處只留頭尾示範 `Case N to M` 用法）：
+（[HelpName=switch&group=CONTROLFLOW](https://xshelp.xq.com.tw/XSHelp/?HelpName=switch&group=CONTROLFLOW)）範例（摘錄：原文含 `Case 1` 到 `Case 5` 共 5 段完整分支，此處只留 `Case 1`、`Case 6 to 20`、`Default` 三段示範 `Case N to M` 用法，捨棄 `Case 2`～`Case 5`；**保留的三段內容逐字未改**）：
 
 ```xs
 Value1 = DayOfMonth(date);
 Switch (value1) Begin
 Case 1:
-    print(Text("今天的日期是", NumToStr(date,0)), "value1=1時執行這段程式碼");
+    // value1=1時執行這段程式碼
+    print(Text("今天的日期是",numtoStr(date,0), "。是",numtoStr(DayOfMonth(date),0),"日") ,"value1=1時執行這段程式碼");
 Case 6 to 20:
-    print(Text("今天的日期是", NumToStr(date,0)), "value1=6~20時執行這段程式碼");
+    // value1= 6 ~ 20 時執行這段程式碼
+    print(Text("今天的日期是",numtoStr(date,0), "。是",numtoStr(DayOfMonth(date),0),"日"), "value1=6~20時執行這段程式碼");
 Default:
-    print(Text("今天的日期是", NumToStr(date,0)), "其他情形都執行這段程式碼");
+    // 其他情形都執行這段程式碼
+    print(Text("今天的日期是",numtoStr(date,0), "。是",numtoStr(DayOfMonth(date),0),"日"), "其他情形都執行這段程式碼");
 End;
 ```
 
