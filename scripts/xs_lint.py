@@ -13,12 +13,14 @@ import re
 import sys
 
 # Windows console 預設可能非 UTF-8（cp950），中文警示會 UnicodeEncodeError。
-# 防禦性轉 UTF-8（stdlib，3.7+）。
+# 防禦性轉 UTF-8（stdlib，3.7+）。以 duck typing 取方法，代理包裝過的串流也能轉。
 for _stream in (sys.stdout, sys.stderr):
-    try:
-        _stream.reconfigure(encoding="utf-8")  # type: ignore[attr-defined]
-    except (AttributeError, ValueError):
-        pass
+    _reconfigure = getattr(_stream, "reconfigure", None)
+    if callable(_reconfigure):
+        try:
+            _reconfigure(encoding="utf-8")
+        except ValueError:
+            pass
 
 # KNOWN_TOKENS：Hook 的離線函數/識別字對照清單（全部小寫）。定位刻意「寧放行不誤殺」——
 # 名單過時頂多漏報未知 token，不會誤殺合法腳本。比對時數字後綴（Plot2 / OutputField12）
@@ -30,6 +32,9 @@ for _stream in (sys.stdout, sys.stderr):
 #      選擇權 bs* / 極值 fast* 等 grammar 快照漏收者）。
 #   3. xshelp 8 個 bif 清單頁全量（GENERAL/FIELD/TIME/DATE/STRING/NUMBER/ARRAY/TRANSACTION FUNC）
 #      —— bif 為引擎原語、無原始碼，只能靠 xshelp。
+#   4. xshelp「關鍵字」大分類中可呼叫者（見區塊末段的第二個 frozenset）。
+# 排除：xshelp 保留字 Bool / Int / Float / Double（「目前並沒有任何作用」）雖在 grammar 裡，
+#   刻意不收，讓 `Int(` 之類呼叫被警示。重生時勿加回。
 # 重生方式（無自動 build、手動，依 SPEC Open Q3）：重新聯集三方來源 —— 解析 vscode-xs
 #   grammar、掃 XScript_Preset/函數/ 的 ASCII 檔名、抓 xshelp 8 個 bif 清單頁 —— 轉小寫、
 #   去重、排序後回填本區塊。新增 grammar / sysfnc / bif 時重做此聯集即可。
@@ -39,24 +44,24 @@ KNOWN_TOKENS: frozenset[str] = frozenset({
     "array_gettype", "array_setmaxindex", "array_setvalrange", "array_sort", "array_sort2d", "array_sum", "arraylinearregslope", "arraymaseries", "arrays",
     "arrayseries", "arrayxdayseries", "atr", "average", "averageif", "avgdeviation", "avglist", "avgprice", "baradjusted",
     "barfreq", "barinterval", "barslast", "begin", "below", "bias", "biasdiff", "blackscholesmodel", "bollingerband",
-    "bollingerbandwidth", "bool", "br", "break", "bsdelta", "bsgamma", "bsprice", "bstheta", "bsvega",
+    "bollingerbandwidth", "br", "break", "bsdelta", "bsgamma", "bsprice", "bstheta", "bsvega",
     "buy", "c", "calcvwapdistribution", "callfunction", "cancelallorders", "case", "cci", "ceiling", "checkfield",
     "checksymbolfield", "close", "closed", "closeh", "closem", "closeq", "closew", "closey", "coefficientr",
     "combination", "commoditychannel", "condition", "correlation", "cos", "cosine", "cotangent", "countif", "countifarow",
     "covariance", "cover", "cross", "crosses", "crossover", "crossunder", "currentbar", "currentdate", "currenttime",
     "currenttimems", "cv", "d_value", "dataalign", "date", "dateadd", "datediff", "datetime", "datetojulian",
     "datetostring", "datevalue", "dayofmonth", "dayofweek", "daystoexpiration", "daystoexpirationtf", "default", "defaultbuyprice", "defaultsellprice",
-    "dif", "diffbidaskvolumelxl", "diffbidaskvolumexl", "difftradevolumeataskbid", "diffupdownvolume", "directionmovement", "dmo", "double", "downto",
+    "dif", "diffbidaskvolumelxl", "diffbidaskvolumexl", "difftradevolumeataskbid", "diffupdownvolume", "directionmovement", "dmo", "downto",
     "downtrend", "dpo", "dwlimit", "else", "ema", "emp", "encodedate", "encodetime", "end",
     "entermarketclosetime", "erc", "execoffset", "expvalue", "extremes", "extremesarray", "factorial", "false", "fasthighest",
     "fasthighestbar", "fastlowest", "fastlowestbar", "file", "filled", "filledatbroker", "filledavgprice", "filledentrydate", "filledentrytime",
     "filledentrytimems", "filledrecordbs", "filledrecordcount", "filledrecorddate", "filledrecordisrealtime", "filledrecordprice", "filledrecordqty", "filledrecordtime", "filledrecordtimems",
-    "filter", "float", "floor", "for", "formatdate", "formatmqy", "formattime", "fracportion", "friday",
+    "filter", "floor", "for", "formatdate", "formatmqy", "formattime", "fracportion", "friday",
     "getbackbar", "getbarback", "getbaroffset", "getbaroffsetforyears", "getfield", "getfielddate", "getfieldpublishdate", "getfieldstartoffset", "getfirstbardate",
     "getinfo", "getlasttradedate", "getquote", "getsymbolfield", "getsymbolfielddate", "getsymbolfieldstartoffset", "getsymbolgroup", "getsymbolinfo", "gettbmode",
     "gettotalbar", "groupsize", "h", "high", "highd", "highdays", "highest", "highestarray", "highestbar",
     "highh", "highm", "highq", "highw", "highy", "hl_osc", "hour", "hvolatility", "if",
-    "iff", "input", "inputs", "instr", "int", "intportion", "intrabarpersist", "isfirstcall", "islastbar",
+    "iff", "input", "inputs", "instr", "intportion", "intrabarpersist", "isfirstcall", "islastbar",
     "islistedsymbol", "ismarketprice", "issessionfirstbar", "issessionlastbar", "issupportfield", "issupportsymbolfield", "isxlorder", "isxorder", "ivolatility",
     "juliantodate", "k_value", "keltnerlb", "keltnerma", "keltnerub", "l", "lastdayofmonth", "leftstr", "linearreg",
     "linearregangle", "linearregslope", "log", "low", "lowd", "lowdays", "lowerstr", "lowest", "lowestarray",
@@ -102,6 +107,12 @@ KNOWN_TOKENS: frozenset[str] = frozenset({
     "xf_xaverage", "xfmin_crossover", "xfmin_crossunder", "xfmin_directionmovement", "xfmin_ema", "xfmin_getboolean", "xfmin_getcurrentbar", "xfmin_getdtvalue", "xfmin_getvalue",
     "xfmin_macd", "xfmin_mtm", "xfmin_percentr", "xfmin_rsi", "xfmin_stochastic", "xfmin_weightedclose", "xfmin_xaverage", "xor", "year",
     "yoy",
+}) | frozenset({
+    # 4. xshelp「關鍵字」大分類中，官方範例以呼叫形式 `name(` 出現、而上方三方來源未收者
+    #    （inputkind:=Dict(...) / DateRange(...) / SymbolPrice()）。其餘關鍵字多為命名參數
+    #    （checkbox:=、Adjusted:=、order:=）或宣告詞，不會以 `name(` 出現，刻意不收，
+    #    免得拼錯的呼叫被放行。全量名單見 references/language.md §9。
+    "daterange", "dict", "symbolprice",
 })
 
 

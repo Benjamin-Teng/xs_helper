@@ -5,6 +5,8 @@
 > 語法範式（宣告、流程控制寫法）以 `XScript_Preset` 真實 `.xs` 原始碼校對。
 > grammar 為 2023 快照，名單可能落後最新 xshelp；冷門關鍵字以 xshelp「關鍵字」分類為準，
 > 查無把握者走 SKILL.md 的 F3 線上查證，不臆測。
+> **§9 的關鍵字／保留字總表**則直接窮舉自 xshelp「關鍵字」大分類（2026-09-23 擷取），
+> 與前文 grammar 名單衝突時以 §9 為準。
 
 XS 語法family近似 TradeStation EasyLanguage：大小寫不敏感（`Close` = `close`）、敘述以分號 `;` 結尾、區塊用 `begin … end`。
 
@@ -26,6 +28,9 @@ XS 語法family近似 TradeStation EasyLanguage：大小寫不敏感（`Close` =
 
 冒號式宣告，可附初始值與中文標籤。大小寫不敏感（`var` = `Var` = `Vars` = `Variable` = `Variables`）。
 
+**命名限制**：不要拿 §9 總表裡的任何名稱（關鍵字、忽略字、常數、保留字）當變數或參數名稱。XS 大小寫不敏感，所以 `if`、`If`、`IF` 都算同一個字，都不要用。
+xshelp 沒有明文列出命名規則（全站搜尋「保留字」「命名規則」「變數名稱」皆 0 筆）；用了之後編譯器是否一定報錯**待查證**（需在 XQ 編輯器實測），因此這裡採保守寫法：一律避開。
+
 ```xs
 var: acc(0), idx(0);                 // 多變數一行，括號內為初始值
 var: intraBarPersist _last_date(0);  // 帶 intraBarPersist 修飾子（見 §7）
@@ -46,10 +51,11 @@ Input: TargetArray[X](NumericArrayRef);   // 陣列參考（回填用）
 |------|-------|
 | 數值 | `Numeric` `NumericSimple` `NumericSeries` `NumericRef` `NumericArray` `NumericArrayRef` |
 | 字串 | `String` `StringSimple` `StringSeries` `StringRef` `StringArray` `StringArrayRef` |
-| 布林 | `TrueFalse` `TrueFalseSimpleVar` `TrueFalseSeries` `TrueFalseRef` `TrueFalseArray` `TrueFalseArrayRef` |
-| 原生 | `Bool` `Int` `Float` `Double` |
+| 布林 | `TrueFalse` `TrueFalseSimple` `TrueFalseSeries` `TrueFalseRef` `TrueFalseArray` `TrueFalseArrayRef` |
 | 陣列 | `Array` `Arrays` |
 
+- ⚠️ `Bool` `Int` `Float` `Double` **不是可用的型別**：xshelp 標為保留字，原文「此文字為系統預先保留的文字，目前並沒有任何作用。」（見 §9.5）。宣告型別一律用上表。
+- 布林簡單型別 xshelp 寫作 `TrueFalseSimple`；vscode-xs grammar 另收 `TrueFalseSimpleVar`，xshelp 查無此名，不要用。
 - `*Simple`：純量；`*Series`：時間序列（可用 `x[n]` 取前 n 根值）；`*Ref` / `*ArrayRef`：傳參考（函數回填）。
 - 回傳：`RetVal` / `Ret` / `RetMsg`（`function` 類以 `retval = …` 回傳，見 [script-types.md](script-types.md)）。
 
@@ -130,7 +136,7 @@ end;
 
 ## 6. 常數（grammar `variable.constant`）
 
-`PI`、星期常數 `Monday` `Tuesday` `Wednesday` `Thursday` `Friday` `Saturday` `Sunday`。
+`PI`、星期常數 `Monday` `Tuesday` `Wednesday` `Thursday` `Friday` `Saturday` `Sunday`（數值見 §9.2）。
 
 ---
 
@@ -173,6 +179,86 @@ end;
 `A` `An` `At` `Based` `By` `Does` `From` `Is` `Of` `On` `Place` `Than` `The` `Was`。
 
 例：`Buy 1 share` 中的 `share` 之類修飾字（依語境）。寫了不影響執行。
+
+---
+
+## 9. 關鍵字與保留字總表（xshelp 窮舉）
+
+> **來源**：xshelp「關鍵字」大分類只有 4 個 group——忽略字 `SKIPWORD`、常數 `CONSTANT`、
+> 流程控制 `CONTROLFLOW`、宣告 `DECLARATION`。以站內搜尋索引 `/XSHelp/rest?a=<字母>` 對 a–z
+> 各查一次取聯集，共 **110 個名稱**（含別名），逐一開頁核對內容，2026-09-23 擷取。
+> 條目網址格式：`https://xshelp.xq.com.tw/XSHelp/?HelpName=<名稱>&group=<GROUP>`。
+> 下列全部名稱都**不要拿來當變數或參數名稱**（見 §2 命名限制）。
+
+### 9.1 忽略字 `SKIPWORD`（14 個）
+
+`A` `An` `At` `Based` `By` `Does` `From` `Is` `Of` `On` `Place` `Than` `The` `Was`
+
+語意見 §8；xshelp 只有一張群組總表（[條目](https://xshelp.xq.com.tw/XSHelp/?HelpName=A&group=SKIPWORD)）。
+
+### 9.2 常數 `CONSTANT`（8 個）
+
+| 名稱 | 值 |
+|------|----|
+| `PI` | 3.14159 |
+| `Sunday` `Monday` `Tuesday` `Wednesday` `Thursday` `Friday` `Saturday` | 依序 0 1 2 3 4 5 6 |
+
+[條目](https://xshelp.xq.com.tw/XSHelp/?HelpName=PI&group=CONSTANT)
+
+### 9.3 流程控制 `CONTROLFLOW`（37 個名稱，16 頁）
+
+| 名稱（含別名） | 用途（xshelp 首句摘要） |
+|------|------|
+| `If` `Then` `Else` | 條件成立時執行哪個動作 |
+| `Begin` `End` | 用在 If、While、For 等控制指令內包住多行 |
+| `For` `To` `DownTo` | 計數迴圈 |
+| `While` | 條件迴圈 |
+| `Repeat` `Until` | 後測迴圈 |
+| `Switch` `Case` `Default` | 判斷變數值符合哪個運算式 |
+| `Once` | 只需要執行一次的程式碼 |
+| `Break` | 跳出迴圈 |
+| `Return` | 中斷正在執行的腳本 |
+| `And` `Or` `Not` `Xor` | 邏輯運算 |
+| `True` `False` | 邏輯值 |
+| `Cross` `Crosses` `Above` `Below` `Over` `Under`，及組合 `Cross Above/Below/Over/Under`、`Crosses Above/Below/Over/Under` | 穿越判斷（見 §4） |
+
+`Default` 有兩種用法：一是 `Switch` 內「都不符合時」的分支；二是 `GetField` / `GetSymbolField` 的命名參數，指定 K 棒沒有資料時回傳的值，例如 `GetField("本益比", "D", Default := 0)`。後者的條目在 `CONTROLFLOW` 與 `DECLARATION` 各掛一頁，內容相同。
+
+### 9.4 宣告 `DECLARATION`（51 個名稱）
+
+| 名稱（含別名） | 用途（xshelp 首句摘要） |
+|------|------|
+| `Var` `Vars` `Variable` `Variables` | 宣告變數並給預設值 |
+| `Array` `Arrays` | 宣告陣列變數 |
+| `Input` `Inputs` | 宣告腳本參數名稱與型別 |
+| `IntraBarPersist` | 控制變數在逐筆洗價時是否回捲（見 §7） |
+| `Numeric` `NumericSimple` `NumericSeries` `NumericRef` `NumericArray` `NumericArrayRef` | 函數腳本參數：數值類 |
+| `String` `StringSimple` `StringSeries` `StringRef` `StringArray` `StringArrayRef` | 函數腳本參數：字串類 |
+| `TrueFalse` `TrueFalseSimple` `TrueFalseSeries` `TrueFalseRef` `TrueFalseArray` `TrueFalseArrayRef` | 函數腳本參數：布林類 |
+| `Ret` | 內建變數，決定警示與選股腳本的結果 |
+| `RetVal` | 函數腳本的回傳值 |
+| `RetMsg` | 警示觸發時顯示的訊息 |
+| `RetSound` | 警示觸發時的提醒音效 |
+| `Rank` | 選股腳本專用，宣告排行作業 |
+| `Group` | 宣告清單，再以 `GetSymbolGroup` 取值 |
+| `SymbolGroup` | 指標腳本 input 中設定清單類型 |
+| `inputkind` | `input` 宣告時的命名參數 |
+| `dict` `daterange` `symbolprice` | 搭配 `inputkind` 產生選項（一般選項／日期範圍／開高低收） |
+| `quickedit` | 指標腳本 `input` 搭配 `inputkind` 時可另加 |
+| `checkbox` | 搭配 `plot`，把指標變成下拉式選單 |
+| `order` | 搭配 `OutputField`，指定選股結果欄位的排序 |
+| `param` | 搭配大戶持股與散戶持股，調整級距 |
+| `Adjusted` | 搭配 `GetField` / `GetSymbolField`，選擇原始或還原資料 |
+| `Default` | `GetField` / `GetSymbolField` 無資料時的回傳值（見 §9.3 末） |
+| `Asc` `Desc` `axis` | 索引有此名稱，但條目頁內容為空（xshelp 缺頁）；用途**待查證** |
+| `Bool` `Int` `Float` `Double` | **保留字**，見 §9.5 |
+
+### 9.5 保留字（4 個）
+
+`Bool` `Int` `Float` `Double`
+
+xshelp 原文：「此文字為系統預先保留的文字，目前並沒有任何作用。」（[條目](https://xshelp.xq.com.tw/XSHelp/?HelpName=Double&group=DECLARATION)）。
+全站只有這 4 個名稱使用「保留字」頁；它們**不能當型別使用**，也不要當變數名稱。
 
 ---
 
