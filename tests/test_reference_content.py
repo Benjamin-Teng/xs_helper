@@ -102,9 +102,8 @@ class TestXshelpFunctionsCovered(unittest.TestCase):
     # 2026-09-24 以 xshelp rest 索引窮舉 *FUNC 分類（a-z 逐字母查 rest?a=<字母>，以 id 去重，
     # 436 個函數）後，比對 builtin-functions.md + system-functions.md 反引號名單，原本漏收的
     # 42 個函數。GetBarOffset 已收錄（builtin-functions.md），不在此名單。無欄位/非函數需排除。
-    # 全部 42 個依字母序（不分大小寫）取前 40 個已補入 builtin-functions.md 對應表格；
-    # SDT_Sum / SDT_Sum_L 因當次漏收數超過 controller 訂的 40 上限，改列 builtin-functions.md
-    # 檔尾「9. SDT 函數」待補區塊（仍以反引號提及，滿足本測試，但未收進函數表格）。
+    # 全部 42 個皆已補入 builtin-functions.md 對應表格（4 個 FIELDFUNC/GENERALFUNC 補漏，
+    # 38 個新分類「9. SDT 函數（SDTFUNC）」，含 SDT_Sum / SDT_Sum_L）。
     MISSING_BEFORE: tuple[str, ...] = (
         "GetfieldFiscalQ",
         "GetfieldFiscalY",

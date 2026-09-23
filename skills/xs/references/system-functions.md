@@ -446,5 +446,5 @@ value4 = IFF(Close > Open, 1, -1);                  // 三元選值
 > ⚠️ **不會由 runtime F3 自動完成** —— F3 只補使用者單次提問、查完即丟，**不回寫 reference**（見 SPEC Out of Scope「不建立自動全量同步」）。
 
 - [x] `SetBarMode(n)` 各值精確語意 → **已補**（見開頭共通慣例第 4 點：0=Auto / 1=Simple / 2=Series，xshelp 一手校對）。
-- [x] `xshelp` 系統函數清單若有 Preset 未涵蓋者（例如 `GetBarOffset` 本體於日期/跨頻多處被呼叫，但分類在 bif/欄位），於 `builtin-functions.md` 蒸餾時交叉補上。`GetBarOffset` 早已收錄於 builtin-functions.md；2026-09-24 以 xshelp 函數目錄窮舉比對，漏收者已補入（`GetSymbolFieldStartOffset`／`GetfieldFiscalQ`／`GetfieldFiscalY`／`GetSymbolFieldTime`／新分類 `SDTFUNC` 36 條，`SDT_Sum`／`SDT_Sum_L` 因當次漏收數 42 超過 40 之高頻規則列入 builtin-functions.md 檔尾待補）。
+- [x] `xshelp` 系統函數清單若有 Preset 未涵蓋者（例如 `GetBarOffset` 本體於日期/跨頻多處被呼叫，但分類在 bif/欄位），於 `builtin-functions.md` 蒸餾時交叉補上。`GetBarOffset` 早已收錄於 builtin-functions.md；2026-09-24 以 xshelp 函數目錄窮舉比對，漏收者已全數補入（`GetSymbolFieldStartOffset`／`GetfieldFiscalQ`／`GetfieldFiscalY`／`GetSymbolFieldTime`／新分類 `SDTFUNC` 38 條，含 `SDT_Sum`／`SDT_Sum_L`）。
 - [ ] 各函數官方中文說明文字：於後續蒸餾 session 用 xshelp 對應頁面 WebFetch 回填校對（動作是蒸餾，非 runtime F3）。

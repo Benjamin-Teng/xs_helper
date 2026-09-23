@@ -123,7 +123,7 @@ KNOWN_TOKENS: frozenset[str] = frozenset({
     "sdt_removekey", "sdt_removekey_l", "sdt_setcolumnname", "sdt_setcolumnname_l", "sdt_setstring",
     "sdt_setstringif", "sdt_setstringif_l", "sdt_setstring_l", "sdt_setvalue", "sdt_setvalueif",
     "sdt_setvalueif_l", "sdt_setvalue_l", "sdt_sort", "sdt_sortkey", "sdt_sortkey_l",
-    "sdt_sortstring", "sdt_sortstring_l", "sdt_sort_l",
+    "sdt_sortstring", "sdt_sortstring_l", "sdt_sort_l", "sdt_sum", "sdt_sum_l",
 })
 
 

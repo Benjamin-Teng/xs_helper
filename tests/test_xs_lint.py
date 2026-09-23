@@ -88,6 +88,8 @@ class TestCheckUnknownTokens(unittest.TestCase):
             "Value5 = SDT_GetValue(sym, 1);\n"
             "Value6 = SDT_Average_L(1);\n"
             "SDT_Sort(1, keyarr);\n"
+            "Value7 = SDT_Sum(1);\n"
+            "Value8 = SDT_Sum_L(1);\n"
         )
         self.assertEqual(xs_lint.check_unknown_tokens(code), [])
 

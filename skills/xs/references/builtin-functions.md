@@ -329,10 +329,7 @@
 | `SDT_Sort` / `SDT_Sort_L` | `(column, sorted_key_array [, order:=-1])` | 依指定直行的**數值**排序，將排序後的 key 寫入傳入的字串陣列；`order` -1 由小到大（預設）、1 由大到小（[xshelp](https://xshelp.xq.com.tw/XSHelp/?HelpName=SDT_Sort&group=SDTFUNC)） |
 | `SDT_SortString` / `SDT_SortString_L` | `(column, sorted_key_array [, order:=-1])` | 依指定直行的**字串**排序，用法同 `SDT_Sort`（[xshelp](https://xshelp.xq.com.tw/XSHelp/?HelpName=SDT_SortString&group=SDTFUNC)） |
 | `SDT_SortKey` / `SDT_SortKey_L` | `(sorted_key_array [, order:=-1])` | 依 SDT 的 key 排序，將排序後的 key 寫入傳入的字串陣列（[xshelp](https://xshelp.xq.com.tw/XSHelp/?HelpName=SDT_SortKey&group=SDTFUNC)） |
-
-> **待補**：`SDT_Sum` / `SDT_Sum_L`（xshelp 官方範例庫呼叫次數為 0，與本節其餘函數同為
-> 2026-09-24 窮舉發現的漏收項；因當次漏收數超過 40，依 controller 高頻規則只補前 40，
-> 這兩個依字母序排最後，列此待查證後補）。
+| `SDT_Sum` / `SDT_Sum_L` | `(column): Num` | 取得 SDT 指定直行所有列的數值加總；無法轉數值的列以 0 計入（[xshelp](https://xshelp.xq.com.tw/XSHelp/?HelpName=SDT_Sum&group=SDTFUNC)） |
 
 ---
 
