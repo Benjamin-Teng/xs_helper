@@ -42,7 +42,7 @@
     "codex_review_rounds": {
       "label": "Codex 對抗式審查",
       "unit": "輪",
-      "total": 11,
+      "total": 12,
       "note": "自 2026-09-23 起記錄；此前未留紀錄，不估算"
     }
   },
@@ -80,13 +80,13 @@
         "benchmark_task_runs": 0,
         "skill_generated_test_scripts": 20,
         "xshelp_entries_verified": 0,
-        "codex_review_rounds": 4
+        "codex_review_rounds": 5
       },
       "evidence": {
         "lint_validation_script_runs": "XScript_Preset 全量 1419 支 ＋ 檔尾突變注入 1419 支 ＋ 宣告初始值突變注入 1107 支（篩選條件：行首 var/vars/variable(s)/input(s) 宣告且名稱後直接接「(」的檔案；不含 array、group） ＋ 精選語料 50 支（30 官方 ＋ 20 skill 產生）",
         "false_positives_eliminated": "XScript_Preset（sysjust-xq，commit d15a415）全量 1419 支：誤報 3814 → 0，且無新增警示",
         "skill_generated_test_scripts": "subagent 依 skills/xs/ 規範撰寫，五類各 4 支",
-        "codex_review_rounds": "AGENTS.md 2 輪、issue #2 修正 2 輪（本 session 紀錄；統計頁與發版審查完成後再補）"
+        "codex_review_rounds": "AGENTS.md 2 輪、issue #2 修正 2 輪、v0.5.1 發版與統計頁 1 輪（本 session 紀錄；最後只改統計數字的 commit 不另送審，由 TestEffortStats 把關）"
       }
     }
   ],
@@ -133,7 +133,7 @@
     },
     "commits": {
       "label": "commit",
-      "value": "51 個",
+      "value": "53 個",
       "note": "main 分支"
     },
     "releases": {
