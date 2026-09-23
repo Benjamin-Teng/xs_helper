@@ -72,7 +72,7 @@ def _install_cards(html: str) -> list[dict]:
 
 
 class TestPluginManifests(unittest.TestCase):
-    def test_both_hosts_publish_version_0_4_0(self) -> None:
+    def test_both_hosts_publish_version_0_5_0(self) -> None:
         claude = load_json(".claude-plugin/plugin.json")
         codex = load_json(".codex-plugin/plugin.json")
         self.assertEqual(claude["name"], "xs-helper")
