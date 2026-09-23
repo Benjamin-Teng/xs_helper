@@ -81,9 +81,17 @@
 | `NoPlot` | `(seriesNumber)` | 清除該序列繪圖值 |
 | `SetPlotLabel` | `(order, name)` | 設定繪圖序列名稱 |
 | **選股輸出 / 輸入命名** | | |
-| `OutputField` | `(輸出序號, value [, decimals [, name]] [, order:=±1])` | 設定**選股**腳本輸出欄位；第一個參數是「輸出序號」（欄位顯示順序），和命名參數 `order:=`（該欄數值排序：`-1` 由小到大、`1` 由大到小）是兩回事，例：`OutputField1(value1, "5日均量", order:=-1)`（[xshelp](https://xshelp.xq.com.tw/XSHelp/?HelpName=order&group=DECLARATION)） |
+| `OutputField` | `OutputField(輸出序號, 數值)` \| `OutputField(輸出序號, 數值, 小數位數)` \| `OutputField(輸出序號, 數值, 小數位數, 輸出欄位名稱)` \| 序號版 `OutputField1(數值)` \| `OutputField1(數值, 小數位數)` \| `OutputField1(數值, 小數位數, 輸出欄位名稱)` | 設定**選股**腳本輸出欄位（逐字依 [xshelp](https://xshelp.xq.com.tw/XSHelp/?HelpName=outputfield&group=GENERALFUNC) 列出的重載）；還可另外加命名參數 `order:=`（`-1` 由小到大、`1` 由大到小，排序該欄輸出數值），見下方說明與 [order 條目](https://xshelp.xq.com.tw/XSHelp/?HelpName=order&group=DECLARATION) |
 | `SetInputName` | `(order, name)` | 設定 input 參數顯示名 |
 | `SetOutputName` | `(order, title)` | 設定輸出欄位標題 |
+
+**`OutputField` 的 `order:=` 範例與上面簽名的位置定義有落差（照抄兩個來源，不調和）**：
+xshelp `order` 條目給的範例是 `outputfield1(value1,"5日均量",order:=-1);`。按上面
+`OutputField1(數值, 小數位數, 輸出欄位名稱)` 的簽名，第 2 個位置參數應該是「小數位數」（數字），
+但這個範例把字串 `"5日均量"`（欄位名稱）放在第 2 個位置、後面才接命名參數 `order:=-1`——
+也就是說這個範例把「小數位數」整個省略、直接讓字串補進原本該是小數位數的位置。xshelp
+兩個條目（`outputfield` 與 `order`）都沒有解釋這個重載是怎麼決議的（例如是否按型別而非位置比對）。
+這裡**只逐字記錄兩段來源的原文**，不自行推測 XS 引擎的參數比對規則。
 
 ---
 

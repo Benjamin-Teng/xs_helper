@@ -211,6 +211,26 @@ end;
 
 摘錄自 `XQStrategy/01台股的選股條件/04籌碼/大戶持股人數/連續N期大戶持股人數增加.xs`。
 
+**這四個關鍵字是否限定腳本類型（2026-09-24 查證）**：`Once`／`repeat`／`while`／`switch`
+在 xshelp 的 CONTROLFLOW 條目（`Once`、`repeat`、`While`、`switch`）**原文都只講語法與執行邏輯，
+xshelp 條目未限定腳本類型**——沒有任何一段提到「只能用在自動交易」或「不能用在選股／指標」。
+
+官方範例庫（`XScript_Preset` 的 函數／指標／自動交易／警示／選股 五個資料夾，加上
+`XQStrategy` 選股條件庫）逐檔 `grep` 的實際分佈如下（檔案數，非出現次數）：
+
+| 關鍵字 | 函數 | 指標 | 自動交易 | 警示 | 選股（XScript_Preset） | 選股（XQStrategy） |
+|---|---|---|---|---|---|---|
+| `Once` | 0 | 0 | 1 | 0 | 0 | 0 |
+| `repeat` | 0 | 0 | 0 | 0 | 1 | 0 |
+| `while` | 12 | 3 | 0 | 2 | 2 | 0 |
+| `switch` | 16 | 12 | 0 | 7 | 0 | 29 |
+
+`Once` 官方範例庫裡只出現在 `XScript_Preset/自動交易/0-基本語法/09-CancelAllOrders.xs`；
+`repeat` 只出現在 `XScript_Preset/選股/05.型態選股/突破整理格局.xs`；`while` 與 `switch`
+都完全沒出現在「自動交易」資料夾裡，但在其他型別（函數／指標／警示／選股）都至少各出現過一次。
+**這只是官方範例庫目前收錄的用例分佈，不是 xshelp 明講的語法限制**——xshelp 條目文字本身
+沒有排除任何腳本類型，不要把「範例庫剛好沒收錄」誤讀成「語法上不允許」。
+
 ---
 
 ## 4. 運算子
@@ -402,6 +422,12 @@ end;
 if _bias10.pos[1] <> _bias10.pos then ret = 1;
 ```
 
+**`Rank` 屬性支援 `[n]` 位移**：上面這段就是 xshelp 條目自己給的範例，`_bias10.pos[1]` 對 `pos`
+屬性加了序列位移 `[1]`（取前一期的排行結果），xshelp 原文描述這段範例是「透過pos屬性篩選出
+前期排行與當期排行不同的商品」——`pos[1]` 對應「前期排行」、`pos` 對應「當期排行」。因此可以
+確認 `Rank` 屬性支援 `[n]` 位移語法讀取歷史值，依據就是這個範例本身；xshelp 沒有另外用文字明講
+這條規則（只在這一個條目、這一個範例出現），沒有第二個獨立來源可交叉核對。
+
 ### 10.2 參數 UI 宣告：`inputkind` 搭配 `Dict` / `daterange` / `SymbolPrice`，及 `quickedit`
 
 `input` 宣告時可以加 `inputkind` 這個命名參數，用來控制系統參數設定介面（UI）；再搭配 `Dict`、`daterange` 或 `SymbolPrice` 函數產生對應的選項內容。來源：[HelpName=inputkind&group=DECLARATION](https://xshelp.xq.com.tw/XSHelp/?HelpName=inputkind&group=DECLARATION)（`dict`／`daterange`／`symbolprice` 三個條目頁內容皆為「搭配 inputkind 使用，可參考 inputkind 語法說明」，不重複摘錄）。
@@ -410,7 +436,7 @@ if _bias10.pos[1] <> _bias10.pos then ret = 1;
 
 - `Dict` 只是把 UI 改成下拉選單；**變數的型別跟預設值一致**，腳本內照一般 `input` 變數讀值即可（下例 `IndexPomUnit` 讀回來就是數值 1 或 2）。
 - `daterange(最小日期, 最大日期, "頻率")` 宣告出來的變數是**單一日期**（`YYYYMMDD` 數值），不是日期區間；`daterange` 的最小／最大兩個參數只是限制 UI 上日曆可選的範圍，第三個參數是頻率字串（支援日／週／月／季／半年／年）。
-- `SymbolPrice()` 讓使用者在 UI 上選 Open、High、Low、Close 四者之一；變數本身仍是數值（讀回來的就是使用者選定的那個價格欄位）。
+- `SymbolPrice()` 讓使用者在 UI 上選 Open、High、Low、Close 四者之一；變數本身仍是數值（讀回來的就是使用者選定的那個價格欄位）。**xshelp 未說明**這個變數宣告之後能不能像序列一樣使用（例如傳進 `Average()` 或加 `[n]` 位移）——xshelp 原文只到「方便在介面上勾選 Open、High、Low、Close 四個選項使用」為止，沒有後續用法示範；範例裡的預設值 `200`（`input:OHLC_Opti(200,"價格：",inputkind:=SymbolPrice());`）代表什麼 xshelp 原文也沒解釋（不是 Open/High/Low/Close 四個選項常見的代碼值，也未見於官方範例庫其他 `SymbolPrice` 用例交叉核對）。兩點皆**待查證**，不要自行腦補成「像其他序列一樣可用」或「200 是某個特定意義的代碼」。
 - `quickedit:=true` 只影響**指標腳本**的 UI（讓 `inputkind` 設定的選項能直接在主圖／副圖上選、不用另開指標設定），**不改變讀值方式**。
 
 `Dict` 產生選項（xshelp 範例，`IndexPomUnit` 預設單位為金額）：

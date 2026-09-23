@@ -156,5 +156,39 @@ class TestXshelpFunctionsCovered(unittest.TestCase):
                 self.assertIn(f"`{name}`", text)
 
 
+class TestGapFillingTask7(unittest.TestCase):
+    """Task 7 (2026-09-24)：驗收測試發現的 4 個推測缺口，逐一改成明講或標「待查證」。"""
+
+    def test_rank_offset_supported_explicitly(self) -> None:
+        text = read_ref("language.md")
+        self.assertIn("_bias10.pos[1]", text)
+        self.assertIn("支援 `[n]` 位移", text)
+
+    def test_symbolprice_series_usage_is_silent(self) -> None:
+        text = read_ref("language.md")
+        # xshelp 對「宣告出來的變數能否像序列一樣用（Average / [n]）」與
+        # 「範例預設值 200 代表什麼」都沒有說明，須明講待查證，不可自行補語意。
+        self.assertIn("xshelp 未說明", text)
+        self.assertIn("待查證", text)
+
+    def test_controlflow_keywords_not_restricted_by_script_type_in_xshelp(self) -> None:
+        text = read_ref("language.md")
+        self.assertIn("xshelp 條目未限定腳本類型", text)
+        # 官方範例庫的實際分佈要寫進去佐證，且是可查證的計數，不是憑印象寫的語意。
+        self.assertIn("Once", text)
+        self.assertIn("自動交易", text)
+        self.assertIn("突破整理格局.xs", text)
+
+    def test_outputfield_signature_matches_xshelp_overloads(self) -> None:
+        text = read_ref("builtin-functions.md")
+        # xshelp fulldesc 逐字列出的四種重載（序號版）
+        self.assertIn("OutputField(輸出序號, 數值)", text)
+        self.assertIn("OutputField(輸出序號, 數值, 小數位數)", text)
+        self.assertIn("OutputField(輸出序號, 數值, 小數位數, 輸出欄位名稱)", text)
+        # order 範例把字串放在「小數位數」的位置，與上面簽名的位置定義互相矛盾，
+        # 必須明講這個落差，不能假裝兩段來源一致。
+        self.assertIn("第 2 個位置參數應該是「小數位數」", text)
+
+
 if __name__ == "__main__":
     unittest.main()
