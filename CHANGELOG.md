@@ -6,10 +6,11 @@
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-09-23
+
 ### Added
 
 - **GitHub Pages 新增 Shioaji Pro 安裝卡**：在 Codex 安裝卡之後說明「AI Agent 面板技能區貼上 `Benjamin-Teng/xs_helper` 後按安裝」。
-
 - **`language.md` 新增 §9 關鍵字與保留字總表**：窮舉 xshelp「關鍵字」大分類 4 個 group 共 110 個名稱（忽略字 14、常數 8、流程控制 37、宣告 51），含 4 個保留字 `Bool` `Int` `Float` `Double`；§2 補命名限制（源自 PR #1，改為附一手來源的保守寫法，編譯器行為待查證）。
 - **`xs_lint` 補收可呼叫的 xshelp 關鍵字**：`Dict` `DateRange` `SymbolPrice`（`inputkind:=` 的選項產生函數），避免誤報為未知 token；`checkbox` 等命名參數不會以呼叫形式出現，刻意不收；保留字 `Bool` `Int` `Float` `Double` 自白名單移除，呼叫形式改為警示。
 
@@ -89,7 +90,8 @@ reference 校正與新手友善文件；新增對外量化報表（GitHub Pages�
 - **`.xs` 編輯驗證 Hook**（`PostToolUse: Write|Edit` → `xs_lint.py`）：對照 604 個 token（grammar 2023 快照 ∪ Preset 215 sysfnc ∪ xshelp 8 群組 bif）的啟發式檢查，對未收錄函數與明顯結構問題提出非阻斷式警示。
 - **散佈基礎建設**：`.claude-plugin/marketplace.json`（marketplace `xs-tools`）、`plugin.json` 起 semver `0.1.0`、MIT LICENSE。
 
-[Unreleased]: https://github.com/Benjamin-Teng/xs_helper/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/Benjamin-Teng/xs_helper/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/Benjamin-Teng/xs_helper/releases/tag/v0.5.0
 [0.4.0]: https://github.com/Benjamin-Teng/xs_helper/releases/tag/v0.4.0
 [0.3.0]: https://github.com/Benjamin-Teng/xs_helper/releases/tag/v0.3.0
 [0.2.0]: https://github.com/Benjamin-Teng/xs_helper/releases/tag/v0.2.0

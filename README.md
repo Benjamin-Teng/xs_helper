@@ -89,7 +89,14 @@ codex plugin add xs-helper@xs-tools
 
 ## 狀態
 
-✅ **v0.4.0** —— skill 目錄改為 Agent Skills 規範的 `references/`（扁平、單層），Shioaji Pro 等只索引固定目錄名的技能安裝器也能讀到 reference；同時提供 Claude Code 與 Codex 原生 manifest / marketplace，兩端共用同一份 skill；Codex plugin 與 skill validator 通過。v0.2.0 移除的 `.xs` 編輯驗證 Hook 維持不掛載，`xs_lint.py` 保留為獨立腳本。功能仍在迭代。
+✅ **v0.5.0** —— 本版重點：
+
+- **關鍵字與保留字總表**：`language.md` §9 窮舉 xshelp「關鍵字」大分類共 110 個名稱（忽略字、常數、流程控制、宣告），標出 4 個保留字 `Bool` `Int` `Float` `Double`，並附命名建議。
+- **修正型別表**：上述 4 個保留字原被誤列為「原生型別」，已移出；`TrueFalseSimpleVar` 更正為 xshelp 的 `TrueFalseSimple`。
+- **`xs_lint.py` 白名單校正**：補收 `Dict` `DateRange` `SymbolPrice`，保留字的呼叫形式改為警示。
+- **GitHub Pages**：新增 Shioaji Pro 安裝卡；「目前最新版本」改為即時讀取 GitHub Releases。
+
+沿用先前版本：skill 目錄採 Agent Skills 規範的 `references/`（扁平、單層，v0.4.0 起），Shioaji Pro 等只索引固定目錄名的技能安裝器也讀得到；Claude Code 與 Codex 各有原生 manifest / marketplace，兩端共用同一份 skill。v0.2.0 移除的 `.xs` 編輯驗證 Hook 維持不掛載，`xs_lint.py` 保留為獨立腳本。功能仍在迭代。
 
 📊 **成效**：[skill 助益量化報表](https://benjamin-teng.github.io/xs_helper/) —— 8 個真實 XS 任務「載 skill vs 未載」對照，通過率 100% vs 75%、零幻覺 token。
 

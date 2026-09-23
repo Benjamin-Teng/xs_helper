@@ -8,7 +8,7 @@
 >
 > 對應 SPEC：[SPEC.md](SPEC.md) 的 Project Structure / Features。
 
-**狀態（v0.4.0）：** `skills/xs/` 是唯一 runtime 知識來源，Claude Code 以 `/xs`、Codex 以 `$xs` 使用；兩端也可依 skill description 自動載入。`PostToolUse: Write|Edit → xs_lint.py` 的**自動 hook 已於 v0.2.0 移除**（見 [CHANGELOG](../CHANGELOG.md) / [SPEC F4](SPEC.md)）。`scripts/xs_lint.py` 保留為 benchmark 與手動檢查工具；下方 Hook 旁支/節點只保留為移除前的歷史設計記錄。
+**狀態（v0.5.0）：** `skills/xs/` 是唯一 runtime 知識來源，Claude Code 以 `/xs`、Codex 以 `$xs` 使用；兩端也可依 skill description 自動載入。`PostToolUse: Write|Edit → xs_lint.py` 的**自動 hook 已於 v0.2.0 移除**（見 [CHANGELOG](../CHANGELOG.md) / [SPEC F4](SPEC.md)）。`scripts/xs_lint.py` 保留為 benchmark 與手動檢查工具；下方 Hook 旁支/節點只保留為移除前的歷史設計記錄。
 
 ## 雙平台封裝與安裝
 
