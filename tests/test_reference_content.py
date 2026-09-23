@@ -46,8 +46,12 @@ class TestControlFlowExamples(unittest.TestCase):
         self.assertRegex(self.code, r"once\s*\(.+\)\s*begin")
 
     def test_switch_nested_and_case_range(self) -> None:
-        self.assertRegex(self.code, r"switch\s*\(")
         self.assertRegex(self.code, r"case \d+ to \d+:")
+        blocks = xs_blocks(read_ref("language.md"))
+        self.assertTrue(
+            any(len(re.findall(r"\bswitch\s*\(", block, re.IGNORECASE)) >= 2 for block in blocks),
+            "expected at least one xs block with a nested switch (>=2 `switch(` occurrences)",
+        )
 
 
 class TestRankAndInputKind(unittest.TestCase):
