@@ -162,6 +162,51 @@ def check_structure(code: str) -> list[str]:
     return warnings
 
 
+# 宣告語句開頭：var/vars/variable(s)、input(s)、array(s)、group 後接冒號；`:=` 是命名參數，排除。
+_DECL_RE = re.compile(r"\b(?:vars?|variables?|inputs?|arrays?|group)\s*:(?!=)", re.IGNORECASE)
+_MODIFIER_RE = re.compile(r"intrabarpersist\s+", re.IGNORECASE)
+_IDENT_RE = re.compile(r"[A-Za-z_]\w*")
+
+
+def declared_name_starts(code: str) -> set[int]:
+    """回傳宣告語句中「變數／參數名稱」的起始位置（issue #2）。
+
+    `var: acc(0), idx(0);` 的 acc、idx 形如呼叫、實為宣告。掃描宣告冒號到分號之間，
+    括號深度 0 且位於冒號或逗號之後的第一個識別字即為名稱（可前置 intraBarPersist）；
+    括號內的初始值與 `inputkind:=Dict(...)` 等仍交給呼叫檢查。字串字面量整段略過。
+    """
+    starts: set[int] = set()
+    for m in _DECL_RE.finditer(code):
+        i, depth, expect_name = m.end(), 0, True
+        while i < len(code):
+            ch = code[i]
+            if ch == '"':
+                close = code.find('"', i + 1)
+                i = len(code) if close < 0 else close + 1
+                continue
+            if ch == ";" and depth == 0:
+                break
+            if ch in "([":
+                depth += 1
+            elif ch in ")]":
+                depth -= 1
+            elif ch == "," and depth == 0:
+                expect_name = True
+            elif expect_name and depth == 0 and not ch.isspace():
+                expect_name = False
+                modifier = _MODIFIER_RE.match(code, i)
+                if modifier:
+                    i, expect_name = modifier.end(), True
+                    continue
+                ident = _IDENT_RE.match(code, i)
+                if ident:
+                    starts.add(i)
+                    i = ident.end()
+                    continue
+            i += 1
+    return starts
+
+
 def check_unknown_tokens(code: str) -> list[str]:
     """未知函數 token 檢查（依賴 KNOWN_TOKENS；未填則跳過）。
 
@@ -169,11 +214,18 @@ def check_unknown_tokens(code: str) -> list[str]:
     比對前正規化去尾數字（Plot2 → plot、OutputField12 → outputfield），對應 grammar
     裡的數字後綴函數族。未命中者**不武斷判錯**——XS 允許自訂函數，故警示語明示
     「可能為自訂函數或拼寫錯誤」，符合「寧放行不誤殺」的離線清單定位。
+    宣告語句裡的名稱（`var: x(0)`）不是呼叫，先排除（見 declared_name_starts）。
     """
     if not KNOWN_TOKENS:
         return []
+    declared = declared_name_starts(code)
+    calls = {
+        m.group(1).lower()
+        for m in re.finditer(r"\b([A-Za-z_]\w*)\s*\(", code)
+        if m.start() not in declared
+    }
     warnings: list[str] = []
-    for name in sorted({m.lower() for m in re.findall(r"\b([A-Za-z_]\w*)\s*\(", code)}):
+    for name in sorted(calls):
         if name in KNOWN_TOKENS:
             continue
         if re.sub(r"\d+$", "", name) in KNOWN_TOKENS:  # 去尾數字再比對（Plot2…）

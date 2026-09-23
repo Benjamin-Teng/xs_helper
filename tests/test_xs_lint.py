@@ -69,16 +69,48 @@ class TestCheckUnknownTokens(unittest.TestCase):
         self.assertEqual(xs_lint.check_unknown_tokens(""), [])
 
     def test_xshelp_callable_keywords_not_flagged(self) -> None:
-        # xshelp inputkind 官方範例：Dict / DateRange / SymbolPrice 以呼叫形式出現，不應誤報。
-        # 只斷言這三者：宣告名稱 U( / D( / P( 被當成呼叫而誤報是既有已知限制（main 即如此），
-        # 屬另案處理，不在本測試範圍。
+        # xshelp inputkind 官方範例整段：Dict / DateRange / SymbolPrice 呼叫與宣告名稱都不應誤報
         code = (
             'input: U(1, "單位", inputkind:=Dict(["金額",1],["張數",2]));\n'
             'input: D(20180301, "日期", inputkind:=daterange(20160301,20190301,"D"));\n'
             'input: P(200, "價格", inputkind:=SymbolPrice());\n'
         )
-        warns = xs_lint.check_unknown_tokens(code)
-        self.assertFalse(any(k in w for w in warns for k in ("dict", "daterange", "symbolprice")))
+        self.assertEqual(xs_lint.check_unknown_tokens(code), [])
+
+    def test_declaration_names_not_flagged(self) -> None:
+        # issue #2：var/input/... 宣告的名稱不是函數呼叫
+        cases = [
+            "var: acc(0), idx(0);",
+            "Vars: a1(0), b2(0);",
+            "Variable: v1(0);",
+            "Variables: v2(0), v3(0);",
+            'input: pv(numericsimple, "成交金額");',
+            "Inputs: len1(5), len2(10);",
+            "var: intraBarPersist _last_date(0), intrabarpersist _cnt(0);",
+            "Array: MAArray[](0); Arrays: a[10](0);",
+            "Group: myGroup();",
+            "var:\n    first_v(0),\n    second_v(0);",
+        ]
+        for code in cases:
+            with self.subTest(code=code):
+                self.assertEqual(xs_lint.check_unknown_tokens(code), [])
+
+    def test_calls_inside_declarations_still_checked(self) -> None:
+        # 宣告只豁免「名稱」；初始值與命名參數裡的真實呼叫仍要檢查
+        warns = xs_lint.check_unknown_tokens(
+            'var: x(FooBar(1)), y(0);\ninput: z(0, "z", inputkind:=BazQux());'
+        )
+        self.assertEqual(sorted(w.split("：")[1].split("（")[0] for w in warns), ["bazqux", "foobar"])
+
+    def test_named_parameter_colon_equals_is_not_declaration(self) -> None:
+        # `checkbox:=1` 的 `:` 不是宣告冒號，後面的未知呼叫仍要警示
+        warns = xs_lint.check_unknown_tokens('plot1(close, "c", checkbox:=1); Foo(1);')
+        self.assertTrue(any("foo" in w for w in warns))
+
+    def test_same_name_called_outside_declaration_is_checked(self) -> None:
+        # 豁免只作用在宣告位置；宣告外同名的呼叫照常檢查
+        warns = xs_lint.check_unknown_tokens("var: mine(0);\nvalue1 = mine(1);")
+        self.assertTrue(any("mine" in w for w in warns))
 
     def test_named_parameter_keyword_called_is_flagged(self) -> None:
         # checkbox 是 Plot 的命名參數（checkbox:=1），寫成 checkbox( 屬可疑呼叫，應警示
