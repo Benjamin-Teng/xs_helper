@@ -59,6 +59,23 @@ Input: TargetArray[X](NumericArrayRef);   // 陣列參考（回填用）
 - `*Simple`：純量；`*Series`：時間序列（可用 `x[n]` 取前 n 根值）；`*Ref` / `*ArrayRef`：傳參考（函數回填）。
 - 回傳：`RetVal` / `Ret` / `RetMsg`（`function` 類以 `retval = …` 回傳，見 [script-types.md](script-types.md)）。
 
+### 型別家族語意：`Simple` / `Series` / `Ref` / `Array`（僅函數腳本 `input`／`Input:`）
+
+以下語意逐字依 xshelp「數值 (Numeric)」家族的 8 個 DECLARATION 條目頁（`og:description`）；`String`／`TrueFalse` 家族的條目頁原文皆寫「相關的語法請參考Numeric」，故只列差異處。
+
+| 型別 | xshelp 原文要點 | 何時用 | 條目連結 |
+|------|------------------|--------|----------|
+| `Numeric` / `String` / `TrueFalse`（無字尾） | 原文：「**僅適用於函數腳本內**」，語法用來定義函數腳本的參數為對應型態（數值／字串／邏輯值）。「目前XS系統內，只要是數值參數，腳本內可以混用Numeric, NumericSimple, 以及 NumericSeries 這三種宣告方式，不影響腳本執行的結果。」 | 函數 `Input:` 宣告參數型態，混用三種寫法不影響執行結果 | [HelpName=Numeric&group=DECLARATION](https://xshelp.xq.com.tw/XSHelp/?HelpName=Numeric&group=DECLARATION) |
+| `NumericSimple` | 原文以範例區分：「Length因為只會用到當下的數值，所以可以宣告成NumericSimple」——表示傳入的數值為一個**單一數值** | 參數只會用到當下這一個值時 | 同上（`Numeric` 條目內文） |
+| `NumericSeries` | 原文以範例區分：「由於Price是被當成序列來使用(計算加總時會用到前期值)，所以可以宣告成NumericSeries」——表示傳入的數值為一個**序列** | 參數會用到前期值（例如加總、取前根資料）時 | 同上（`Numeric` 條目內文） |
+| `NumericRef` | 原文：「當一個函數變數被宣告成Numeric時，在函數內對這個數值的修改並不會影響呼叫者端傳入的變數，這個行為稱之為 Call By Value。如果有需要從函數內可以更改呼叫者端的變數的話，則可以使用NumericRef的語法，此時的行為會變成Call By Reference。」——即**可以從函數內修改呼叫者傳入的數值** | 函數需要回傳多個值（藉由修改呼叫端傳入的變數）時 | [HelpName=NumericRef&group=DECLARATION](https://xshelp.xq.com.tw/XSHelp/?HelpName=NumericRef&group=DECLARATION) |
+| `NumericArray` | 原文：「NumericArray與Numeric最大的差異是在Input語法內陣列變數名稱之後還需要定義`[陣列大小變數]`」，該變數的數值會是傳入陣列的大小；二維陣列語法為 `[X,Y]`，兩個變數分別是傳入陣列的行數與欄數 | 函數參數需要接收陣列（一維或二維）時 | [HelpName=NumericArray&group=DECLARATION](https://xshelp.xq.com.tw/XSHelp/?HelpName=NumericArray&group=DECLARATION) |
+| `NumericArrayRef` | 原文：「可以視為NumericArray以及NumericRef的綜合體」——陣列 + 可從函數內修改呼叫者傳入的陣列 | 函數需要回填（修改）呼叫端傳入的陣列時 | [HelpName=NumericArrayRef&group=DECLARATION](https://xshelp.xq.com.tw/XSHelp/?HelpName=NumericArrayRef&group=DECLARATION) |
+| `String` / `StringRef` | `String` 原文同 `Numeric` 僅型態換成字串；`StringRef` 原文：「可以從函數內修改呼叫者傳入的數值」，並註明回傳行為「請參考 NumericRef」 | 與對應 `Numeric*` 相同，型態換成字串 | [HelpName=String&group=DECLARATION](https://xshelp.xq.com.tw/XSHelp/?HelpName=String&group=DECLARATION)、[HelpName=StringRef&group=DECLARATION](https://xshelp.xq.com.tw/XSHelp/?HelpName=StringRef&group=DECLARATION) |
+| `TrueFalse` / `TrueFalseRef` | `TrueFalse` 原文同 `Numeric` 僅型態換成邏輯值（TRUE 或 FALSE）；`TrueFalseRef` 原文同 `StringRef`，回傳行為「請參考 NumericRef」 | 與對應 `Numeric*` 相同，型態換成邏輯值 | [HelpName=TrueFalse&group=DECLARATION](https://xshelp.xq.com.tw/XSHelp/?HelpName=TrueFalse&group=DECLARATION)、[HelpName=TrueFalseRef&group=DECLARATION](https://xshelp.xq.com.tw/XSHelp/?HelpName=TrueFalseRef&group=DECLARATION) |
+
+> ⚠️ **skill 慣例（非 xshelp 原文）**：xshelp 沒有明講 `Series` 可用 `[n]` 語法取前值；§2 開頭「序列位移」一節的 `x[n]` 用法是本 skill 依 Preset 原始碼與既有用法歸納的慣例，不是 xshelp 逐字定義。上表 `NumericSimple`／`NumericSeries` 的差異僅到「單一數值 vs 序列（會用到前期值）」為止，這是 xshelp 原文本身講的語意。
+
 ### 序列位移（offset）
 
 `Series` 型別變數與報價欄位可用 `[n]` 取「往前第 n 根 K 棒」的值（`[0]` = 當根）：
@@ -432,5 +449,5 @@ if IndexPomUnit = 1 then plot1(GetField("融資買進金額", "D")) else if Inde
 
 ## 待補（後續蒸餾）
 
-- [ ] 各型別關鍵字的精確語意差異（`Simple` vs `Series` vs `Ref` 的記憶體/求值模型）以 xshelp 校對補強。
+- [x] 各型別關鍵字的精確語意差異（`Simple` vs `Series` vs `Ref` 的記憶體/求值模型）以 xshelp 校對補強 → 已補（§2「型別家族語意」小節，出處見各條目連結）。
 - [x] `switch/case`、`repeat/until`、`while` 的完整語法範式 → 已補（§3.1，出處見各段）。

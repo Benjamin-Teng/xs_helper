@@ -90,5 +90,13 @@ class TestPlotAndOutputFieldNamedParams(unittest.TestCase):
         self.assertIn("axis:=", text)
 
 
+class TestTypeSemantics(unittest.TestCase):
+    def test_simple_series_ref_explained_with_source(self) -> None:
+        text = read_ref("language.md")
+        self.assertIn("僅適用於函數腳本", text)
+        self.assertIn("HelpName=NumericRef", text)
+        self.assertIn("HelpName=Numeric&group=DECLARATION", text)
+
+
 if __name__ == "__main__":
     unittest.main()
