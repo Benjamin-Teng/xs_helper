@@ -176,7 +176,10 @@ def declared_name_starts(code: str) -> set[int]:
     括號內的初始值與 `inputkind:=Dict(...)` 等仍交給呼叫檢查。字串字面量整段略過。
     """
     starts: set[int] = set()
+    scanned_to = 0  # 已掃過的位置；重疊的宣告命中直接跳過，未終止宣告也維持 O(n)
     for m in _DECL_RE.finditer(code):
+        if m.start() < scanned_to:
+            continue
         i, depth, expect_name = m.end(), 0, True
         while i < len(code):
             ch = code[i]
@@ -204,6 +207,7 @@ def declared_name_starts(code: str) -> set[int]:
                     i = ident.end()
                     continue
             i += 1
+        scanned_to = i
     return starts
 
 

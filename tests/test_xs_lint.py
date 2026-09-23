@@ -107,6 +107,16 @@ class TestCheckUnknownTokens(unittest.TestCase):
         warns = xs_lint.check_unknown_tokens('plot1(close, "c", checkbox:=1); Foo(1);')
         self.assertTrue(any("foo" in w for w in warns))
 
+    def test_unterminated_declarations_scan_linearly(self) -> None:
+        # 未打分號的宣告不可讓每個 var: 各自重掃尾段（O(n²)）。
+        # 16000 行：線性約 0.01 秒；平方級實測外推約 50 秒以上。
+        import time
+
+        t0 = time.perf_counter()
+        warns = xs_lint.check_unknown_tokens(("var:\n" * 16000) + "Foo();")
+        self.assertLess(time.perf_counter() - t0, 1.0)
+        self.assertTrue(any("foo" in w for w in warns))
+
     def test_same_name_called_outside_declaration_is_checked(self) -> None:
         # 豁免只作用在宣告位置；宣告外同名的呼叫照常檢查
         warns = xs_lint.check_unknown_tokens("var: mine(0);\nvalue1 = mine(1);")
