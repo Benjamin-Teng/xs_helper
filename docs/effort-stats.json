@@ -1,0 +1,150 @@
+{
+  "schema": "累計類（cumulative）只能追加 history 增量，totals 由測試驗證＝各筆 history 增量加總；現況類（snapshot）每次更新直接覆寫為當下值。",
+  "as_of": "2026-09-24",
+  "since": "2026-05-30",
+  "cumulative": {
+    "official_scripts_distilled": {
+      "label": "蒸餾期研讀的官方 XS 腳本",
+      "unit": "支",
+      "total": 6114,
+      "note": "XScript_Preset 1366 支（五類）＋ XQStrategy 4748 支（選股）"
+    },
+    "lint_validation_script_runs": {
+      "label": "lint 驗證掃描的腳本",
+      "unit": "支·次",
+      "total": 10109,
+      "note": "真實語料重掃、突變注入測試、精選語料測試的累計掃描量"
+    },
+    "false_positives_eliminated": {
+      "label": "在官方語料上消除的 lint 誤報",
+      "unit": "個",
+      "total": 3868,
+      "note": "官方程式碼一定合法，其上的警示即誤報"
+    },
+    "benchmark_task_runs": {
+      "label": "「載 skill vs 未載」評測任務",
+      "unit": "次",
+      "total": 16,
+      "note": "8 個任務 × 2 輪，每次各跑載入與未載兩組"
+    },
+    "skill_generated_test_scripts": {
+      "label": "依 skill 規範產生的測試腳本",
+      "unit": "支",
+      "total": 20,
+      "note": "五類各 4 支，用來同時檢驗 skill 與 lint"
+    },
+    "xshelp_entries_verified": {
+      "label": "逐條對照 xshelp 官方站的條目",
+      "unit": "條",
+      "total": 110,
+      "note": "關鍵字大分類全量窮舉並逐頁核對"
+    },
+    "codex_review_rounds": {
+      "label": "Codex 對抗式審查",
+      "unit": "輪",
+      "total": 11,
+      "note": "自 2026-09-23 起記錄；此前未留紀錄，不估算"
+    }
+  },
+  "history": [
+    {
+      "version": "v0.1.0–v0.5.0",
+      "date": "2026-09-23",
+      "summary": "開專案到 v0.5.0 的基準：蒸餾官方範例與 xshelp、建立 lint、兩輪評測、窮舉關鍵字與保留字（PR #1）",
+      "deltas": {
+        "official_scripts_distilled": 6114,
+        "lint_validation_script_runs": 6114,
+        "false_positives_eliminated": 54,
+        "benchmark_task_runs": 16,
+        "skill_generated_test_scripts": 0,
+        "xshelp_entries_verified": 110,
+        "codex_review_rounds": 7
+      },
+      "evidence": {
+        "official_scripts_distilled": "skills/xs/references/script-types.md §0（Preset 1366 支依 {@type:} 分布）；commit d74d52f（以 sources/ 全 6114 支重掃）；sysjust-xq/XQStrategy clone 實數 4748 支",
+        "lint_validation_script_runs": "commit d74d52f：KNOWN_TOKENS 重生後對 6114 支真實 .xs 重掃",
+        "false_positives_eliminated": "commit d74d52f：誤判面 55 → 1",
+        "benchmark_task_runs": "docs/index.html 評測報表：8 案例、38 條 assertion、2 輪",
+        "xshelp_entries_verified": "skills/xs/references/language.md §9；CHANGELOG [0.5.0]",
+        "codex_review_rounds": "PR #1 共 5 輪、v0.5.0 發版 2 輪（本 session 紀錄）"
+      }
+    },
+    {
+      "version": "v0.5.1",
+      "date": "2026-09-24",
+      "summary": "修正 lint 把宣告名稱誤報為未知函數（issue #2）並改為線性掃描；新增 AGENTS.md；以官方全量語料、突變注入與 50 支精選語料做高強度驗證",
+      "deltas": {
+        "official_scripts_distilled": 0,
+        "lint_validation_script_runs": 3995,
+        "false_positives_eliminated": 3814,
+        "benchmark_task_runs": 0,
+        "skill_generated_test_scripts": 20,
+        "xshelp_entries_verified": 0,
+        "codex_review_rounds": 4
+      },
+      "evidence": {
+        "lint_validation_script_runs": "XScript_Preset 全量 1419 支 ＋ 檔尾突變注入 1419 支 ＋ 宣告初始值突變注入 1107 支（篩選條件：行首 var/vars/variable(s)/input(s) 宣告且名稱後直接接「(」的檔案；不含 array、group） ＋ 精選語料 50 支（30 官方 ＋ 20 skill 產生）",
+        "false_positives_eliminated": "XScript_Preset（sysjust-xq，commit d15a415）全量 1419 支：誤報 3814 → 0，且無新增警示",
+        "skill_generated_test_scripts": "subagent 依 skills/xs/ 規範撰寫，五類各 4 支",
+        "codex_review_rounds": "AGENTS.md 2 輪、issue #2 修正 2 輪（本 session 紀錄；統計頁與發版審查完成後再補）"
+      }
+    }
+  ],
+  "snapshot": {
+    "reference_docs": {
+      "label": "reference 文件",
+      "value": "10 份",
+      "note": "5 份規範 ＋ 5 份範例（含 12 段精選 XS 程式碼）"
+    },
+    "system_functions": {
+      "label": "收錄的 Preset 系統函數",
+      "value": "224 個",
+      "note": "依官方目錄分 14 類（system-functions.md）"
+    },
+    "builtin_categories": {
+      "label": "xshelp 內建函數分類",
+      "value": "8 類",
+      "note": "builtin-functions.md"
+    },
+    "keywords": {
+      "label": "關鍵字與保留字",
+      "value": "110 個",
+      "note": "含 4 個保留字 Bool / Int / Float / Double"
+    },
+    "screening_fields": {
+      "label": "選股欄位",
+      "value": "498+ 種",
+      "note": "fields.md 所列中文欄位"
+    },
+    "known_tokens": {
+      "label": "lint 內建已知 token",
+      "value": "603 個",
+      "note": "grammar ∪ Preset 系統函數 ∪ xshelp 內建函數 ∪ 可呼叫關鍵字，扣除保留字"
+    },
+    "lint_rules": {
+      "label": "lint 檢查",
+      "value": "結構 ＋ 未知呼叫",
+      "note": "begin/end 與 if/then 配對；未知函數呼叫（豁免宣告名稱、保留字呼叫會警示）"
+    },
+    "unit_tests": {
+      "label": "單元測試",
+      "value": "51 個",
+      "note": "v0.1.0 時為 17 個"
+    },
+    "commits": {
+      "label": "commit",
+      "value": "51 個",
+      "note": "main 分支"
+    },
+    "releases": {
+      "label": "版本",
+      "value": "9 個",
+      "note": "v0.1.0 至 v0.5.1 的 git tag"
+    },
+    "dev_days": {
+      "label": "開發期間",
+      "value": "117 天",
+      "note": "2026-05-30 起"
+    }
+  }
+}

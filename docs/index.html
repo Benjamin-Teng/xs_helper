@@ -131,6 +131,17 @@
   .card .lbl{color:var(--muted);font-size:.92rem;margin-top:10px}
   .card .delta{font-family:var(--mono);font-size:.82rem;color:var(--good);margin-top:10px;font-weight:600}
 
+  /* ===== Effort stats ===== */
+  .effort-h3{font-family:var(--serif);font-size:1.1rem;margin:34px 0 0}
+  #effort-cards .num{font-size:2.3rem}
+  #effort-cards .delta{color:var(--muted);font-family:var(--sans);font-weight:400;font-size:.8rem}
+  .snap{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:14px}
+  .snap>div{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:12px 14px}
+  .snap b{display:block;font-family:var(--mono);font-size:1.05rem;color:var(--text)}
+  .snap span{display:block;color:var(--muted);font-size:.82rem;margin-top:2px}
+  .effort-foot{color:var(--muted);font-size:.82rem;margin-top:18px}
+  .effort-foot a{color:var(--accent)}
+
   /* ===== Method panel ===== */
   .method{background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--accent);
     border-radius:12px;padding:22px 26px;margin-top:22px;font-size:.94rem;color:var(--muted)}
@@ -484,6 +495,16 @@ if inSP500 and roe&gt;15 and pe&gt;0
   </ul>
 </section>
 
+<section id="effort">
+  <h2>這份 skill 下了多少功夫<span class="sub" id="effort-sub">從開專案起累計，每次更新在上一次的數字上疊加</span></h2>
+  <div class="cards" id="effort-cards"></div>
+  <h3 class="effort-h3">目前規模</h3>
+  <div class="snap" id="effort-snap"></div>
+  <h3 class="effort-h3">每次更新疊加了什麼</h3>
+  <ul class="notes" id="effort-hist"></ul>
+  <p class="effort-foot" id="effort-foot">統計資料：<a href="effort-stats.json">effort-stats.json</a>（每個數字都附出處；查不到根據的項目不估算、不列入）。</p>
+</section>
+
 <footer>
   <p><b>xs-helper</b> — 讓 Claude Code 與 Codex 依 XScript 規範協助撰寫自動交易 / 選股 / 指標 / 警示 / 函數腳本的共享 skill。</p>
   <p class="meta">本報告由 skill-creator 評測流程產生 · 模型 Claude Opus 4.8 · 8 案例 / 38 assertion / 2 輪 ·
@@ -587,6 +608,33 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeInstall();});
       }
     })
     .catch(function(){});
+})();
+// 投入功夫統計：資料在 effort-stats.json（累計類＝history 增量加總，現況類＝當下值）；抓不到就只留連結
+(function showEffortStats(){
+  if(!window.fetch)return;
+  function el(tag,cls,text){var e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e;}
+  fetch('effort-stats.json').then(function(r){return r.ok?r.json():Promise.reject(r.status)}).then(function(d){
+    document.getElementById('effort-sub').textContent='自 '+d.since+' 開專案累計至 '+d.as_of+'，每次更新在上一次的數字上疊加';
+    var cards=document.getElementById('effort-cards');
+    Object.keys(d.cumulative).forEach(function(k){
+      var m=d.cumulative[k],c=el('div','card');
+      c.appendChild(el('div','num good',m.total.toLocaleString('zh-TW')));
+      c.appendChild(el('div','lbl',m.label+'（'+m.unit+'）'));
+      c.appendChild(el('div','delta',m.note));
+      cards.appendChild(c);
+    });
+    var snap=document.getElementById('effort-snap');
+    Object.keys(d.snapshot).forEach(function(k){
+      var s=d.snapshot[k],box=el('div');
+      box.appendChild(el('span',null,s.label));box.appendChild(el('b',null,s.value));box.appendChild(el('span',null,s.note));
+      snap.appendChild(box);
+    });
+    var hist=document.getElementById('effort-hist');
+    d.history.slice().reverse().forEach(function(h){
+      var li=el('li');li.appendChild(el('b',null,h.version+'（'+h.date+'）'));li.appendChild(document.createTextNode('：'+h.summary));
+      hist.appendChild(li);
+    });
+  }).catch(function(){});
 })();
 function copyCmd(btn){
   const txt=btn.previousElementSibling.textContent.trim();

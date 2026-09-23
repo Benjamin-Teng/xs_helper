@@ -72,13 +72,13 @@ def _install_cards(html: str) -> list[dict]:
 
 
 class TestPluginManifests(unittest.TestCase):
-    def test_both_hosts_publish_version_0_5_0(self) -> None:
+    def test_both_hosts_publish_version_0_5_1(self) -> None:
         claude = load_json(".claude-plugin/plugin.json")
         codex = load_json(".codex-plugin/plugin.json")
         self.assertEqual(claude["name"], "xs-helper")
         self.assertEqual(codex["name"], "xs-helper")
-        self.assertEqual(claude["version"], "0.5.0")
-        self.assertEqual(codex["version"], "0.5.0")
+        self.assertEqual(claude["version"], "0.5.1")
+        self.assertEqual(codex["version"], "0.5.1")
 
     def test_codex_manifest_points_to_shared_skill_only(self) -> None:
         manifest = load_json(".codex-plugin/plugin.json")
@@ -243,6 +243,33 @@ class TestPublishedPage(unittest.TestCase):
             self.assertIn(expected, self.html)
 
 
+class TestEffortStats(unittest.TestCase):
+    """docs/effort-stats.json：累計類只能靠 history 增量疊加，頁面讀這份資料。"""
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.stats = load_json("docs/effort-stats.json")
+
+    def test_cumulative_totals_equal_sum_of_history_deltas(self) -> None:
+        for key, metric in self.stats["cumulative"].items():
+            with self.subTest(metric=key):
+                total = sum(h["deltas"][key] for h in self.stats["history"])
+                self.assertEqual(metric["total"], total)
+
+    def test_every_history_entry_covers_all_metrics_with_nonnegative_deltas(self) -> None:
+        keys = set(self.stats["cumulative"])
+        for entry in self.stats["history"]:
+            with self.subTest(version=entry["version"]):
+                self.assertEqual(set(entry["deltas"]), keys)
+                self.assertTrue(all(v >= 0 for v in entry["deltas"].values()))
+                self.assertTrue(entry["summary"])
+
+    def test_page_renders_stats_from_json(self) -> None:
+        html = (ROOT / "docs/index.html").read_text(encoding="utf-8")
+        self.assertIn('fetch(\'effort-stats.json\')', html)
+        self.assertIn('id="effort-cards"', html)
+
+
 class TestSkillLayoutForFixedDirInstallers(unittest.TestCase):
     """AC7: installers that only index the spec directory name must see every reference.
 
@@ -305,7 +332,7 @@ class TestSkillLayoutForFixedDirInstallers(unittest.TestCase):
         # not from plugin.json (Sinotrade's shioaji entry carries one; the Codex
         # marketplace schema is unverified for this field, so it stays manifest-only).
         entry = next(p for p in load_json(".claude-plugin/marketplace.json")["plugins"] if p["name"] == "xs-helper")
-        self.assertEqual(entry["version"], "0.5.0")
+        self.assertEqual(entry["version"], "0.5.1")
 
     def test_maintained_docs_contain_no_obsolete_singular_reference_path(self) -> None:
         stale = re.compile(r"skills/xs/reference/|\]\(reference/|reference/examples/")

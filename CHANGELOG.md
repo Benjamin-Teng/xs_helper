@@ -6,9 +6,17 @@
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-09-24
+
+### Fixed
+
+- **`xs_lint` 把宣告名稱誤報為未知函數**（[#2](https://github.com/Benjamin-Teng/xs_helper/issues/2)）：`var: x(0)`、`input: p(5, "標籤")` 等宣告的名稱不再被當成函數呼叫；宣告初始值與 `inputkind:=Dict(...)` 裡的真實呼叫仍照常檢查。對官方 XScript_Preset 全量 1419 支腳本，誤報由 3814 個降為 0，且無新增警示；突變注入的拼錯呼叫全數抓到。
+- **`xs_lint` 未寫完的宣告造成 O(n²) 掃描**：改為線性，16000 行約 0.01 秒。
+
 ### Added
 
-- **`AGENTS.md`**：給 Codex 等 agent 與貢獻者的專案指引，列出實測零寫入的驗證指令（唯讀沙箱的 review 也能實際跑測試）；README 新增「開發」段落指向它。不影響 plugin 使用者，故不進版。
+- **GitHub Pages 新增「這份 skill 下了多少功夫」統計**：從開專案起累計的研讀語料、驗證掃描、消除誤報、評測、審查等數字，資料放在 `docs/effort-stats.json`，每次更新以追加增量的方式疊加（測試會檢查累計值＝增量加總）。
+- **`AGENTS.md`**：給 Codex 等 agent 與貢獻者的專案指引，列出實測零寫入的驗證指令（唯讀沙箱的 review 也能實際跑測試）；README 新增「開發」段落指向它。
 
 ## [0.5.0] - 2026-09-23
 
@@ -94,7 +102,8 @@ reference 校正與新手友善文件；新增對外量化報表（GitHub Pages�
 - **`.xs` 編輯驗證 Hook**（`PostToolUse: Write|Edit` → `xs_lint.py`）：對照 604 個 token（grammar 2023 快照 ∪ Preset 215 sysfnc ∪ xshelp 8 群組 bif）的啟發式檢查，對未收錄函數與明顯結構問題提出非阻斷式警示。
 - **散佈基礎建設**：`.claude-plugin/marketplace.json`（marketplace `xs-tools`）、`plugin.json` 起 semver `0.1.0`、MIT LICENSE。
 
-[Unreleased]: https://github.com/Benjamin-Teng/xs_helper/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/Benjamin-Teng/xs_helper/compare/v0.5.1...HEAD
+[0.5.1]: https://github.com/Benjamin-Teng/xs_helper/releases/tag/v0.5.1
 [0.5.0]: https://github.com/Benjamin-Teng/xs_helper/releases/tag/v0.5.0
 [0.4.0]: https://github.com/Benjamin-Teng/xs_helper/releases/tag/v0.4.0
 [0.3.0]: https://github.com/Benjamin-Teng/xs_helper/releases/tag/v0.3.0

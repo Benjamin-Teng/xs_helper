@@ -89,7 +89,13 @@ codex plugin add xs-helper@xs-tools
 
 ## 狀態
 
-✅ **v0.5.0** —— 本版重點：
+✅ **v0.5.1** —— 本版重點：
+
+- **`xs_lint.py` 不再誤報宣告名稱**（[#2](https://github.com/Benjamin-Teng/xs_helper/issues/2)）：`var: x(0)`、`input: p(...)` 的名稱不再被當成未知函數。以官方 XScript_Preset 全量 1419 支腳本驗證，誤報由 3814 個降為 0；未寫完的宣告也改為線性掃描。
+- **GitHub Pages 新增投入功夫統計**：從開專案起累計的研讀語料、驗證掃描、評測與審查數字，資料在 `docs/effort-stats.json`，每次更新疊加。
+- **新增 `AGENTS.md`**：貢獻者與 agent 的驗證指令（見下方「開發」）。
+
+v0.5.0 重點：
 
 - **關鍵字與保留字總表**：`language.md` §9 窮舉 xshelp「關鍵字」大分類共 110 個名稱（忽略字、常數、流程控制、宣告），標出 4 個保留字 `Bool` `Int` `Float` `Double`，並附命名建議。
 - **修正型別表**：上述 4 個保留字原被誤列為「原生型別」，已移出；`TrueFalseSimpleVar` 更正為 xshelp 的 `TrueFalseSimple`。
