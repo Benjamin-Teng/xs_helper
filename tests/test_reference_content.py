@@ -31,6 +31,25 @@ class TestReferenceCodeBlocksLintClean(unittest.TestCase):
                     self.assertEqual(xs_lint.check_unknown_tokens(code) + xs_lint.check_structure(code), [])
 
 
+class TestControlFlowExamples(unittest.TestCase):
+    def setUp(self) -> None:
+        self.code = "\n".join(xs_blocks(read_ref("language.md"))).lower()
+
+    def test_while_example(self) -> None:
+        self.assertRegex(self.code, r"while .+ begin")
+
+    def test_repeat_until_example(self) -> None:
+        self.assertIn("repeat", self.code)
+        self.assertRegex(self.code, r"until .+;")
+
+    def test_once_condition_form(self) -> None:
+        self.assertRegex(self.code, r"once\s*\(.+\)\s*begin")
+
+    def test_switch_nested_and_case_range(self) -> None:
+        self.assertRegex(self.code, r"switch\s*\(")
+        self.assertRegex(self.code, r"case \d+ to \d+:")
+
+
 class TestPlotAndOutputFieldNamedParams(unittest.TestCase):
     def test_plot_checkbox_is_named_parameter(self) -> None:
         text = read_ref("builtin-functions.md")

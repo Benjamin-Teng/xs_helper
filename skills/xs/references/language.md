@@ -106,6 +106,91 @@ end;
 | `once` | 只執行一次的區塊 |
 | `break` / `return` | 跳出 / 提前返回 |
 
+### 3.1 迴圈與分支的官方寫法
+
+以下四段各取自官方 Preset / xshelp 原文，未涵蓋在上面 §3 範例裡的完整語法範式。
+
+**`while 條件 begin … end;`**：迴圈體多行時用 `begin/end` 包住（與 §3 已示範的 `if`/`for` 同慣例）。
+
+```xs
+idx = 1;
+while GetFieldDate("Date", "1")[idx] = lastdate begin
+    idx = idx + 1;
+end;
+```
+
+摘錄自 `XScript_Preset/函數/交易相關/CalcVWAPDistribution.xs`。同一支腳本另有 `while` 巢狀寫法：
+
+```xs
+while success = 1 and tmpnow-now <= LeftStrength
+begin
+    if Price[now] < Price[tmpnow] then
+        success = 0
+    else tmpnow = tmpnow+1;
+end;
+```
+
+摘錄自 `XScript_Preset/函數/趨勢分析/SwingHigh.xs`。
+
+**`repeat … until 條件;`**：先執行迴圈體、再判斷 `until` 後的條件（後測迴圈），迴圈體可用 `begin/end`：
+
+```xs
+repeat
+ begin
+    value1 = simplehighest(high[1], period);
+    value2 = simplelowest(low[1], period);
+    period = period + 1;
+ end;
+until period >= rangemax or (value1 > value2 * (1 + limit1/100));
+```
+
+逐字取自 `XScript_Preset/選股/05.型態選股/突破整理格局.xs`。
+
+**`Once(條件) begin … end;`**：**只有這一種語法**——xshelp 條目
+（[HelpName=Once&group=CONTROLFLOW](https://xshelp.xq.com.tw/XSHelp/?HelpName=Once&group=CONTROLFLOW)）提到的「只做一次」另一種做法，是用
+`var: FirstTime(false);` 搭配 `if … and not FirstTime then begin … FirstTime = True; end;`，那是 `if` 加旗標的等效寫法，**不是 `Once` 本身的第二種語法**。
+
+```xs
+Once(Position = 0 and Filled = 0 and GetInfo("TradeMode") = 1) begin
+    SetPosition(1, GetField("跌停價", "D"), label:="跌停價買進委託");
+    _time = TimeAdd(CurrentTime, "M", _n);
+end;
+```
+
+逐字取自 `XScript_Preset/自動交易/0-基本語法/09-CancelAllOrders.xs`。
+
+**`switch (變數) begin case 值: … ; case N to M: … ; default: … ; end;`**：`case`
+支援 `N to M` 數值範圍，且 `switch` 可以巢狀。xshelp 條目
+（[HelpName=switch&group=CONTROLFLOW](https://xshelp.xq.com.tw/XSHelp/?HelpName=switch&group=CONTROLFLOW)）範例（摘錄，原文含 `Case 1` 到 `Case 5` 五段，此處只留頭尾示範 `Case N to M` 用法）：
+
+```xs
+Value1 = DayOfMonth(date);
+Switch (value1) Begin
+Case 1:
+    print(Text("今天的日期是", NumToStr(date,0)), "value1=1時執行這段程式碼");
+Case 6 to 20:
+    print(Text("今天的日期是", NumToStr(date,0)), "value1=6~20時執行這段程式碼");
+Default:
+    print(Text("今天的日期是", NumToStr(date,0)), "其他情形都執行這段程式碼");
+End;
+```
+
+巢狀寫法（摘錄，原文外層還包一層 `if x <= 10 then … else`，此處只留 `else` 分支裡的巢狀 `switch`）：
+
+```xs
+switch(value1) begin
+    case 1: condition1 = TrueAll(Getfield("大戶持股人數",param:=50) > Getfield("大戶持股人數",param:=50)[1],N);
+    value2 = Getfield("大戶持股人數",param:=50);
+    default : value1 = round(x/200,0);
+    switch (value1) begin
+        case 1: condition1 = TrueAll(Getfield("大戶持股人數",param:=200) > Getfield("大戶持股人數",param:=200)[1],N);
+        default: condition1 = TrueAll(Getfield("大戶持股人數",param:=1000) > Getfield("大戶持股人數",param:=1000)[1],N);
+    end;
+end;
+```
+
+摘錄自 `XQStrategy/01台股的選股條件/04籌碼/大戶持股人數/連續N期大戶持股人數增加.xs`。
+
 ---
 
 ## 4. 運算子
@@ -266,4 +351,4 @@ xshelp 原文：「此文字為系統預先保留的文字，目前並沒有任�
 ## 待補（後續蒸餾）
 
 - [ ] 各型別關鍵字的精確語意差異（`Simple` vs `Series` vs `Ref` 的記憶體/求值模型）以 xshelp 校對補強。
-- [ ] `switch/case`、`repeat/until`、`while` 的完整語法範式（目前 Preset 取樣未涵蓋，需補真實範例）。
+- [x] `switch/case`、`repeat/until`、`while` 的完整語法範式 → 已補（§3.1，出處見各段）。
