@@ -26,6 +26,8 @@ XS 語法family近似 TradeStation EasyLanguage：大小寫不敏感（`Close` =
 
 冒號式宣告，可附初始值與中文標籤。大小寫不敏感（`var` = `Var` = `Vars` = `Variable` = `Variables`）。
 
+**命名限制**：XS [保留字是系統預留文字](https://xshelp.xq.com.tw/XSHelp/?HelpName=Double&group=DECLARATION)，不能拿來當變數名稱，且判定大小寫不敏感；例如 `if`、`If` 都不能作為變數名稱。
+
 ```xs
 var: acc(0), idx(0);                 // 多變數一行，括號內為初始值
 var: intraBarPersist _last_date(0);  // 帶 intraBarPersist 修飾子（見 §7）
