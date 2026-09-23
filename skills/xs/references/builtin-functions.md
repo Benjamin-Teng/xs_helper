@@ -73,14 +73,14 @@
 | `RaiseRunTimeError` | `(errorMessage)` | 中斷執行並拋出錯誤訊息 |
 | `Playsound` | `(file)` | 播放指定音效檔（警示用） |
 | **繪圖（指標腳本）** | | |
-| `Plot` | `(order, value [, name [, checkbox]])` | 建立繪圖序列（第 `order` 條線） |
+| `Plot` | `(輸出序號, value [, name] [, checkbox:=0/1])` | 建立繪圖序列（第 N 條線）；`checkbox:=` 是**命名參數**，放在名稱之後，1＝預設繪出、0＝預設不繪（[xshelp](https://xshelp.xq.com.tw/XSHelp/?HelpName=checkbox&group=DECLARATION)）。官方範例庫另見 `axis:=`、`ScaleLabel:=`、`ScaleDecimal:=` 等命名參數，語意見 language.md §9.4 |
 | `PlotFill` | `(order, vFrom, vTo [, name])` | 區間填色 |
 | `PlotK` | `(order, open, high, low, close [, name])` | 畫 K 棒 |
 | `PlotLine` | `(order, x1, y1, x2, y2 [, name])` | 畫趨勢線 |
 | `NoPlot` | `(seriesNumber)` | 清除該序列繪圖值 |
 | `SetPlotLabel` | `(order, name)` | 設定繪圖序列名稱 |
 | **選股輸出 / 輸入命名** | | |
-| `OutputField` | `(order, value [, decimals [, name]])` | 設定**選股**腳本輸出欄位 |
+| `OutputField` | `(輸出序號, value [, decimals [, name]] [, order:=±1])` | 設定**選股**腳本輸出欄位；第一個參數是「輸出序號」（欄位顯示順序），和命名參數 `order:=`（該欄數值排序：`-1` 由小到大、`1` 由大到小）是兩回事，例：`OutputField1(value1, "5日均量", order:=-1)`（[xshelp](https://xshelp.xq.com.tw/XSHelp/?HelpName=order&group=DECLARATION)） |
 | `SetInputName` | `(order, name)` | 設定 input 參數顯示名 |
 | `SetOutputName` | `(order, title)` | 設定輸出欄位標題 |
 

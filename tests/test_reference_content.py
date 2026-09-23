@@ -31,5 +31,21 @@ class TestReferenceCodeBlocksLintClean(unittest.TestCase):
                     self.assertEqual(xs_lint.check_unknown_tokens(code) + xs_lint.check_structure(code), [])
 
 
+class TestPlotAndOutputFieldNamedParams(unittest.TestCase):
+    def test_plot_checkbox_is_named_parameter(self) -> None:
+        text = read_ref("builtin-functions.md")
+        self.assertIn("checkbox:=", text)
+        self.assertNotIn("(order, value [, name [, checkbox]])", text)
+
+    def test_outputfield_documents_order_named_parameter(self) -> None:
+        text = read_ref("builtin-functions.md")
+        self.assertIn("order:=", text)
+        self.assertIn("輸出序號", text)
+
+    def test_axis_usage_recorded_with_source(self) -> None:
+        text = read_ref("language.md")
+        self.assertIn("axis:=", text)
+
+
 if __name__ == "__main__":
     unittest.main()

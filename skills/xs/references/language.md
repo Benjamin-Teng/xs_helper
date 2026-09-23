@@ -245,12 +245,13 @@ end;
 | `inputkind` | `input` 宣告時的命名參數 |
 | `dict` `daterange` `symbolprice` | 搭配 `inputkind` 產生選項（一般選項／日期範圍／開高低收） |
 | `quickedit` | 指標腳本 `input` 搭配 `inputkind` 時可另加 |
-| `checkbox` | 搭配 `plot`，把指標變成下拉式選單 |
-| `order` | 搭配 `OutputField`，指定選股結果欄位的排序 |
+| `checkbox` | 搭配 `plot` 系列的**命名參數**，寫法 `checkbox:=1`（把指標變成下拉式選單，1＝預設繪出、0＝預設不繪，見 builtin-functions.md `Plot` 一列） |
+| `order` | 搭配 `OutputField` 的**命名參數**，寫法 `order:=-1`（指定選股結果欄位的排序，見 builtin-functions.md `OutputField` 一列） |
 | `param` | 搭配大戶持股與散戶持股，調整級距 |
 | `Adjusted` | 搭配 `GetField` / `GetSymbolField`，選擇原始或還原資料 |
 | `Default` | `GetField` / `GetSymbolField` 無資料時的回傳值（見 §9.3 末） |
-| `Asc` `Desc` `axis` | 索引有此名稱，但條目頁內容為空（xshelp 缺頁）；用途**待查證** |
+| `axis` | `Plot` 系列的命名參數，指定畫在哪條 Y 軸，官方範例庫可見 `axis:=1`、`axis:=2`、`axis:=11`（例：`plot2(value4,"主力累計買賣超",checkbox:=1,axis:=2)`）；xshelp 條目頁為空，**各值的精確編碼待查證** |
+| `Asc` `Desc` | 索引有此名稱，但 xshelp 條目頁為空、官方範例庫零命中；用途**待查證**（2026-09-24 重新查證仍無資料） |
 | `Bool` `Int` `Float` `Double` | **保留字**，見 §9.5 |
 
 ### 9.5 保留字（4 個）
