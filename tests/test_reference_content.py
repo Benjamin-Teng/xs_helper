@@ -50,6 +50,26 @@ class TestControlFlowExamples(unittest.TestCase):
         self.assertRegex(self.code, r"case \d+ to \d+:")
 
 
+class TestRankAndInputKind(unittest.TestCase):
+    def setUp(self) -> None:
+        self.text = read_ref("language.md")
+
+    def test_rank_declaration_and_properties(self) -> None:
+        self.assertRegex(self.text, r"Rank \w+ begin")
+        self.assertIn(".pos", self.text)
+        for prop in ("`pos`", "`range`", "`pr`", "`count`", "`isvalid`", "`Q1`", "`Q3`"):
+            self.assertIn(prop, self.text)
+        self.assertIn("選股", self.text)
+
+    def test_daterange_is_single_date(self) -> None:
+        self.assertIn("單一日期", self.text)
+        self.assertNotIn("一般選項／日期範圍／開高低收", self.text)
+
+    def test_inputkind_examples(self) -> None:
+        for token in ("inputkind:=Dict(", "daterange(", "SymbolPrice()", "quickedit:=true"):
+            self.assertIn(token, self.text)
+
+
 class TestPlotAndOutputFieldNamedParams(unittest.TestCase):
     def test_plot_checkbox_is_named_parameter(self) -> None:
         text = read_ref("builtin-functions.md")

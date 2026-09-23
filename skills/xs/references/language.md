@@ -327,11 +327,11 @@ end;
 | `RetVal` | 函數腳本的回傳值 |
 | `RetMsg` | 警示觸發時顯示的訊息 |
 | `RetSound` | 警示觸發時的提醒音效 |
-| `Rank` | 選股腳本專用，宣告排行作業 |
+| `Rank` | 選股腳本專用，宣告排行作業，見 §10.1 |
 | `Group` | 宣告清單，再以 `GetSymbolGroup` 取值 |
 | `SymbolGroup` | 指標腳本 input 中設定清單類型 |
 | `inputkind` | `input` 宣告時的命名參數 |
-| `dict` `daterange` `symbolprice` | 搭配 `inputkind` 產生選項（一般選項／日期範圍／開高低收） |
+| `dict` `daterange` `symbolprice` | 搭配 `inputkind` 產生選項（一般選項／單一日期（附可選範圍）／開高低收之一），見 §10.2 |
 | `quickedit` | 指標腳本 `input` 搭配 `inputkind` 時可另加 |
 | `checkbox` | 搭配 `plot` 系列的**命名參數**，寫法 `checkbox:=1`（把指標變成下拉式選單，1＝預設繪出、0＝預設不繪，見 builtin-functions.md `Plot` 一列） |
 | `order` | 搭配 `OutputField` 的**命名參數**，寫法 `order:=-1`（指定選股結果欄位的排序，見 builtin-functions.md `OutputField` 一列） |
@@ -348,6 +348,85 @@ end;
 
 xshelp 原文：「此文字為系統預先保留的文字，目前並沒有任何作用。」（[條目](https://xshelp.xq.com.tw/XSHelp/?HelpName=Double&group=DECLARATION)）。
 全站只有這 4 個名稱使用「保留字」頁；它們**不能當型別使用**，也不要當變數名稱。
+
+---
+
+## 10. 進階宣告：`Rank` 與參數 UI（`inputkind` 系列）
+
+### 10.1 `Rank`（僅選股腳本）
+
+`Rank` 是**只有選股腳本能用**的語法，用來宣告腳本執行排行的作業，通常用於選股中心內的排行語法。寫法是 `Rank 名稱 begin … end;`，區塊內用 `retval = …;` 決定參與排行的數值；之後用 `名稱.屬性` 讀排行結果。
+
+> **來源**：僅 xshelp 單一條目（[HelpName=Rank&group=DECLARATION](https://xshelp.xq.com.tw/XSHelp/?HelpName=Rank&group=DECLARATION)），官方範例庫（`XScript_Preset` / `XQStrategy`）目前無第二個 `Rank` 用例可交叉核對。
+
+`Rank` 物件支援的屬性（逐字依 xshelp）：
+
+| 屬性 | 意義 |
+|------|------|
+| `pos` | 排行名次，整數，從 1 開始，1 是第一名 |
+| `range` | 排行 %，等於 `pos / <參與排行商品數> * 100`；實數，範圍 0～100，越小排名越前面 |
+| `pr` | Percentile Rank %，`PR = (N - pos) / (N - 1) * 100`；實數，範圍 100～0，第一名是 100 |
+| `count` | 參與排行的商品個數；對任何一檔商品而言都是固定值 |
+| `value` | rank object 的回傳數值，也就是 `retval` 的回傳數值 |
+| `avgvalue` | 所有商品 `rank.value` 的平均值 |
+| `medvalue` | 所有商品 `rank.value` 的中位數（median value） |
+| `minvalue` | 所有商品內 `rank.value` 的最小值 |
+| `maxvalue` | 所有商品內 `rank.value` 的最大值 |
+| `Q1` | 所有商品的 `rank.value` 由小到大排序後，前 25% 位置對應的數值 |
+| `Q3` | 所有商品的 `rank.value` 由小到大排序後，前 75% 位置對應的數值 |
+| `isvalid` | 回傳 0 或 1，0 代表這檔商品沒有加入排行（可能沒指定 `retval` 或執行時發生錯誤） |
+
+xshelp 範例（依收盤價與均線的乖離程度排序，並用 `pos` 屬性篩選出前期排行與當期排行不同的商品）：
+
+```xs
+Rank _bias10 begin
+    retval = close - average(close, 10);
+end;
+if _bias10.pos[1] <> _bias10.pos then ret = 1;
+```
+
+### 10.2 參數 UI 宣告：`inputkind` 搭配 `Dict` / `daterange` / `SymbolPrice`，及 `quickedit`
+
+`input` 宣告時可以加 `inputkind` 這個命名參數，用來控制系統參數設定介面（UI）；再搭配 `Dict`、`daterange` 或 `SymbolPrice` 函數產生對應的選項內容。來源：[HelpName=inputkind&group=DECLARATION](https://xshelp.xq.com.tw/XSHelp/?HelpName=inputkind&group=DECLARATION)（`dict`／`daterange`／`symbolprice` 三個條目頁內容皆為「搭配 inputkind 使用，可參考 inputkind 語法說明」，不重複摘錄）。
+
+**讀值規則（必記）**：
+
+- `Dict` 只是把 UI 改成下拉選單；**變數的型別跟預設值一致**，腳本內照一般 `input` 變數讀值即可（下例 `IndexPomUnit` 讀回來就是數值 1 或 2）。
+- `daterange(最小日期, 最大日期, "頻率")` 宣告出來的變數是**單一日期**（`YYYYMMDD` 數值），不是日期區間；`daterange` 的最小／最大兩個參數只是限制 UI 上日曆可選的範圍，第三個參數是頻率字串（支援日／週／月／季／半年／年）。
+- `SymbolPrice()` 讓使用者在 UI 上選 Open、High、Low、Close 四者之一；變數本身仍是數值（讀回來的就是使用者選定的那個價格欄位）。
+- `quickedit:=true` 只影響**指標腳本**的 UI（讓 `inputkind` 設定的選項能直接在主圖／副圖上選、不用另開指標設定），**不改變讀值方式**。
+
+`Dict` 產生選項（xshelp 範例，`IndexPomUnit` 預設單位為金額）：
+
+```xs
+input: IndexPomUnit(1, "大盤融資單位", inputkind:=Dict(["金額",1],["張數",2]));
+```
+
+也可以改寫成字串型態版本（xshelp 同條目附的第二種寫法）：
+
+```xs
+input: IndexPomUnit("Amount", "大盤融資單位", inputkind:=Dict(["金額","Amount"],["張數","Sheets"]));
+```
+
+`daterange` 產生日期範圍選項（`FdifferenceDate` 預設查詢日期為 2018 年 3 月 1 日；`D` 為頻率參數）：
+
+```xs
+input:FdifferenceDate(20180301,"外資買賣超查詢日期",inputkind:=daterange(20160301,20190301,"D"));
+//daterange(最小查詢日期,最大查詢日期,"支援日/週/月/季/半年/年頻率")
+```
+
+`SymbolPrice` 產生 Open／High／Low／Close 四個選項：
+
+```xs
+input:OHLC_Opti(200,"價格：",inputkind:=SymbolPrice());
+```
+
+`quickedit`（來源：[HelpName=quickedit&group=DECLARATION](https://xshelp.xq.com.tw/XSHelp/?HelpName=quickedit&group=DECLARATION)；範例標籤是「大盤融資買進單位」，與上面 `Dict` 範例的「大盤融資單位」不同標籤，兩者是 xshelp 兩個不同條目各自的原文，逐字保留）：
+
+```xs
+input: IndexPomUnit(1, "大盤融資買進單位", inputkind:=Dict(["金額",1],["張數",2]), quickedit:=true);
+if IndexPomUnit = 1 then plot1(GetField("融資買進金額", "D")) else if IndexPomUnit = 2 then plot1(GetField("融資買進張數", "D"));
+```
 
 ---
 
