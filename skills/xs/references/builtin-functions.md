@@ -74,7 +74,7 @@
 | `RaiseRunTimeError` | `(errorMessage)` | 中斷執行並拋出錯誤訊息 |
 | `Playsound` | `(file)` | 播放指定音效檔（警示用） |
 | **繪圖（指標腳本）** | | |
-| `Plot` | `(輸出序號, value [, name] [, checkbox:=0/1])` | 建立繪圖序列（第 N 條線）；`checkbox:=` 是**命名參數**，放在名稱之後，1＝預設繪出、0＝預設不繪（[xshelp](https://xshelp.xq.com.tw/XSHelp/?HelpName=checkbox&group=DECLARATION)）。官方範例庫另見 `axis:=`、`ScaleLabel:=`、`ScaleDecimal:=` 等命名參數，語意見 language.md §9.4 |
+| `Plot` | `Plot(輸出序號，指標數值)` \| `Plot(輸出序號，指標數值，繪圖序列名稱)` \| `Plot(輸出序號，指標數值，繪圖序列名稱，checkbox:=1)` \| 序號版 `Plot1(指標數值)` \| `Plot1(指標數值，繪圖序列名稱)` \| `Plot1(指標數值，繪圖序列名稱，checkbox:=1)` | 建立繪圖序列（逐字依 [xshelp](https://xshelp.xq.com.tw/XSHelp/?HelpName=Plot&group=GENERALFUNC) 列出的重載）；`checkbox:=` 是**命名參數**，放在名稱之後，1＝預設繪出、0＝預設不繪（[xshelp](https://xshelp.xq.com.tw/XSHelp/?HelpName=checkbox&group=DECLARATION)）。官方範例庫另見 `axis:=`、`ScaleLabel:=`、`ScaleDecimal:=` 等命名參數，語意見 language.md §9.4 |
 | `PlotFill` | `(order, vFrom, vTo [, name])` | 區間填色 |
 | `PlotK` | `(order, open, high, low, close [, name])` | 畫 K 棒 |
 | `PlotLine` | `(order, x1, y1, x2, y2 [, name])` | 畫趨勢線 |
@@ -84,6 +84,27 @@
 | `OutputField` | `OutputField(輸出序號, 數值)` \| `OutputField(輸出序號, 數值, 小數位數)` \| `OutputField(輸出序號, 數值, 小數位數, 輸出欄位名稱)` \| 序號版 `OutputField1(數值)` \| `OutputField1(數值, 小數位數)` \| `OutputField1(數值, 小數位數, 輸出欄位名稱)` | 設定**選股**腳本輸出欄位（逐字依 [xshelp](https://xshelp.xq.com.tw/XSHelp/?HelpName=outputfield&group=GENERALFUNC) 列出的重載）；還可另外加命名參數 `order:=`（`-1` 由小到大、`1` 由大到小，排序該欄輸出數值），見下方說明與 [order 條目](https://xshelp.xq.com.tw/XSHelp/?HelpName=order&group=DECLARATION) |
 | `SetInputName` | `(order, name)` | 設定 input 參數顯示名 |
 | `SetOutputName` | `(order, title)` | 設定輸出欄位標題 |
+
+**`Plot` 的兩個關鍵事實（逐字依 xshelp `Plot` 條目 fulldesc）**：
+
+- 每個指標腳本**最多可以產生 999 個繪圖數列**，用時在 `Plot` 之後加上序號，例如 `Plot1`、`Plot2`，
+  一路到 `Plot999`。
+- **`Plot1` 到 `Plot99` 除了可以是一個函數之外，也可以在腳本內被當成數列來引用**（xshelp 原文：
+  「Plot1到Plot99除了可以是一個函數之外，也可以在腳本內被當成數列來引用」）。也就是說
+  `Plot(輸出序號, …)` 與對應的 `PlotN(…)` 是同一個東西：呼叫 `PlotN(值)` 建立第 N 條繪圖數列後，
+  之後可以直接把 `PlotN` 當成一個變數/數列讀，不必再查一次值。
+
+xshelp `範例#2`（逐字）：
+
+```xs
+Plot1(Average(Close, 5));
+Plot2(Close, "收盤價");
+Value1 = Plot2 - Plot1;
+Plot3(Value1, "差值");
+```
+
+xshelp 原文對這段的說明：「在範例#2 內Value1的數值是繪圖數列2(Plot2)與繪圖數列1(Plot1)的相減值，
+然後把這個差值畫在Plot3上面。」
 
 **`OutputField` 的 `order:=` 範例與上面簽名的位置定義有落差（照抄兩個來源，不調和）**：
 xshelp `order` 條目給的範例是 `outputfield1(value1,"5日均量",order:=-1);`。按上面

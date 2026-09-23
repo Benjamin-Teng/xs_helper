@@ -189,6 +189,18 @@ class TestGapFillingTask7(unittest.TestCase):
         # 必須明講這個落差，不能假裝兩段來源一致。
         self.assertIn("第 2 個位置參數應該是「小數位數」", text)
 
+    def test_plot_numbered_forms_and_series_reference(self) -> None:
+        text = read_ref("builtin-functions.md")
+        # xshelp desc 逐字列出的 Plot1 三種重載
+        self.assertIn("Plot1(指標數值)", text)
+        self.assertIn("Plot1(指標數值，繪圖序列名稱)", text)
+        self.assertIn("Plot1(指標數值，繪圖序列名稱，checkbox:=1)", text)
+        # fulldesc 的兩個關鍵事實：最多 999 條、Plot1~Plot99 可當數列引用
+        self.assertIn("999", text)
+        self.assertIn("Plot1到Plot99除了可以是一個函數之外，也可以在腳本內被當成數列來引用", text)
+        # 範例#2 逐字（含 Plot2 - Plot1 這行數列引用）
+        self.assertIn("Value1 = Plot2 - Plot1;", text)
+
 
 if __name__ == "__main__":
     unittest.main()
