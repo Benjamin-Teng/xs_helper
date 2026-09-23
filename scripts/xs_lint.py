@@ -113,6 +113,17 @@ KNOWN_TOKENS: frozenset[str] = frozenset({
     #    （checkbox:=、Adjusted:=、order:=）或宣告詞，不會以 `name(` 出現，刻意不收，
     #    免得拼錯的呼叫被放行。全量名單見 references/language.md §9。
     "daterange", "dict", "symbolprice",
+    # 5. 2026-09-24 用 xshelp rest 索引（a-z 逐字母窮舉 *FUNC 分類）反查 references/ 漏收函數
+    #    時新發現、原三方來源皆未收者：既有 FIELDFUNC/GENERALFUNC 補漏，以及全新分類
+    #    SDTFUNC（鍵值表 SDT_* 家族，含 _L 尾碼版本）。詳 references/builtin-functions.md §6、§9。
+    "getfieldfiscalq", "getfieldfiscaly", "getsymbolfieldtime",
+    "sdt_average", "sdt_average_l", "sdt_getkeys", "sdt_getkeys_l", "sdt_getstring", "sdt_getstring_l",
+    "sdt_getvalue", "sdt_getvalue_l", "sdt_haskey", "sdt_haskey_l", "sdt_max", "sdt_max_l",
+    "sdt_median", "sdt_median_l", "sdt_min", "sdt_min_l", "sdt_removeall", "sdt_removeall_l",
+    "sdt_removekey", "sdt_removekey_l", "sdt_setcolumnname", "sdt_setcolumnname_l", "sdt_setstring",
+    "sdt_setstringif", "sdt_setstringif_l", "sdt_setstring_l", "sdt_setvalue", "sdt_setvalueif",
+    "sdt_setvalueif_l", "sdt_setvalue_l", "sdt_sort", "sdt_sortkey", "sdt_sortkey_l",
+    "sdt_sortstring", "sdt_sortstring_l", "sdt_sort_l",
 })
 
 

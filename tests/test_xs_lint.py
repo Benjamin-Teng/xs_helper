@@ -77,6 +77,20 @@ class TestCheckUnknownTokens(unittest.TestCase):
         )
         self.assertEqual(xs_lint.check_unknown_tokens(code), [])
 
+    def test_xshelp_gap_filled_functions_not_flagged(self) -> None:
+        # 2026-09-24 xshelp 函數目錄窮舉補列：FIELDFUNC/GENERALFUNC 漏收與新分類 SDTFUNC
+        code = (
+            'Value1 = GetfieldFiscalQ("月營收");\n'
+            'Value2 = GetfieldFiscalY("月營收");\n'
+            'Value3 = GetSymbolFieldStartOffset("1101.TW", "月營收");\n'
+            'Value4 = GetSymbolFieldTime("1101.TW", "月營收");\n'
+            "SDT_SetValue(sym, 1, Close);\n"
+            "Value5 = SDT_GetValue(sym, 1);\n"
+            "Value6 = SDT_Average_L(1);\n"
+            "SDT_Sort(1, keyarr);\n"
+        )
+        self.assertEqual(xs_lint.check_unknown_tokens(code), [])
+
     def test_declaration_names_not_flagged(self) -> None:
         # issue #2：var/input/... 宣告的名稱不是函數呼叫
         cases = [

@@ -4,8 +4,8 @@
 > （`xshelp.xq.com.tw/XSHelp/lists?a=<分類碼>`，build-time 抓取的快照）。grammar 的
 > `keyword.bif` 只佐證名字、且為 2023 快照已落後，以本檔（xshelp）清單為準。
 > 此處未收錄、或冷門無把握者 → 走 SKILL.md 的 **F3 線上查證**，**不杜撰**（G1）。
-> 收錄 8 分類，xshelp 分類碼：`GENERALFUNC` / `TIMEFUNC` / `DATEFUNC` / `STRINGFUNC` /
-> `NUMBERFUNC` / `FIELDFUNC` / `ARRAYFUNC` / `TRANSACTIONFUNC`。
+> 收錄 9 分類，xshelp 分類碼：`GENERALFUNC` / `TIMEFUNC` / `DATEFUNC` / `STRINGFUNC` /
+> `NUMBERFUNC` / `FIELDFUNC` / `ARRAYFUNC` / `TRANSACTIONFUNC` / `SDTFUNC`。
 
 ---
 
@@ -47,6 +47,7 @@
 | `GetFirstBarDate` | `(): Num` | 第一根資料棒的日期 |
 | `SetFirstBarDate` | `(date)` | 設定起始資料日期 |
 | `GetFieldStartOffset` | `(): Num` | 欄位起始位移；無則回 -1 |
+| `GetSymbolFieldStartOffset` | `("ID", "欄位名稱" [, "頻率"]): Num` | `GetFieldStartOffset` 的延伸，可指定商品；回傳該商品該欄位最新一筆與第一筆資料間的筆數，無此欄位或超出範圍回 -1；僅支援選股腳本（[xshelp](https://xshelp.xq.com.tw/XSHelp/?HelpName=GetSymbolFieldStartOffset&group=GENERALFUNC)） |
 | `IsFirstCall` | `(): Bool` | 是否為事件首次計算 |
 | `IsLastBar` | `(): Bool` | 目前是否為最新一根棒 |
 | `IsSessionFirstBar` | `(): Bool` | 是否為交易盤節的第一根棒 |
@@ -216,6 +217,9 @@
 | `GetFieldPublishDate` | `("欄位" [, "頻率"]): Num` | 取該欄位在 XQ 系統的資料更新日 |
 | `GetSymbolField` | `(symbolID, "欄位" [, "頻率"])` | 讀**指定商品**的資料欄位 |
 | `GetSymbolFieldDate` | `(symbolID, "欄位" [, "頻率"]): Num` | 指定商品欄位最新資料日 |
+| `GetSymbolFieldTime` | `(symbolID, "欄位" [, "頻率"]): Num` | 讀系統內指定商品欄位的資料時間，格式 `HHmmss`（[xshelp](https://xshelp.xq.com.tw/XSHelp/?HelpName=GetSymbolFieldTime&group=FIELDFUNC)） |
+| `GetfieldFiscalQ` | `("欄位名稱" [, "頻率"]): Num` | 讀取系統內欄位的財務季別（[xshelp](https://xshelp.xq.com.tw/XSHelp/?HelpName=GetfieldFiscalQ&group=FIELDFUNC)） |
+| `GetfieldFiscalY` | `("欄位名稱" [, "頻率"]): Num` | 讀取系統內欄位的財務年度（[xshelp](https://xshelp.xq.com.tw/XSHelp/?HelpName=GetfieldFiscalY&group=FIELDFUNC)） |
 | `GetQuote` | `("報價欄位")` | 讀系統內**報價欄位**（限警示 / 交易腳本） |
 | `GetSymbolInfo` | `("資訊欄位")` | 讀系統內商品資訊欄位 |
 | `CheckField` | `("欄位", "頻率"): Bool` | 該欄位資料是否存在 |
@@ -295,6 +299,40 @@
 | `Alert` | `(str1) \| (str1, num1, ...)` | 策略執行中產生**警示**紀錄（警示腳本核心） |
 
 > `Playsound`（音效）歸一般函數；`Alert` 才是文字警示輸出。
+
+---
+
+## 9. SDT 函數（`SDTFUNC`）
+
+> 2026-09-24 以 xshelp rest 索引窮舉 `*FUNC` 分類時新發現的第 9 個分類（原 8 分類清單未涵蓋）。
+> SDT（Symbol Data Table，依 xshelp 分類名稱推測）是一張以 **key（列）× column（1~100 直行）**
+> 定址的鍵值表，供腳本暫存/共用資料；每個函數均有 `_L` 尾碼版本，xshelp 對兩者的說明文字逐字相同，
+> `_L` 確切語意差異待查證（不臆造）。
+
+| 名稱 | 簽名 | 說明 |
+|------|------|------|
+| `SDT_GetValue` / `SDT_GetValue_L` | `(key, column [, default:=0]): Num` | 取得 SDT 指定 key 列、column 行的數值；找不到回 default，字串會嘗試轉數值失敗則回 0（[xshelp](https://xshelp.xq.com.tw/XSHelp/?HelpName=SDT_GetValue&group=SDTFUNC)） |
+| `SDT_GetString` / `SDT_GetString_L` | `(key, column [, default:=""]): Str` | 取得 SDT 指定 key 列、column 行的字串；找不到回 default（[xshelp](https://xshelp.xq.com.tw/XSHelp/?HelpName=SDT_GetString&group=SDTFUNC)） |
+| `SDT_SetValue` / `SDT_SetValue_L` | `(key, column, value)` | 寫入 SDT 指定 key 列、column 行的數值；column 為新字串會新增該行，column 數字大於現有行數會補齊中間空白欄，欄號或直行總數超過 100 回傳錯誤（[xshelp](https://xshelp.xq.com.tw/XSHelp/?HelpName=SDT_SetValue&group=SDTFUNC)） |
+| `SDT_SetString` / `SDT_SetString_L` | `(key, column, value)` | 寫入 SDT 指定 key 列、column 行的字串；規則同 `SDT_SetValue`（[xshelp](https://xshelp.xq.com.tw/XSHelp/?HelpName=SDT_SetString&group=SDTFUNC)） |
+| `SDT_SetValueIf` / `SDT_SetValueIf_L` | `(key, column, newvalue, oldvalue): Bool` | 僅當指定欄位目前數值等於 `oldvalue` 才覆寫為 `newvalue` 並回 True，可用於避免多商品/策略同時寫入互相覆蓋（[xshelp](https://xshelp.xq.com.tw/XSHelp/?HelpName=SDT_SetValueIf&group=SDTFUNC)） |
+| `SDT_SetStringIf` / `SDT_SetStringIf_L` | `(key, column, newvalue, oldvalue): Bool` | 字串版 `SDT_SetValueIf`：僅當目前字串等於 `oldvalue` 才覆寫並回 True（[xshelp](https://xshelp.xq.com.tw/XSHelp/?HelpName=SDT_SetStringIf&group=SDTFUNC)） |
+| `SDT_HasKey` / `SDT_HasKey_L` | `(key): Bool` | 判斷傳入字串是否包含在 SDT 的 key 中（[xshelp](https://xshelp.xq.com.tw/XSHelp/?HelpName=SDT_HasKey&group=SDTFUNC)） |
+| `SDT_GetKeys` / `SDT_GetKeys_L` | `(output_key_array)` | 取得 SDT 所有 key，寫入傳入的一維字串陣列（輸出用）；取回順序不保證，需依序處理改用 `SDT_SortKey` / `SDT_Sort`（[xshelp](https://xshelp.xq.com.tw/XSHelp/?HelpName=SDT_GetKeys&group=SDTFUNC)） |
+| `SDT_RemoveKey` / `SDT_RemoveKey_L` | `(key)` | 移除 SDT 指定 key 所對應的整列資料（含 key）（[xshelp](https://xshelp.xq.com.tw/XSHelp/?HelpName=SDT_RemoveKey&group=SDTFUNC)） |
+| `SDT_RemoveAll` / `SDT_RemoveAll_L` | `()` | 一次移除此 SDT 內所有資料（清空整張表）（[xshelp](https://xshelp.xq.com.tw/XSHelp/?HelpName=SDT_RemoveAll&group=SDTFUNC)） |
+| `SDT_SetColumnName` / `SDT_SetColumnName_L` | `(column_num, column_name)` | 命名或修改 SDT 指定直行的名稱（[xshelp](https://xshelp.xq.com.tw/XSHelp/?HelpName=SDT_SetColumnName&group=SDTFUNC)） |
+| `SDT_Average` / `SDT_Average_L` | `(column): Num` | 取得 SDT 指定直行的數值平均；無法轉數值的列以 0 計入（[xshelp](https://xshelp.xq.com.tw/XSHelp/?HelpName=SDT_Average&group=SDTFUNC)） |
+| `SDT_Max` / `SDT_Max_L` | `(column [, output_key]): Num` | 取得 SDT 指定直行的最大值，可另傳字串變數 `output_key` 取回最大值所在列的 key（[xshelp](https://xshelp.xq.com.tw/XSHelp/?HelpName=SDT_Max&group=SDTFUNC)） |
+| `SDT_Min` / `SDT_Min_L` | `(column [, output_key]): Num` | 取得 SDT 指定直行的最小值，用法同 `SDT_Max`（[xshelp](https://xshelp.xq.com.tw/XSHelp/?HelpName=SDT_Min&group=SDTFUNC)） |
+| `SDT_Median` / `SDT_Median_L` | `(column [, output_key]): Num` | 取得 SDT 指定直行的中位數，可另傳 `output_key` 取回該列 key（[xshelp](https://xshelp.xq.com.tw/XSHelp/?HelpName=SDT_Median&group=SDTFUNC)） |
+| `SDT_Sort` / `SDT_Sort_L` | `(column, sorted_key_array [, order:=-1])` | 依指定直行的**數值**排序，將排序後的 key 寫入傳入的字串陣列；`order` -1 由小到大（預設）、1 由大到小（[xshelp](https://xshelp.xq.com.tw/XSHelp/?HelpName=SDT_Sort&group=SDTFUNC)） |
+| `SDT_SortString` / `SDT_SortString_L` | `(column, sorted_key_array [, order:=-1])` | 依指定直行的**字串**排序，用法同 `SDT_Sort`（[xshelp](https://xshelp.xq.com.tw/XSHelp/?HelpName=SDT_SortString&group=SDTFUNC)） |
+| `SDT_SortKey` / `SDT_SortKey_L` | `(sorted_key_array [, order:=-1])` | 依 SDT 的 key 排序，將排序後的 key 寫入傳入的字串陣列（[xshelp](https://xshelp.xq.com.tw/XSHelp/?HelpName=SDT_SortKey&group=SDTFUNC)） |
+
+> **待補**：`SDT_Sum` / `SDT_Sum_L`（xshelp 官方範例庫呼叫次數為 0，與本節其餘函數同為
+> 2026-09-24 窮舉發現的漏收項；因當次漏收數超過 40，依 controller 高頻規則只補前 40，
+> 這兩個依字母序排最後，列此待查證後補）。
 
 ---
 

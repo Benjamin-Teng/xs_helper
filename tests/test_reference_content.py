@@ -98,5 +98,64 @@ class TestTypeSemantics(unittest.TestCase):
         self.assertIn("HelpName=Numeric&group=DECLARATION", text)
 
 
+class TestXshelpFunctionsCovered(unittest.TestCase):
+    # 2026-09-24 以 xshelp rest 索引窮舉 *FUNC 分類（a-z 逐字母查 rest?a=<字母>，以 id 去重，
+    # 436 個函數）後，比對 builtin-functions.md + system-functions.md 反引號名單，原本漏收的
+    # 42 個函數。GetBarOffset 已收錄（builtin-functions.md），不在此名單。無欄位/非函數需排除。
+    # 全部 42 個依字母序（不分大小寫）取前 40 個已補入 builtin-functions.md 對應表格；
+    # SDT_Sum / SDT_Sum_L 因當次漏收數超過 controller 訂的 40 上限，改列 builtin-functions.md
+    # 檔尾「9. SDT 函數」待補區塊（仍以反引號提及，滿足本測試，但未收進函數表格）。
+    MISSING_BEFORE: tuple[str, ...] = (
+        "GetfieldFiscalQ",
+        "GetfieldFiscalY",
+        "GetSymbolFieldStartOffset",
+        "GetSymbolFieldTime",
+        "SDT_Average",
+        "SDT_Average_L",
+        "SDT_GetKeys",
+        "SDT_GetKeys_L",
+        "SDT_GetString",
+        "SDT_GetString_L",
+        "SDT_GetValue",
+        "SDT_GetValue_L",
+        "SDT_HasKey",
+        "SDT_HasKey_L",
+        "SDT_Max",
+        "SDT_Max_L",
+        "SDT_Median",
+        "SDT_Median_L",
+        "SDT_Min",
+        "SDT_Min_L",
+        "SDT_RemoveAll",
+        "SDT_RemoveAll_L",
+        "SDT_RemoveKey",
+        "SDT_RemoveKey_L",
+        "SDT_SetColumnName",
+        "SDT_SetColumnName_L",
+        "SDT_SetString",
+        "SDT_SetStringIf",
+        "SDT_SetStringIf_L",
+        "SDT_SetString_L",
+        "SDT_SetValue",
+        "SDT_SetValueIf",
+        "SDT_SetValueIf_L",
+        "SDT_SetValue_L",
+        "SDT_Sort",
+        "SDT_SortKey",
+        "SDT_SortKey_L",
+        "SDT_SortString",
+        "SDT_SortString_L",
+        "SDT_Sort_L",
+        "SDT_Sum",
+        "SDT_Sum_L",
+    )
+
+    def test_previously_missing_functions_now_documented(self) -> None:
+        text = read_ref("builtin-functions.md") + read_ref("system-functions.md")
+        for name in self.MISSING_BEFORE:
+            with self.subTest(name=name):
+                self.assertIn(f"`{name}`", text)
+
+
 if __name__ == "__main__":
     unittest.main()
