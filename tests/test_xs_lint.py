@@ -97,6 +97,31 @@ class TestCheckUnknownTokens(unittest.TestCase):
         self.assertGreater(len(xs_lint.KNOWN_TOKENS), 400)
 
 
+class TestStreamReconfigure(unittest.TestCase):
+    def test_proxied_cp950_stream_switched_to_utf8(self) -> None:
+        # 代理包裝過的 cp950 串流（如 Colorama）也要被轉成 UTF-8，否則中文警示會 UnicodeEncodeError
+        import importlib.util
+        import io
+
+        class Proxy:
+            def __init__(self, inner: io.TextIOWrapper) -> None:
+                self._inner = inner
+
+            def __getattr__(self, name: str) -> object:
+                return getattr(self._inner, name)
+
+        inner = io.TextIOWrapper(io.BytesIO(), encoding="cp950")
+        saved = sys.stdout
+        sys.stdout = Proxy(inner)  # type: ignore[assignment]
+        try:
+            spec = importlib.util.spec_from_file_location("xs_lint_fresh", xs_lint.__file__)
+            assert spec is not None and spec.loader is not None
+            spec.loader.exec_module(importlib.util.module_from_spec(spec))
+        finally:
+            sys.stdout = saved
+        self.assertEqual(inner.encoding, "utf-8")
+
+
 class TestGetTargetPath(unittest.TestCase):
     def test_xs_path(self) -> None:
         ev = {"tool_input": {"file_path": "C:/x/foo.XS"}}  # 大小寫不敏感

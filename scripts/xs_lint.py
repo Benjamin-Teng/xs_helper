@@ -8,17 +8,17 @@
 """
 from __future__ import annotations
 
-import io
 import json
 import re
 import sys
 
 # Windows console 預設可能非 UTF-8（cp950），中文警示會 UnicodeEncodeError。
-# 防禦性轉 UTF-8（stdlib，3.7+）；被替換成非 TextIOWrapper 的串流（如測試擷取）則略過。
+# 防禦性轉 UTF-8（stdlib，3.7+）。以 duck typing 取方法，代理包裝過的串流也能轉。
 for _stream in (sys.stdout, sys.stderr):
-    if isinstance(_stream, io.TextIOWrapper):
+    _reconfigure = getattr(_stream, "reconfigure", None)
+    if callable(_reconfigure):
         try:
-            _stream.reconfigure(encoding="utf-8")
+            _reconfigure(encoding="utf-8")
         except ValueError:
             pass
 
