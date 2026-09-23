@@ -6,6 +6,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- **`AGENTS.md`**：給 Codex 等 agent 與貢獻者的專案指引，列出實測零寫入的驗證指令（唯讀沙箱的 review 也能實際跑測試）；README 新增「開發」段落指向它。不影響 plugin 使用者，故不進版。
+
 ## [0.5.0] - 2026-09-23
 
 ### Added

@@ -117,6 +117,10 @@ reference 進度：
 
 reference 蒸餾自 XQ 官方範例庫與說明站：`XScript_Preset`、`XQStrategy`、`vscode-xs`、[xshelp 官方站](https://xshelp.xq.com.tw/XSHelp/)。
 
+## 開發
+
+測試與 lint 指令、內容以 xshelp 為準等貢獻規則見 [AGENTS.md](AGENTS.md)。送 PR 前至少跑過 `python -B -m unittest discover -s tests`。
+
 ## License
 
 [MIT](LICENSE)。本 plugin 只散佈自己撰寫的程式碼與「蒸餾後的 DSL 事實」，**不含**任何來源庫的原始 `.xs`（`XScript_Preset` / `XQStrategy` 無授權檔，故未 bundle；見 [docs/SPEC.md](docs/SPEC.md) Open Q5）。
