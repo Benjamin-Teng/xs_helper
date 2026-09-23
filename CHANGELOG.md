@@ -10,6 +10,14 @@
 
 - **GitHub Pages 新增 Shioaji Pro 安裝卡**：在 Codex 安裝卡之後說明「AI Agent 面板技能區貼上 `Benjamin-Teng/xs_helper` 後按安裝」。
 
+- **`language.md` 新增 §9 關鍵字與保留字總表**：窮舉 xshelp「關鍵字」大分類 4 個 group 共 110 個名稱（忽略字 14、常數 8、流程控制 37、宣告 51），含 4 個保留字 `Bool` `Int` `Float` `Double`；§2 補命名限制（源自 PR #1，改為附一手來源的保守寫法，編譯器行為待查證）。
+- **`xs_lint` 補收可呼叫的 xshelp 關鍵字**：`Dict` `DateRange` `SymbolPrice`（`inputkind:=` 的選項產生函數），避免誤報為未知 token；`checkbox` 等命名參數不會以呼叫形式出現，刻意不收；保留字 `Bool` `Int` `Float` `Double` 自白名單移除，呼叫形式改為警示。
+
+### Fixed
+
+- **`Bool` `Int` `Float` `Double` 誤列為「原生型別」**：xshelp 標為保留字（「目前並沒有任何作用」），已移出型別表並加註警示。
+- **`TrueFalseSimpleVar` 更正為 `TrueFalseSimple`**：前者僅見於 vscode-xs grammar，xshelp 查無此名。
+
 ### Changed
 
 - **頁面「目前最新版本」改為即時抓 GitHub Releases**（`releases/latest`），發版後不必再改 `index.html`；抓不到時保留「見 Releases」連結。

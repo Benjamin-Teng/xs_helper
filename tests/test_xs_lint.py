@@ -68,6 +68,30 @@ class TestCheckUnknownTokens(unittest.TestCase):
     def test_empty_code(self) -> None:
         self.assertEqual(xs_lint.check_unknown_tokens(""), [])
 
+    def test_xshelp_callable_keywords_not_flagged(self) -> None:
+        # xshelp inputkind 官方範例：Dict / DateRange / SymbolPrice 以呼叫形式出現，不應誤報。
+        # 只斷言這三者：宣告名稱 U( / D( / P( 被當成呼叫而誤報是既有已知限制（main 即如此），
+        # 屬另案處理，不在本測試範圍。
+        code = (
+            'input: U(1, "單位", inputkind:=Dict(["金額",1],["張數",2]));\n'
+            'input: D(20180301, "日期", inputkind:=daterange(20160301,20190301,"D"));\n'
+            'input: P(200, "價格", inputkind:=SymbolPrice());\n'
+        )
+        warns = xs_lint.check_unknown_tokens(code)
+        self.assertFalse(any(k in w for w in warns for k in ("dict", "daterange", "symbolprice")))
+
+    def test_named_parameter_keyword_called_is_flagged(self) -> None:
+        # checkbox 是 Plot 的命名參數（checkbox:=1），寫成 checkbox( 屬可疑呼叫，應警示
+        warns = xs_lint.check_unknown_tokens("checkbox(1);")
+        self.assertTrue(any("checkbox" in w for w in warns))
+
+    def test_reserved_words_called_are_flagged(self) -> None:
+        # xshelp 保留字「目前並沒有任何作用」，呼叫形式應警示
+        for word in ("Bool", "Int", "Float", "Double"):
+            with self.subTest(word=word):
+                warns = xs_lint.check_unknown_tokens(f"value1 = {word}(1);")
+                self.assertTrue(any(word.lower() in w for w in warns))
+
     def test_known_tokens_populated(self) -> None:
         # 蒸餾後 KNOWN_TOKENS 不應為空（否則檢查靜默停用）
         self.assertGreater(len(xs_lint.KNOWN_TOKENS), 400)
