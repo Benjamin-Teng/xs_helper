@@ -12,7 +12,7 @@
     "lint_validation_script_runs": {
       "label": "lint 驗證掃描的腳本",
       "unit": "支·次",
-      "total": 10109,
+      "total": 10124,
       "note": "真實語料重掃、突變注入測試、精選語料測試的累計掃描量"
     },
     "false_positives_eliminated": {
@@ -30,19 +30,19 @@
     "skill_generated_test_scripts": {
       "label": "依 skill 規範產生的測試腳本",
       "unit": "支",
-      "total": 20,
+      "total": 35,
       "note": "五類各 4 支，用來同時檢驗 skill 與 lint"
     },
     "xshelp_entries_verified": {
       "label": "逐條對照 xshelp 官方站的條目",
       "unit": "條",
-      "total": 110,
+      "total": 154,
       "note": "關鍵字大分類全量窮舉並逐頁核對"
     },
     "codex_review_rounds": {
       "label": "Codex 對抗式審查",
       "unit": "輪",
-      "total": 12,
+      "total": 13,
       "note": "自 2026-09-23 起記錄；此前未留紀錄，不估算"
     }
   },
@@ -88,6 +88,26 @@
         "skill_generated_test_scripts": "subagent 依 skills/xs/ 規範撰寫，五類各 4 支",
         "codex_review_rounds": "AGENTS.md 2 輪、issue #2 修正 2 輪、v0.5.1 發版與統計頁 1 輪（本 session 紀錄；最後只改統計數字的 commit 不另送審，由 TestEffortStats 把關）"
       }
+    },
+    {
+      "version": "v0.6.0",
+      "date": "2026-09-24",
+      "summary": "補齊 skill reference 缺口：Plot／OutputField 命名參數與多載、流程控制官方寫法、Rank 與參數 UI 宣告、型別語意，並依 xshelp 函數目錄補入 42 個漏收函數（新增 SDTFUNC 分類）；以 skill 重寫 15 支驗收腳本、範圍內類推歸零",
+      "deltas": {
+        "official_scripts_distilled": 0,
+        "lint_validation_script_runs": 15,
+        "false_positives_eliminated": 0,
+        "benchmark_task_runs": 0,
+        "skill_generated_test_scripts": 15,
+        "xshelp_entries_verified": 44,
+        "codex_review_rounds": 1
+      },
+      "evidence": {
+        "lint_validation_script_runs": "Task 7 三輪驗收：7＋7＋1 支，由未看計畫的 fresh subagent 只依 skills/xs/ 撰寫，全數通過 xs_lint",
+        "skill_generated_test_scripts": "Task 7 三輪驗收：7＋7＋1 支，由未看計畫的 fresh subagent 只依 skills/xs/ 撰寫，全數通過 xs_lint",
+        "xshelp_entries_verified": "Plot、OutputField 兩條目＋42 個 xshelp 函數（含新分類 SDTFUNC）逐條以 rest 索引 API 取 desc/fulldesc 撰寫；與 v0.5.0 已計的 110 個關鍵字條目重複核對者不重複計",
+        "codex_review_rounds": "檢查點 A 1 輪（發版檢查點 B 完成後照實補）"
+      }
     }
   ],
   "snapshot": {
@@ -103,8 +123,8 @@
     },
     "builtin_categories": {
       "label": "xshelp 內建函數分類",
-      "value": "8 類",
-      "note": "builtin-functions.md"
+      "value": "9 類",
+      "note": "builtin-functions.md（v0.6.0 起新增 SDTFUNC）"
     },
     "keywords": {
       "label": "關鍵字與保留字",
@@ -118,7 +138,7 @@
     },
     "known_tokens": {
       "label": "lint 內建已知 token",
-      "value": "603 個",
+      "value": "644 個",
       "note": "grammar ∪ Preset 系統函數 ∪ xshelp 內建函數 ∪ 可呼叫關鍵字，扣除保留字"
     },
     "lint_rules": {
@@ -128,7 +148,7 @@
     },
     "unit_tests": {
       "label": "單元測試",
-      "value": "51 個",
+      "value": "70 個",
       "note": "v0.1.0 時為 17 個"
     },
     "commits": {
@@ -138,8 +158,8 @@
     },
     "releases": {
       "label": "版本",
-      "value": "9 個",
-      "note": "v0.1.0 至 v0.5.1 的 git tag"
+      "value": "10 個",
+      "note": "v0.1.0 至 v0.6.0 的 git tag"
     },
     "dev_days": {
       "label": "開發期間",

@@ -6,6 +6,30 @@
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-09-24
+
+### Added
+
+- **`Plot`／`OutputField` 命名參數與多載**：`checkbox:=`、`order:=`、`axis:=`（部分待查證）補齊官方語法；`PlotN` 多載寫法與「數列參照」形式，並文件化 `Plot`/`PlotN` 的等價關係。
+- **控制流程官方寫法**：`while`／`repeat…until`／`Once`／`switch`（含 `case N to M` 及巢狀 `switch`）改附 xshelp 一手來源逐字校對，並補上各腳本類型的適用範圍分布註記。
+- **`Rank` 語法與屬性**：新增官方語法與屬性存取範例。
+- **`inputkind:=Dict/DateRange/SymbolPrice/quickedit`**：四種 inputkind 補齊語法、參數與範例。
+- **型別家族語意**：依 xshelp 條目補完型別家族（如 `TrueFalseSimple`）的語意說明。
+- **依 xshelp 函數目錄補收 42 個先前漏收的內建函數**，含新發現的第 9 個分類 `SDTFUNC`（`SDT_Sum`/`SDT_Sum_L` 等）；`xs_lint.py` `KNOWN_TOKENS` 同步收錄，604 → 644 個 token。
+- **新增 reference 內容測試關卡**：`references/` 內每個 XS 程式碼區塊都會經 `xs_lint` 檢查，確保文件本身不含未知呼叫或結構錯誤。
+
+### Fixed
+
+- **`checkbox` 先前誤寫為 `Plot` 的位置參數**：xshelp 原文為具名參數 `checkbox:=`。
+- **`daterange` 先前誤寫為「日期範圍」**：xshelp 原文為單一日期（date），非範圍。
+- **`OutputField` 簽名改為 xshelp 原文的完整多載**，取代先前只收錄的單一形式。
+
+### Known unverified（待查證，已在文件中標註）
+
+- `axis:=` 的實際編碼值。
+- `SDT_*_L` 後綴的精確語意。
+- `SymbolPrice` 作為數列使用時的可用性與預設值。
+
 ## [0.5.1] - 2026-09-24
 
 ### Fixed
@@ -102,7 +126,8 @@ reference 校正與新手友善文件；新增對外量化報表（GitHub Pages�
 - **`.xs` 編輯驗證 Hook**（`PostToolUse: Write|Edit` → `xs_lint.py`）：對照 604 個 token（grammar 2023 快照 ∪ Preset 215 sysfnc ∪ xshelp 8 群組 bif）的啟發式檢查，對未收錄函數與明顯結構問題提出非阻斷式警示。
 - **散佈基礎建設**：`.claude-plugin/marketplace.json`（marketplace `xs-tools`）、`plugin.json` 起 semver `0.1.0`、MIT LICENSE。
 
-[Unreleased]: https://github.com/Benjamin-Teng/xs_helper/compare/v0.5.1...HEAD
+[Unreleased]: https://github.com/Benjamin-Teng/xs_helper/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/Benjamin-Teng/xs_helper/releases/tag/v0.6.0
 [0.5.1]: https://github.com/Benjamin-Teng/xs_helper/releases/tag/v0.5.1
 [0.5.0]: https://github.com/Benjamin-Teng/xs_helper/releases/tag/v0.5.0
 [0.4.0]: https://github.com/Benjamin-Teng/xs_helper/releases/tag/v0.4.0

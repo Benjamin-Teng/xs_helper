@@ -89,18 +89,18 @@ codex plugin add xs-helper@xs-tools
 
 ## 狀態
 
-✅ **v0.5.1** —— 本版重點：
+✅ **v0.6.0** —— 本版重點：
 
-- **`xs_lint.py` 不再誤報宣告名稱**（[#2](https://github.com/Benjamin-Teng/xs_helper/issues/2)）：`var: x(0)`、`input: p(...)` 的名稱不再被當成未知函數。以官方 XScript_Preset 全量 1419 支腳本驗證，誤報由 3814 個降為 0；未寫完的宣告也改為線性掃描。
-- **GitHub Pages 新增投入功夫統計**：從開專案起累計的研讀語料、驗證掃描、評測與審查數字，資料在 `docs/effort-stats.json`，每次更新疊加。
-- **新增 `AGENTS.md`**：貢獻者與 agent 的驗證指令（見下方「開發」）。
+- **Plot／OutputField 命名參數與多載補完**：`checkbox:=`（原誤寫為位置參數）、`order:=`、`axis:=`（部分待查證）、`PlotN` 多載寫法與數列參照形式；`OutputField` 改為 xshelp 原文的完整多載簽名。
+- **流程控制官方寫法**：`while`／`repeat…until`／`Once`／`switch`（含 `case N to M` 與巢狀）改附一手來源，並補腳本類型適用範圍註記。
+- **`Rank` 語法與屬性**、`inputkind:=Dict/DateRange/SymbolPrice/quickedit` 補齊語法與範例。
+- **型別家族語意**補完（`TrueFalseSimple` 等）。
+- **依 xshelp 函數目錄補收 42 個先前漏收的函數**，新增第 9 個內建函數分類 `SDTFUNC`；`xs_lint.py` 白名單同步收錄。
+- **新增 reference 內容測試關卡**：`references/` 內每個 XS 程式碼區塊皆需通過 `xs_lint` 才能過測試。
+- **修正**：`checkbox` 先前誤寫為 `Plot` 的位置參數；`daterange` 先前誤寫為「日期範圍」，實為單一日期。
+- 已知待查證：`axis:=` 編碼、`SDT_*_L` 後綴語意、`SymbolPrice` 數列可用性與預設值。
 
-v0.5.0 重點：
-
-- **關鍵字與保留字總表**：`language.md` §9 窮舉 xshelp「關鍵字」大分類共 110 個名稱（忽略字、常數、流程控制、宣告），標出 4 個保留字 `Bool` `Int` `Float` `Double`，並附命名建議。
-- **修正型別表**：上述 4 個保留字原被誤列為「原生型別」，已移出；`TrueFalseSimpleVar` 更正為 xshelp 的 `TrueFalseSimple`。
-- **`xs_lint.py` 白名單校正**：補收 `Dict` `DateRange` `SymbolPrice`，保留字的呼叫形式改為警示。
-- **GitHub Pages**：新增 Shioaji Pro 安裝卡；「目前最新版本」改為即時讀取 GitHub Releases。
+v0.5.1／v0.5.0 重點（節錄）：`xs_lint.py` 不再誤報宣告名稱（[#2](https://github.com/Benjamin-Teng/xs_helper/issues/2)）、GitHub Pages 新增投入功夫統計、新增 `AGENTS.md`、關鍵字與保留字總表、`xs_lint.py` 白名單校正。
 
 沿用先前版本：skill 目錄採 Agent Skills 規範的 `references/`（扁平、單層，v0.4.0 起），Shioaji Pro 等只索引固定目錄名的技能安裝器也讀得到；Claude Code 與 Codex 各有原生 manifest / marketplace，兩端共用同一份 skill。v0.2.0 移除的 `.xs` 編輯驗證 Hook 維持不掛載，`xs_lint.py` 保留為獨立腳本。功能仍在迭代。
 
@@ -111,9 +111,9 @@ reference 進度：
 | reference | 狀態 |
 |-----------|------|
 | `language.md`（語法基礎） | ✅ 已蒸餾（grammar token × Preset 真實語法校對） |
-| `xs_lint.py` 已知 token 清單 | ✅ 內建（604 個 token：grammar 2023 快照 ∪ Preset 215 sysfnc ∪ xshelp 8 群組 bif）；供 benchmark 幻覺掃描與手動檢查的獨立腳本 |
+| `xs_lint.py` 已知 token 清單 | ✅ 內建（644 個 token：grammar 2023 快照 ∪ Preset 215 sysfnc ∪ xshelp 9 群組 bif）；供 benchmark 幻覺掃描與手動檢查的獨立腳本 |
 | `system-functions.md`（sysfnc） | ✅ 已蒸餾（Preset 224 函數 × 14 分類） |
-| `builtin-functions.md`（bif） | ✅ 已蒸餾（xshelp 8 分類） |
+| `builtin-functions.md`（bif） | ✅ 已蒸餾（xshelp 9 分類，v0.6.0 起新增 `SDTFUNC`） |
 | `fields.md`（三類欄位） | ✅ 已蒸餾（xshelp `Q*`/`T*`/`F*` × XQStrategy `GetField` 交叉驗證） |
 | `script-types.md` + `example-*.md` ×5 | ✅ 已蒸餾（5 類 `{@type:}` 結構/邊界 + 各一份精選範例） |
 

@@ -215,7 +215,7 @@ codex plugin add xs-helper@xs-tools
 
 ### Acceptance Criteria
 
-- **AC1**：Claude Code 安裝後可用 `/xs`；VS Code／Codex IDE 可用 `$skill-installer` 從 `skills/xs` 安裝後以 `$xs` 使用；Codex CLI 可從 `/plugins` 或直接命令安裝完整 plugin。兩個 manifest 皆識別 `xs-helper@0.5.1` 並載入同一份 `skills/xs/`。
+- **AC1**：Claude Code 安裝後可用 `/xs`；VS Code／Codex IDE 可用 `$skill-installer` 從 `skills/xs` 安裝後以 `$xs` 使用；Codex CLI 可從 `/plugins` 或直接命令安裝完整 plugin。兩個 manifest 皆識別 `xs-helper@0.6.0` 並載入同一份 `skills/xs/`。
 - **AC2**：輸入「幫我寫一個『連續三天放量上漲』的台股選股條件」，產出的 XS 只使用 reference 中存在的選股欄位 / 函數，結構符合「選股」類型慣例。
 - **AC3**：輸入「`Average` 怎麼用？」能回出官方定義（參數、回傳）＋ 一個最小範例。
 - **AC4**：產出腳本中若出現 reference 未收錄之函數，AI agent 必須走 F3 fallback 或明示不確定，**不得**直接杜撰（抽查 10 個生成案例，幻覺函數數 = 0）。
@@ -230,7 +230,7 @@ codex plugin add xs-helper@xs-tools
 - **可維護性**：reference 為快照，須在 SKILL.md 標注蒸餾自哪個來源 commit / 文件版本，便於日後比對更新。
 - **離線可用**：核心問答與生成只依賴內建 reference，無網路時仍可運作；僅冷門 fallback 需網路。
 - **零重型相依**：skill runtime 為 Markdown；獨立 lint 腳本只用 Python stdlib，終端使用者不需安裝 Python 才能載入 plugin。
-- **版本策略**：自 `v0.1.0` 起採 semver；對外變動同步更新兩份 `plugin.json`。**現況：v0.5.1**；`.claude-plugin/marketplace.json` 的 entry 亦同步設 `version`（部分安裝器只讀 marketplace entry 的版本，不讀 manifest；Codex marketplace schema 未查證有此欄位，故 `.agents/plugins/marketplace.json` 不設）。
+- **版本策略**：自 `v0.1.0` 起採 semver；對外變動同步更新兩份 `plugin.json`。**現況：v0.6.0**；`.claude-plugin/marketplace.json` 的 entry 亦同步設 `version`（部分安裝器只讀 marketplace entry 的版本，不讀 manifest；Codex marketplace schema 未查證有此欄位，故 `.agents/plugins/marketplace.json` 不設）。
 
 ---
 
@@ -274,7 +274,7 @@ codex plugin add xs-helper@xs-tools
 - ✅ **`builtin-functions.md`（bif）已蒸餾**（「下一步」第 2 項之一）：xshelp 8 分類
   （`GENERALFUNC`/`TIMEFUNC`/`DATEFUNC`/`STRINGFUNC`/`NUMBERFUNC`/`FIELDFUNC`/`ARRAYFUNC`/
   `TRANSACTIONFUNC`）全收，每條 `名稱 / 簽名 / 一行語意`；開頭立 bif vs sysfnc 差異 +
-  欄位/報價/交易函數的腳本邊界（`GetQuote`/交易函數限即時/自動交易）。
+  欄位/報價/交易函數的腳本邊界（`GetQuote`/交易函數限即時/自動交易）。（v0.6.0 起 9 分類，新增 `SDTFUNC`）
 - ✅ **`fields.md`（三類欄位）已蒸餾**（「下一步」第 2 項之二）：報價`Q*`（含 grammar `q_*`
   全名單錨定）/ 資料`T*` / 選股`F*` 七子類；選股欄位以 `XQStrategy` `GetField` 實際用例
   **交叉驗證**（高頻標 ✅）。立三類欄位×入口×腳本邊界表。`FFINANCE` 200+ 僅收高頻子集，餘走 F3。
