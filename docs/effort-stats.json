@@ -42,7 +42,7 @@
     "codex_review_rounds": {
       "label": "Codex 對抗式審查",
       "unit": "輪",
-      "total": 15,
+      "total": 18,
       "note": "自 2026-09-23 起記錄；此前未留紀錄，不估算"
     }
   },
@@ -120,13 +120,13 @@
         "benchmark_task_runs": 0,
         "skill_generated_test_scripts": 1,
         "xshelp_entries_verified": 0,
-        "codex_review_rounds": 0
+        "codex_review_rounds": 3
       },
       "evidence": {
         "lint_validation_script_runs": "Task 5 驗收腳本 filter.xs 通過 xs_lint",
         "skill_generated_test_scripts": "Task 5 由只讀 skill 的 fresh subagent 撰寫、使用只見於索引的欄位",
         "xshelp_entries_verified": "索引只收名稱，不算逐條內容核對，故不增加",
-        "codex_review_rounds": "發版前審查完成後照實補"
+        "codex_review_rounds": "發版前最終審查 3 輪（抓到 fetch 未驗證回應、截斷資料可通過、測試寫暫存檔三個問題，均已修正）；最後只改統計數字的 commit 不另送審，由 TestEffortStats 把關"
       }
     }
   ],
@@ -173,12 +173,12 @@
     },
     "unit_tests": {
       "label": "單元測試",
-      "value": "90 個",
+      "value": "101 個",
       "note": "v0.1.0 時為 17 個"
     },
     "commits": {
       "label": "commit",
-      "value": "68 個",
+      "value": "78 個",
       "note": "main 分支"
     },
     "releases": {
