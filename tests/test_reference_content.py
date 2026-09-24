@@ -205,5 +205,16 @@ class TestGapFillingTask7(unittest.TestCase):
         self.assertIn("並未提到它們也能像 `Plot1`～`Plot99` 那樣被當成數列讀", text)
 
 
+class TestXshelpIndexWiring(unittest.TestCase):
+    def test_skill_lists_index_and_f3_uses_rest_api(self) -> None:
+        skill = (ROOT / "skills" / "xs" / "SKILL.md").read_text(encoding="utf-8")
+        self.assertIn("](references/xshelp-index.md)", skill)
+        self.assertIn("rest?a=", skill)
+
+    def test_fields_points_to_index_for_full_lists(self) -> None:
+        text = read_ref("fields.md")
+        self.assertIn("xshelp-index.md", text)
+
+
 if __name__ == "__main__":
     unittest.main()

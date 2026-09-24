@@ -208,6 +208,9 @@ class TestPublishedPage(unittest.TestCase):
         for expected in required:
             self.assertIn(expected, self.html)
 
+    def test_reference_doc_count_reflects_name_index(self) -> None:
+        self.assertIn("11 份參考文件", self.html)
+
     def test_shioaji_pro_install_card_follows_codex(self) -> None:
         cards = _install_cards(self.html)
         labels = [card["labelledby"] for card in cards]

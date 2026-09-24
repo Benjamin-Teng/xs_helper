@@ -84,7 +84,8 @@
 - **歷史收盤**：`q_Close1Wago` `q_Close1Mago` `q_Close3Mago` `q_Close1Yago` `q_CloseOfLastYear`
 - **五檔前值**：`q_PreMatch1..4`
 
-> 其餘分類（`QPRICE`/`QVOLUME`/`QFINANCE`/`QMARKET`/`QOPTION`/`QFIVE`）的完整中文清單走 F3。
+> 其餘分類（`QPRICE`/`QVOLUME`/`QFINANCE`/`QMARKET`/`QOPTION`/`QFIVE`）的完整名稱清單見
+> [xshelp-index.md](xshelp-index.md) 的『報價欄位』『資料欄位』『選股欄位』各分組；語意再走 F3。
 
 ---
 
@@ -210,6 +211,7 @@
 
 > **待補 / 邊界（build-time，非 F3 回寫）：**
 >
-> - 報價 `QPRICE/QVOLUME/QFINANCE/QMARKET/QOPTION/QFIVE`、資料 `TPRICE/TVOLUME/TCHIP/TBASIC/…`
->   各子類的完整中文清單未逐一收錄（量大、與選股欄位高度重疊）；需要時 build-time 抓對應 `a=` 頁。
+> - [x] 報價 `QPRICE/QVOLUME/QFINANCE/QMARKET/QOPTION/QFIVE`、資料 `TPRICE/TVOLUME/TCHIP/TBASIC/…`
+>   各子類的完整中文清單未逐一收錄（量大、與選股欄位高度重疊）；名稱清單已由 xshelp-index.md
+>   提供（2026-09-24）。
 > - 選股 `FFINANCE` 200+ 欄位本檔僅收高頻子集；冷門財務 / 因子欄位走 SKILL.md F3（不杜撰，G1）。

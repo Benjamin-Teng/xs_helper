@@ -119,6 +119,7 @@
 | Skill 內容 | 純 markdown（SKILL.md + references/*.md） | 無 runtime 相依 |
 | Lint 腳本 | Python 3 stdlib（零第三方相依） | 獨立手動工具；不由 Claude Code 或 Codex plugin 自動掛載 |
 | Reference 來源 | XScript_Preset / XQStrategy / vscode-xs / xshelp 官方站 | 實作階段 clone 到 `sources/` 後蒸餾 |
+| xshelp 全量鏡像 | 只存本機 `sources/xshelp/`；隨 skill 散佈的只有名稱索引 `xshelp-index.md`（不含說明內容），手動重生 | 鏡像不進 repo（`.gitignore` 已含 `sources/`） |
 | Docker | **否** | plugin 為 markdown + 輕量腳本，無容器化需求（已依規則評估） |
 | 散佈方式 | Claude marketplace + Codex repo marketplace | marketplace 名稱皆為 `xs-tools`，共用 repository-root plugin |
 

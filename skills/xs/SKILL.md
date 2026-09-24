@@ -40,11 +40,11 @@ description: "XScript (XS) 專家模式 — 依 XQ 全球贏家自行開發的 X
 
 ## F3 Fallback（冷門查詢）
 
-reference 未涵蓋的函數 / 欄位 → 使用目前環境可用的網頁查詢或瀏覽工具查 XSHelp 官方站；查得後在回覆標明「此為線上查詢結果」：
+reference 未涵蓋的函數 / 欄位，依序三步：
 
-- 清單頁：`https://xshelp.xq.com.tw/XSHelp/lists?a=<代碼>`
-  （函數：`GENERALFUNC` 等；資料欄位：`TBASIC`/`TPRICE`/`TVOLUME`/`TCHIP`…；選股欄位：`FBASIC`/`FFINANCE`/`FOFTEN`…）
-- 細節頁：`https://xshelp.xq.com.tw/XSHelp/?HelpName=<名稱>&group=<代碼>`（中文名需 URL-encode）
+1. 在 [xshelp-index.md](references/xshelp-index.md) 搜尋該名稱，確認是否存在與所屬分組代碼；**不在索引中即查無，不得使用**。
+2. 用目前環境可用的網頁查詢或瀏覽工具取 `https://xshelp.xq.com.tw/XSHelp/rest?a=<名稱>` 的 JSON，挑 `name` 與查詢名稱**完全相符**的那筆，讀 `desc`（語法）與 `fulldesc`（說明）。條目頁內文由 JS 渲染，直接抓 HTML 通常只剩摘要，故用 `rest?a=` 而非頁面 HTML。
+3. 回覆標明「此為線上查詢結果」，並附條目頁連結 `https://xshelp.xq.com.tw/XSHelp/?HelpName=<名稱>&group=<分組代碼>`（中文名需 URL-encode）。
 
 查無此函數 → 明確告知「查無，可能版本差異或拼寫」，**不杜撰**。
 
