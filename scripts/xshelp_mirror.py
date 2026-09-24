@@ -1,0 +1,90 @@
+#!/usr/bin/env python3
+"""xshelp_mirror — xshelp 全站索引的本機鏡像與 references 名稱索引。
+
+  python -B scripts/xshelp_mirror.py fetch   # rest?a= 全量 → sources/xshelp/entries.json（不進 repo）
+  python -B scripts/xshelp_mirror.py index   # 鏡像 → skills/xs/references/xshelp-index.md
+
+零第三方相依（stdlib only）。索引只收名稱與分組，不含官方說明內容。
+"""
+from __future__ import annotations
+
+import html
+import json
+import re
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+MIRROR_FILE = ROOT / "sources" / "xshelp" / "entries.json"
+INDEX_FILE = ROOT / "skills" / "xs" / "references" / "xshelp-index.md"
+REST_ALL = "https://xshelp.xq.com.tw/XSHelp/rest?a="  # 空字串＝全量；a–z 窮舉會漏
+PAGE_URL = "https://xshelp.xq.com.tw/XSHelp/?HelpName={name}&group={group}"
+FATHER_ORDER = ("流程控制", "宣告", "常數", "忽略字", "內建函數", "系統函數",
+                "報價欄位", "資料欄位", "選股欄位", "屬性欄位")
+KEEP = ("id", "name", "Description", "CategoryName", "father", "desc", "fulldesc")
+
+_META_RE = re.compile(r"<meta\b[^>]*>", re.IGNORECASE)
+_OG_RE = re.compile(r'property\s*=\s*"og:description"', re.IGNORECASE)
+_CONTENT_RE = re.compile(r'content\s*=\s*"([^"]*)"', re.IGNORECASE)
+_GROUP_HEAD_RE = re.compile(r"^### (\S+) ")
+
+
+def parse_entries(raw: str) -> list[dict[str, object]]:
+    """rest?a= 的 JSON 陣列 → 只留需要的欄位。"""
+    return [{k: e.get(k) for k in KEEP} for e in json.loads(raw)]
+
+
+def og_description(page: str) -> str:
+    """條目頁內文由 JS 渲染；原始 HTML 只有 og:description 有文字。"""
+    for tag in _META_RE.findall(page):
+        if _OG_RE.search(tag):
+            found = _CONTENT_RE.search(tag)
+            return html.unescape(found.group(1)).strip() if found else ""
+    return ""
+
+
+def _father_key(father: str) -> tuple[int, str]:
+    return (FATHER_ORDER.index(father), "") if father in FATHER_ORDER else (len(FATHER_ORDER), father)
+
+
+def build_index(entries: list[dict[str, object]], fetched: str) -> str:
+    """產生 references 名稱索引（決定性：相同輸入 → 逐位元相同輸出）。"""
+    tree: dict[str, dict[tuple[str, str], list[str]]] = {}
+    for e in entries:
+        group = (str(e["Description"]), str(e["CategoryName"]))
+        tree.setdefault(str(e["father"]), {}).setdefault(group, []).append(str(e["name"]))
+    lines = [
+        "# xshelp 名稱索引",
+        "",
+        f"> 由 xshelp 官方站索引 API 產生（{fetched}，共 {len(entries)} 筆），只收名稱與分組，不含官方說明內容。",
+        "> **用法：用搜尋找名稱，不要整份讀入。** 名稱不在本檔＝xshelp 查無，不得使用。",
+        (
+            "> 確認存在後，語法與說明用 `https://xshelp.xq.com.tw/XSHelp/rest?a=<名稱>` 取回 JSON，"
+            "挑 `name` 完全相符那筆的 `desc`（語法）與 `fulldesc`（說明）；"
+        ),
+        "> 給使用者的連結用 `https://xshelp.xq.com.tw/XSHelp/?HelpName=<名稱>&group=<分組代碼>`（中文名需 URL-encode）。",
+        "> 重生：`python -B scripts/xshelp_mirror.py fetch` 後 `python -B scripts/xshelp_mirror.py index`。",
+    ]
+    for father in sorted(tree, key=_father_key):
+        groups = tree[father]
+        lines += ["", f"## {father}（{sum(len(n) for n in groups.values())}）"]
+        for (code, cname) in sorted(groups):
+            names = sorted(groups[(code, cname)], key=lambda s: (s.lower(), s))
+            lines += ["", f"### {code} {cname}（{len(names)}）", "", " · ".join(f"`{n}`" for n in names)]
+    return "\n".join(lines) + "\n"
+
+
+def parse_index(text: str) -> dict[str, dict[str, list[str]]]:
+    """build_index 的反向：{大類: {分組代碼: [名稱…]}}。"""
+    tree: dict[str, dict[str, list[str]]] = {}
+    father = code = ""
+    for line in text.splitlines():
+        if line.startswith("## "):
+            father = line[3:].rsplit("（", 1)[0]
+            tree[father] = {}
+        elif line.startswith("### "):
+            head = _GROUP_HEAD_RE.match(line)
+            code = head.group(1) if head else ""
+            tree[father][code] = []
+        elif line.startswith("`") and father and code:
+            tree[father][code] += [n.strip("`") for n in line.split(" · ")]
+    return tree
