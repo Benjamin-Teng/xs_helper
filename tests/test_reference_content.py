@@ -200,6 +200,9 @@ class TestGapFillingTask7(unittest.TestCase):
         self.assertIn("Plot1到Plot99除了可以是一個函數之外，也可以在腳本內被當成數列來引用", text)
         # 範例#2 逐字（含 Plot2 - Plot1 這行數列引用）
         self.assertIn("Value1 = Plot2 - Plot1;", text)
+        # 當數列讀的能力必須明講只到 Plot1~Plot99，不能延伸到 Plot100~Plot999
+        self.assertIn("當數列讀的能力明確只到 `Plot1`～`Plot99`", text)
+        self.assertIn("並未提到它們也能像 `Plot1`～`Plot99` 那樣被當成數列讀", text)
 
 
 if __name__ == "__main__":

@@ -261,9 +261,11 @@ codex plugin add xs-helper@xs-tools
 - ✅ **語法錨點（離線、grammar 確定性）已蒸餾**（commit `47a24de`）：
   - `references/language.md`：grammar 五類 token × Preset 真實語法校對；`intraBarPersist`
     列一級概念（回捲對比表 + `IsXLOrder.xs` 換 Bar 重設慣例）。
-  - `scripts/xs_lint.py`：`KNOWN_TOKENS` 已嵌入 **604 個 token**（grammar 2023 快照 ∪ Preset 215 sysfnc ∪ xshelp 8 群組 bif，小寫）+ 數字後綴
+  - `scripts/xs_lint.py`：`KNOWN_TOKENS` 已嵌入（v0.1.0 當時）**604 個 token**（grammar 2023 快照 ∪
+    Preset 215 sysfnc ∪ xshelp 8 群組 bif，小寫）+ 數字後綴
     正規化 + 字串字面量 strip + 警示改「未收錄(可能自訂函數)」→ **達成 AC5**。
-  - `tests/test_xs_lint.py`：17 個 stdlib 單元測試全過。
+    **現況**：token 數見 `scripts/xs_lint.py` 的 `KNOWN_TOKENS`；bif 9 分類（v0.6.0 起含 `SDTFUNC`）。
+  - `tests/test_xs_lint.py`：（v0.1.0 當時）17 個 stdlib 單元測試全過；現況見 `tests/` 目錄。
 - ✅ **`system-functions.md` 已蒸餾**（「下一步」第 1 項完成）：`XScript_Preset/函數/` 全 **224 個 sysfnc**
   依官方 14 分類入檔，每條 `簽名（input 宣告）+ 一行語意（實作）`；開頭立共通慣例
   （回傳機制：同名變數 / `ret`/`retval` / `numericref` 回填；型別縮寫表；頻率代碼 `H`=半年）。
@@ -271,10 +273,11 @@ codex plugin add xs-helper@xs-tools
   發現：存在中文名函數（`KO成交量擺盪指標`/`Q指標`/`KST確認指標`/`漲幅排行榜`系列）；
   `排行/` 6 支實為「自訂排行條件範本」；`xfMin_*` 不支援 XS 選股/排行/回測。
   檔尾 3 個待補項皆已標明為 **build-time、不由 F3 回寫**。
-- ✅ **`builtin-functions.md`（bif）已蒸餾**（「下一步」第 2 項之一）：xshelp 8 分類
+- ✅ **`builtin-functions.md`（bif）已蒸餾**（「下一步」第 2 項之一）：當時 xshelp 8 分類
   （`GENERALFUNC`/`TIMEFUNC`/`DATEFUNC`/`STRINGFUNC`/`NUMBERFUNC`/`FIELDFUNC`/`ARRAYFUNC`/
   `TRANSACTIONFUNC`）全收，每條 `名稱 / 簽名 / 一行語意`；開頭立 bif vs sysfnc 差異 +
-  欄位/報價/交易函數的腳本邊界（`GetQuote`/交易函數限即時/自動交易）。（v0.6.0 起 9 分類，新增 `SDTFUNC`）
+  欄位/報價/交易函數的腳本邊界（`GetQuote`/交易函數限即時/自動交易）；**v0.6.0 起為 9 分類，新增
+  `SDTFUNC`**。
 - ✅ **`fields.md`（三類欄位）已蒸餾**（「下一步」第 2 項之二）：報價`Q*`（含 grammar `q_*`
   全名單錨定）/ 資料`T*` / 選股`F*` 七子類；選股欄位以 `XQStrategy` `GetField` 實際用例
   **交叉驗證**（高頻標 ✅）。立三類欄位×入口×腳本邊界表。`FFINANCE` 200+ 僅收高頻子集，餘走 F3。

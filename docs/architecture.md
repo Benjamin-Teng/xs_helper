@@ -213,10 +213,10 @@ flowchart TD
         STRIP["strip_comments(src: str) → str<br/>去區塊/行註解 + 字串字面量"]
         CHKSTRUCT["check_structure(code: str) → list[str]<br/>begin/end 配對；if 缺 then"]
         CHKTOK["check_unknown_tokens(code: str) → list[str]<br/>抓 識別字( 比對；去尾數正規化"]
-        KTOK["KNOWN_TOKENS: frozenset[str]<br/>604 token(grammar 2023 ∪ Preset 215 sysfnc ∪ xshelp bif · 小寫)"]
+        KTOK["KNOWN_TOKENS: frozenset[str]<br/>grammar ∪ Preset sysfnc ∪ xshelp bif（9 類）∪ 可呼叫關鍵字 · 小寫；數量見程式"]
     end
 
-    subgraph TEST["🧪 tests/test_xs_lint.py（17 stdlib 測試）"]
+    subgraph TEST["🧪 tests/test_xs_lint.py（stdlib 測試）"]
         T["StripComments / CheckStructure /<br/>CheckUnknownTokens / GetTargetPath"]
     end
 
