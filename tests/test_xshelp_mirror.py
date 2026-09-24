@@ -61,6 +61,10 @@ class TestBuildIndex(unittest.TestCase):
         self.assertIn("共 5 筆", self.text)
         self.assertIn("rest?a=<名稱>", self.text)
 
+    def test_header_warns_url_encode_and_group_code_selection(self) -> None:
+        self.assertIn("URL-encode", self.text)
+        self.assertIn("分組代碼", self.text)
+
     def test_no_description_content_leaks(self) -> None:
         for leaked in ("DESC_SENTINEL", "FULLDESC_SENTINEL"):
             self.assertNotIn(leaked, self.text)

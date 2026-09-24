@@ -211,6 +211,10 @@ class TestXshelpIndexWiring(unittest.TestCase):
         self.assertIn("](references/xshelp-index.md)", skill)
         self.assertIn("rest?a=", skill)
 
+    def test_f3_step2_requires_url_encoding_chinese_names(self) -> None:
+        skill = (ROOT / "skills" / "xs" / "SKILL.md").read_text(encoding="utf-8")
+        self.assertIn("URL-encode", skill)
+
     def test_fields_points_to_index_for_full_lists(self) -> None:
         text = read_ref("fields.md")
         self.assertIn("xshelp-index.md", text)

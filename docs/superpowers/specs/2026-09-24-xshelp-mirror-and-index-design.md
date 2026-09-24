@@ -5,7 +5,7 @@
 
 ## 已查證的事實（2026-09-24）
 
-- **一個請求拿到整站**：`GET https://xshelp.xq.com.tw/XSHelp/rest?a=`（空字串）回傳 JSON 陣列 1621 筆，`id` 全部不重複。先前以 a–z 各查一次的窮舉只得 1593 筆，漏 28 筆；以中文字查詢（`a=成`）回傳 0 筆，所以空字串是唯一可靠的全量查法。
+- **一個請求拿到整站**：`GET https://xshelp.xq.com.tw/XSHelp/rest?a=`（空字串）回傳 JSON 陣列 1621 筆，`id` 全部不重複。先前以 a–z 各查一次的窮舉只得 1593 筆，漏 28 筆；空字串仍是唯一可靠的全量查法（列舉法漏筆，且無法窮舉中文字首）。中文名稱查詢本身可行，但 `a=<中文名>` 必須先 URL-encode，未編碼直接送出中文字會回傳 0 筆——這是編碼問題，不是該名稱不存在；同一名稱編碼後可能命中多筆（分屬不同分組），須依分組代碼比對再取用。
 - **每筆欄位**：`id`、`name`、`ename`、`abbrev`、`Description`（分組代碼，如 `GENERALFUNC`、`QPRICE`）、`CategoryName`（分組中文名）、`father`（大類中文名）、`categoryid`、`desc`（官方語法／多載）、`fulldesc`（完整說明＋範例）。
 - **規模**：10 個大類（選股欄位 492、資料欄位 363、系統函數 267、內建函數 220、報價欄位 131、宣告 51、屬性欄位 38、流程控制 37、忽略字 14、常數 8），54 個分組；全文約 700 KB；111 筆 `desc`／`fulldesc` 皆空。
 - **條目頁內文由 JS 渲染**：`?HelpName=<名稱>&group=<代碼>` 的原始 HTML 只剩 `<meta property="og:description">` 有文字。`desc`／`fulldesc` 為空的條目，只能從 og:description 取得摘要。

@@ -2,7 +2,7 @@
 
 > 由 xshelp 官方站索引 API 產生（2026-09-24，共 1621 筆），只收名稱與分組，不含官方說明內容。
 > **用法：用搜尋找名稱，不要整份讀入。** 名稱不在本檔＝xshelp 查無，不得使用。
-> 確認存在後，語法與說明用 `https://xshelp.xq.com.tw/XSHelp/rest?a=<名稱>` 取回 JSON，挑 `name` 完全相符那筆的 `desc`（語法）與 `fulldesc`（說明）；
+> 確認存在後，語法與說明用 `https://xshelp.xq.com.tw/XSHelp/rest?a=<名稱>` 取回 JSON（**中文名稱需先 URL-encode**，未編碼查無結果）；`name` 完全相符者可能不只一筆（同名分屬多個分組），依分組代碼（`Description`）比對目前所需的大類挑出正確那筆，讀 `desc`（語法）與 `fulldesc`（說明）；
 > 給使用者的連結用 `https://xshelp.xq.com.tw/XSHelp/?HelpName=<名稱>&group=<分組代碼>`（中文名需 URL-encode）。
 > 重生：`python -B scripts/xshelp_mirror.py fetch` 後 `python -B scripts/xshelp_mirror.py index`。
 

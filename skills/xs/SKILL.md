@@ -43,7 +43,7 @@ description: "XScript (XS) 專家模式 — 依 XQ 全球贏家自行開發的 X
 reference 未涵蓋的函數 / 欄位，依序三步：
 
 1. 在 [xshelp-index.md](references/xshelp-index.md) 搜尋該名稱，確認是否存在與所屬分組代碼；**不在索引中即查無，不得使用**。
-2. 用目前環境可用的網頁查詢或瀏覽工具取 `https://xshelp.xq.com.tw/XSHelp/rest?a=<名稱>` 的 JSON，挑 `name` 與查詢名稱**完全相符**的那筆，讀 `desc`（語法）與 `fulldesc`（說明）。條目頁內文由 JS 渲染，直接抓 HTML 通常只剩摘要，故用 `rest?a=` 而非頁面 HTML。
+2. 用目前環境可用的網頁查詢或瀏覽工具取 `https://xshelp.xq.com.tw/XSHelp/rest?a=<名稱>` 的 JSON；**中文名稱必須 URL-encode**，未編碼直接送出中文字會查無結果。`name` 與查詢名稱**完全相符**的可能不只一筆（同名可分屬多個分組，例如「內盤量」同時是報價欄位／資料欄位／選股欄位），此時依步驟 1 索引中查到的分組代碼、或目前腳本類型（`Q*`=報價欄位、`T*`=資料欄位、`F*`=選股欄位）比對 `Description` 欄位，挑出對應那一筆，讀 `desc`（語法）與 `fulldesc`（說明）。條目頁內文由 JS 渲染，直接抓 HTML 通常只剩摘要，故用 `rest?a=` 而非頁面 HTML。
 3. 回覆標明「此為線上查詢結果」，並附條目頁連結 `https://xshelp.xq.com.tw/XSHelp/?HelpName=<名稱>&group=<分組代碼>`（中文名需 URL-encode）。
 
 查無此函數 → 明確告知「查無，可能版本差異或拼寫」，**不杜撰**。
