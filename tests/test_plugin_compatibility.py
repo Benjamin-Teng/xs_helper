@@ -292,6 +292,7 @@ class TestSkillLayoutForFixedDirInstallers(unittest.TestCase):
             "example-indicator.md",
             "example-screening.md",
             "example-alert.md",
+            "xshelp-index.md",
         }
     )
 

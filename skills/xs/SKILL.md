@@ -32,6 +32,7 @@ description: "XScript (XS) 專家模式 — 依 XQ 全球贏家自行開發的 X
    - [fields.md](references/fields.md) — 報價 / 資料 / 選股 三類欄位
    - [script-types.md](references/script-types.md) — 5 類結構與可用 / 禁用函數邊界
    - [example-auto-trade.md](references/example-auto-trade.md) / [example-function.md](references/example-function.md) / [example-indicator.md](references/example-indicator.md) / [example-screening.md](references/example-screening.md) / [example-alert.md](references/example-alert.md) — 每類型一份精選範例
+   - [xshelp-index.md](references/xshelp-index.md) — xshelp 全站名稱索引（只收名稱與分組）；用搜尋確認某名稱是否存在，不要整份讀入
 
 3. **產出**：
    - **腳本生成**：可直接貼回 XQ Script Editor 的 XS 程式碼，開頭帶正確 `{@type:}`，附簡短說明用到哪些函數 / 欄位。

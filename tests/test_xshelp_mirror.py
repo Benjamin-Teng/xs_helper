@@ -75,6 +75,41 @@ class TestBuildIndex(unittest.TestCase):
         self.assertEqual(parsed["系統函數"], {"PRICEGETFUNC": ["average"]})
         self.assertEqual(sum(len(n) for g in parsed.values() for n in g.values()), 5)
 
+    def test_name_with_backtick_raises(self) -> None:
+        bad = json.loads(json.dumps(FIXTURE, ensure_ascii=False))
+        bad[0]["name"] = "P`lot"
+        entries = m.parse_entries(json.dumps(bad, ensure_ascii=False))
+        with self.assertRaises(ValueError):
+            m.build_index(entries, "2026-09-24")
+
+
+class TestShippedIndex(unittest.TestCase):
+    """隨 skill 散佈的索引檔：可解析、筆數一致、含已知名稱、不含說明內容、大小受控。"""
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.text = m.INDEX_FILE.read_text(encoding="utf-8")
+        cls.tree = m.parse_index(cls.text)
+
+    def test_count_in_header_matches_names(self) -> None:
+        total = sum(len(n) for g in self.tree.values() for n in g.values())
+        self.assertIn(f"共 {total} 筆", self.text)
+        self.assertGreaterEqual(total, 1600)
+
+    def test_contains_known_names_by_father(self) -> None:
+        flat = {f: {n for g in grp.values() for n in g} for f, grp in self.tree.items()}
+        self.assertIn("Plot", flat["內建函數"])
+        self.assertIn("Bool", flat["宣告"])
+        self.assertIn("SDT_Sum", flat["內建函數"])
+        self.assertIn("QPRICE", {code for code in self.tree["報價欄位"]})
+
+    def test_size_is_bounded(self) -> None:
+        self.assertLess(len(self.text.encode("utf-8")), 80_000)
+
+    def test_no_markup_from_descriptions(self) -> None:
+        self.assertNotIn("<br", self.text)
+        self.assertNotIn("fulldesc\":", self.text)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -11,6 +11,10 @@ from __future__ import annotations
 import html
 import json
 import re
+import sys
+import urllib.parse
+import urllib.request
+from datetime import UTC, datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -46,10 +50,22 @@ def _father_key(father: str) -> tuple[int, str]:
     return (FATHER_ORDER.index(father), "") if father in FATHER_ORDER else (len(FATHER_ORDER), father)
 
 
+def _validate_entry(e: dict[str, object]) -> None:
+    name = str(e["name"])
+    for bad in ("·", "`", "\n"):
+        if bad in name:
+            raise ValueError(f"entry name contains {bad!r}: {name!r}")
+    for field in ("Description", "CategoryName"):
+        value = str(e[field])
+        if any(ch.isspace() for ch in value):
+            raise ValueError(f"{field} contains whitespace for entry {name!r}: {value!r}")
+
+
 def build_index(entries: list[dict[str, object]], fetched: str) -> str:
     """產生 references 名稱索引（決定性：相同輸入 → 逐位元相同輸出）。"""
     tree: dict[str, dict[tuple[str, str], list[str]]] = {}
     for e in entries:
+        _validate_entry(e)
         group = (str(e["Description"]), str(e["CategoryName"]))
         tree.setdefault(str(e["father"]), {}).setdefault(group, []).append(str(e["name"]))
     lines = [
@@ -88,3 +104,44 @@ def parse_index(text: str) -> dict[str, dict[str, list[str]]]:
         elif line.startswith("`") and father and code:
             tree[father][code] += [n.strip("`") for n in line.split(" · ")]
     return tree
+
+
+def _get(url: str) -> str:
+    with urllib.request.urlopen(url, timeout=60) as resp:
+        return resp.read().decode("utf-8")
+
+
+def fetch(today: str) -> int:
+    """抓全量索引存成鏡像；全文為空的條目補抓條目頁 og:description。"""
+    entries = parse_entries(_get(REST_ALL))
+    for e in entries:
+        if not (e.get("desc") or e.get("fulldesc")):
+            url = PAGE_URL.format(name=urllib.parse.quote(str(e["name"])), group=e["Description"])
+            e["og_description"] = og_description(_get(url))
+    MIRROR_FILE.parent.mkdir(parents=True, exist_ok=True)
+    MIRROR_FILE.write_text(
+        json.dumps({"fetched": today, "source": REST_ALL, "entries": entries}, ensure_ascii=False, indent=1),
+        encoding="utf-8",
+    )
+    return len(entries)
+
+
+def write_index() -> int:
+    mirror = json.loads(MIRROR_FILE.read_text(encoding="utf-8"))
+    INDEX_FILE.write_text(build_index(mirror["entries"], mirror["fetched"]), encoding="utf-8")
+    return len(mirror["entries"])
+
+
+def main(argv: list[str]) -> int:
+    if argv[1:] == ["fetch"]:
+        print(f"鏡像 {fetch(datetime.now(UTC).date().isoformat())} 筆 → {MIRROR_FILE}")
+        return 0
+    if argv[1:] == ["index"]:
+        print(f"索引 {write_index()} 筆 → {INDEX_FILE}")
+        return 0
+    print("用法：python -B scripts/xshelp_mirror.py fetch|index", file=sys.stderr)
+    return 2
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))
