@@ -124,6 +124,12 @@ KNOWN_TOKENS: frozenset[str] = frozenset({
     "sdt_setstringif", "sdt_setstringif_l", "sdt_setstring_l", "sdt_setvalue", "sdt_setvalueif",
     "sdt_setvalueif_l", "sdt_setvalue_l", "sdt_sort", "sdt_sortkey", "sdt_sortkey_l",
     "sdt_sortstring", "sdt_sortstring_l", "sdt_sort_l", "sdt_sum", "sdt_sum_l",
+    # 6. xshelp 名稱索引（references/xshelp-index.md）中大類為內建函數／系統函數的 ASCII 名稱，
+    #    由 TestLintCoversIndexedFunctions 守住；全為 系統函數 底下 量化因子／技術指標 分組的
+    #    社群量化因子命名（如 calmar_ratio_250d、ROE_P），非關鍵字亦非欄位。
+    "atr_10日", "empty_line指標_20d", "ko成交量擺盪指標", "kst確認指標", "p_cfv", "q指標",
+    "qmj_safe", "roa_p", "roa_pb", "roe_p", "roe_pb", "ros_p", "stochrsi_k",
+    "calmar_ratio_250d", "dd_ma_250d",
 })
 
 

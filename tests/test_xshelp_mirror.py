@@ -3,13 +3,17 @@
 from __future__ import annotations
 
 import json
+import re
 import sys
 import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 
+import xs_lint
 import xshelp_mirror as m
+
+_ASCII_IDENT = re.compile(r"^[A-Za-z_]\w*$")
 
 FIXTURE = [
     {"id": 3, "name": "Plot", "Description": "GENERALFUNC", "CategoryName": "一般函數",
@@ -109,6 +113,14 @@ class TestShippedIndex(unittest.TestCase):
     def test_no_markup_from_descriptions(self) -> None:
         self.assertNotIn("<br", self.text)
         self.assertNotIn("fulldesc\":", self.text)
+
+
+class TestLintCoversIndexedFunctions(unittest.TestCase):
+    def test_every_ascii_function_name_is_known_to_lint(self) -> None:
+        tree = m.parse_index(m.INDEX_FILE.read_text(encoding="utf-8"))
+        names = {n for f in ("內建函數", "系統函數") for g in tree.get(f, {}).values() for n in g}
+        missing = sorted(n for n in names if _ASCII_IDENT.match(n) and n.lower() not in xs_lint.KNOWN_TOKENS)
+        self.assertEqual(missing, [])
 
 
 if __name__ == "__main__":
