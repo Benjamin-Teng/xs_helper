@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import re
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -117,6 +118,92 @@ class TestShippedIndex(unittest.TestCase):
     def test_no_markup_from_descriptions(self) -> None:
         self.assertNotIn("<br", self.text)
         self.assertNotIn("fulldesc\":", self.text)
+
+
+def _make_valid_payload(n: int = m.MIN_ENTRIES) -> list[dict[str, object]]:
+    """>=n 筆合成資料，涵蓋每個 FATHER_ORDER 大類，id 唯一。"""
+    fathers = m.FATHER_ORDER
+    return [
+        {
+            "id": i,
+            "name": f"Name{i}",
+            "Description": "GROUPCODE",
+            "CategoryName": "分組",
+            "father": fathers[i % len(fathers)],
+        }
+        for i in range(n)
+    ]
+
+
+class TestValidatePayload(unittest.TestCase):
+    def test_valid_payload_passes(self) -> None:
+        m.validate_payload(_make_valid_payload())  # 不應丟例外
+
+    def test_empty_list_raises(self) -> None:
+        with self.assertRaises(ValueError):
+            m.validate_payload([])
+
+    def test_missing_name_raises(self) -> None:
+        entries = _make_valid_payload()
+        entries[0] = dict(entries[0])
+        del entries[0]["name"]
+        with self.assertRaises(ValueError):
+            m.validate_payload(entries)
+
+    def test_empty_name_raises(self) -> None:
+        entries = _make_valid_payload()
+        entries[0] = dict(entries[0])
+        entries[0]["name"] = ""
+        with self.assertRaises(ValueError):
+            m.validate_payload(entries)
+
+    def test_duplicate_id_raises(self) -> None:
+        entries = _make_valid_payload()
+        entries[1] = dict(entries[1])
+        entries[1]["id"] = entries[0]["id"]
+        with self.assertRaises(ValueError):
+            m.validate_payload(entries)
+
+    def test_below_min_entries_raises(self) -> None:
+        with self.assertRaises(ValueError):
+            m.validate_payload(_make_valid_payload(m.MIN_ENTRIES - 1))
+
+    def test_missing_father_category_raises(self) -> None:
+        remaining = m.FATHER_ORDER[1:]  # 缺 FATHER_ORDER[0] 這個大類
+        n = m.MIN_ENTRIES + len(remaining)
+        entries: list[dict[str, object]] = [
+            {
+                "id": i,
+                "name": f"Name{i}",
+                "Description": "GROUPCODE",
+                "CategoryName": "分組",
+                "father": remaining[i % len(remaining)],
+            }
+            for i in range(n)
+        ]
+        with self.assertRaises(ValueError):
+            m.validate_payload(entries)
+
+
+class TestWriteIndexValidation(unittest.TestCase):
+    def test_write_index_does_not_touch_index_file_when_mirror_invalid(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            mirror_file = tmp_path / "entries.json"
+            index_file = tmp_path / "xshelp-index.md"
+            index_file.write_text("原有內容", encoding="utf-8")
+            mirror_file.write_text(
+                json.dumps({"fetched": "2026-09-24", "source": "x", "entries": []}, ensure_ascii=False),
+                encoding="utf-8",
+            )
+            original_mirror, original_index = m.MIRROR_FILE, m.INDEX_FILE
+            m.MIRROR_FILE, m.INDEX_FILE = mirror_file, index_file
+            try:
+                with self.assertRaises(ValueError):
+                    m.write_index()
+            finally:
+                m.MIRROR_FILE, m.INDEX_FILE = original_mirror, original_index
+            self.assertEqual(index_file.read_text(encoding="utf-8"), "原有內容")
 
 
 class TestLintCoversIndexedFunctions(unittest.TestCase):

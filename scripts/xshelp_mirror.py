@@ -25,6 +25,7 @@ PAGE_URL = "https://xshelp.xq.com.tw/XSHelp/?HelpName={name}&group={group}"
 FATHER_ORDER = ("流程控制", "宣告", "常數", "忽略字", "內建函數", "系統函數",
                 "報價欄位", "資料欄位", "選股欄位", "屬性欄位")
 KEEP = ("id", "name", "Description", "CategoryName", "father", "desc", "fulldesc")
+MIN_ENTRIES = 1600  # 低於此門檻視為上游異常（斷線／截斷／schema 改版），拒絕覆寫鏡像與索引
 
 _META_RE = re.compile(r"<meta\b[^>]*>", re.IGNORECASE)
 _OG_RE = re.compile(r'property\s*=\s*"og:description"', re.IGNORECASE)
@@ -35,6 +36,30 @@ _GROUP_HEAD_RE = re.compile(r"^### (\S+) ")
 def parse_entries(raw: str) -> list[dict[str, object]]:
     """rest?a= 的 JSON 陣列 → 只留需要的欄位。"""
     return [{k: e.get(k) for k in KEEP} for e in json.loads(raw)]
+
+
+def validate_payload(entries: list[dict[str, object]]) -> None:
+    """驗證 rest?a= 回應是否為完整全量清單，非上游斷線／截斷／schema 改版的殘缺資料。
+
+    未過 → ValueError（呼叫端不得寫入鏡像或索引，保留既有檔案）。
+    """
+    if len(entries) < MIN_ENTRIES:
+        raise ValueError(f"entries 只有 {len(entries)} 筆，低於 MIN_ENTRIES={MIN_ENTRIES}，疑似上游異常")
+    seen_ids: set[object] = set()
+    seen_fathers: set[str] = set()
+    for i, e in enumerate(entries):
+        for field in ("name", "Description", "CategoryName", "father"):
+            value = e.get(field)
+            if not isinstance(value, str) or not value:
+                raise ValueError(f"entries[{i}] 的 {field!r} 非空字串: {value!r}")
+        entry_id = e.get("id")
+        if entry_id in seen_ids:
+            raise ValueError(f"entries[{i}] 的 id 重複: {entry_id!r}")
+        seen_ids.add(entry_id)
+        seen_fathers.add(str(e["father"]))
+    missing = [f for f in FATHER_ORDER if f not in seen_fathers]
+    if missing:
+        raise ValueError(f"缺少下列大類（可能是 schema 改版）: {missing}")
 
 
 def og_description(page: str) -> str:
@@ -116,6 +141,7 @@ def _get(url: str) -> str:
 def fetch(today: str) -> int:
     """抓全量索引存成鏡像；全文為空的條目補抓條目頁 og:description。"""
     entries = parse_entries(_get(REST_ALL))
+    validate_payload(entries)  # 寫入前、補抓 og:description 前先驗證，異常時不浪費請求也不覆寫鏡像
     for e in entries:
         if not (e.get("desc") or e.get("fulldesc")):
             url = PAGE_URL.format(name=urllib.parse.quote(str(e["name"])), group=e["Description"])
@@ -130,16 +156,25 @@ def fetch(today: str) -> int:
 
 def write_index() -> int:
     mirror = json.loads(MIRROR_FILE.read_text(encoding="utf-8"))
+    validate_payload(mirror["entries"])  # 驗證通過才覆寫既有索引，異常時保留舊檔
     INDEX_FILE.write_text(build_index(mirror["entries"], mirror["fetched"]), encoding="utf-8")
     return len(mirror["entries"])
 
 
 def main(argv: list[str]) -> int:
     if argv[1:] == ["fetch"]:
-        print(f"鏡像 {fetch(datetime.now(UTC).date().isoformat())} 筆 → {MIRROR_FILE}")
+        try:
+            print(f"鏡像 {fetch(datetime.now(UTC).date().isoformat())} 筆 → {MIRROR_FILE}")
+        except ValueError as err:
+            print(f"fetch 失敗，未覆寫鏡像：{err}", file=sys.stderr)
+            return 1
         return 0
     if argv[1:] == ["index"]:
-        print(f"索引 {write_index()} 筆 → {INDEX_FILE}")
+        try:
+            print(f"索引 {write_index()} 筆 → {INDEX_FILE}")
+        except ValueError as err:
+            print(f"index 失敗，未覆寫索引：{err}", file=sys.stderr)
+            return 1
         return 0
     print("用法：python -B scripts/xshelp_mirror.py fetch|index", file=sys.stderr)
     return 2
