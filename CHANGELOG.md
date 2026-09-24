@@ -6,6 +6,21 @@
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-09-24
+
+### Added
+
+- **xshelp 名稱索引 `references/xshelp-index.md`**：1621 個名稱、10 大類 54 分組，只含名稱與分組（不含逐條說明），供 F3 fallback 與欄位清單查詢。
+- **`scripts/xshelp_mirror.py`**：`fetch` 子指令把 xshelp 官方站全站鏡像到本機 `sources/xshelp/`（不進 repo）；`index` 子指令由鏡像產生上述索引，結果決定性（同輸入必同輸出）。
+- **F3 fallback 改走索引 API**：先查 `references/xshelp-index.md`，再以 `rest?a=<名稱>` 查官方站；中文名稱需 URL-encode，同名跨多分組時依分組代碼挑選正確條目。
+- **`fields.md` 報價／資料／選股欄位完整名稱清單**改由 xshelp 名稱索引提供來源，取代先前「來源待定位」的標註。
+- **reference 由 10 份增為 11 份**（新增 `xshelp-index.md`）。
+
+### Fixed
+
+- **`xs_lint.py` 補齊 15 個先前漏收的 xshelp 系統函數名稱**，並新增測試以索引為準守住白名單一致性，避免未來再度漏收。
+- **先前以 a–z 窮舉查詢 xshelp 會漏收 28 筆**：改用空字串全量查詢一次取得完整名稱清單。
+
 ## [0.6.0] - 2026-09-24
 
 ### Added
@@ -126,7 +141,8 @@ reference 校正與新手友善文件；新增對外量化報表（GitHub Pages�
 - **`.xs` 編輯驗證 Hook**（`PostToolUse: Write|Edit` → `xs_lint.py`）：對照 604 個 token（grammar 2023 快照 ∪ Preset 215 sysfnc ∪ xshelp 8 群組 bif）的啟發式檢查，對未收錄函數與明顯結構問題提出非阻斷式警示。
 - **散佈基礎建設**：`.claude-plugin/marketplace.json`（marketplace `xs-tools`）、`plugin.json` 起 semver `0.1.0`、MIT LICENSE。
 
-[Unreleased]: https://github.com/Benjamin-Teng/xs_helper/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/Benjamin-Teng/xs_helper/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/Benjamin-Teng/xs_helper/releases/tag/v0.7.0
 [0.6.0]: https://github.com/Benjamin-Teng/xs_helper/releases/tag/v0.6.0
 [0.5.1]: https://github.com/Benjamin-Teng/xs_helper/releases/tag/v0.5.1
 [0.5.0]: https://github.com/Benjamin-Teng/xs_helper/releases/tag/v0.5.0

@@ -89,24 +89,21 @@ codex plugin add xs-helper@xs-tools
 
 ## 狀態
 
-✅ **v0.6.0** —— 本版重點：
+✅ **v0.7.0** —— 本版重點：
 
-- **Plot／OutputField 命名參數與多載補完**：`checkbox:=`（原誤寫為位置參數）、`order:=`、`axis:=`（部分待查證）、`PlotN` 多載寫法與數列參照形式；`OutputField` 改為 xshelp 原文的完整多載簽名。
-- **流程控制官方寫法**：`while`／`repeat…until`／`Once`／`switch`（含 `case N to M` 與巢狀）改附一手來源，並補腳本類型適用範圍註記。
-- **`Rank` 語法與屬性**、`inputkind:=Dict/DateRange/SymbolPrice/quickedit` 補齊語法與範例。
-- **型別家族語意**補完（`TrueFalseSimple` 等）。
-- **依 xshelp 函數目錄補收 42 個先前漏收的函數**，新增第 9 個內建函數分類 `SDTFUNC`；`xs_lint.py` 白名單同步收錄。
-- **新增 reference 內容測試關卡**：`references/` 內每個 XS 程式碼區塊皆需通過 `xs_lint` 才能過測試。
-- **修正**：`checkbox` 先前誤寫為 `Plot` 的位置參數；`daterange` 先前誤寫為「日期範圍」，實為單一日期。
-- 已知待查證：`axis:=` 編碼、`SDT_*_L` 後綴語意、`SymbolPrice` 數列可用性與預設值。
+- **新增 xshelp 名稱索引 `references/xshelp-index.md`**：1621 個名稱、10 大類 54 分組，只含名稱與分組。
+- **新增 `scripts/xshelp_mirror.py`**：`fetch` 把 xshelp 官方站鏡像到本機（不進 repo）、`index` 由鏡像決定性產出上述索引。
+- **F3 fallback 改走索引 API**：先查索引，再以 `rest?a=<名稱>` 查官方站；中文名稱需 URL-encode，同名跨分組時依分組代碼挑選。
+- **`fields.md` 報價／資料／選股欄位完整名稱清單**改由索引提供來源。
+- **修正**：`xs_lint.py` 補齊 15 個先前漏收的 xshelp 系統函數名稱，並以測試守住索引一致性；先前以 a–z 窮舉查詢會漏收 28 筆，改為空字串全量查詢。
 
-v0.5.1／v0.5.0 重點（節錄）：`xs_lint.py` 不再誤報宣告名稱（[#2](https://github.com/Benjamin-Teng/xs_helper/issues/2)）、GitHub Pages 新增投入功夫統計、新增 `AGENTS.md`、關鍵字與保留字總表、`xs_lint.py` 白名單校正。
+v0.6.0 重點（節錄）：`Plot`/`OutputField` 命名參數與多載、流程控制官方寫法、`Rank`/`inputkind` 補齊、補收 42 個漏收函數與第 9 分類 `SDTFUNC`。v0.5.1／v0.5.0 重點（節錄）：`xs_lint.py` 不再誤報宣告名稱（[#2](https://github.com/Benjamin-Teng/xs_helper/issues/2)）、GitHub Pages 新增投入功夫統計、新增 `AGENTS.md`、關鍵字與保留字總表、`xs_lint.py` 白名單校正。
 
 沿用先前版本：skill 目錄採 Agent Skills 規範的 `references/`（扁平、單層，v0.4.0 起），Shioaji Pro 等只索引固定目錄名的技能安裝器也讀得到；Claude Code 與 Codex 各有原生 manifest / marketplace，兩端共用同一份 skill。v0.2.0 移除的 `.xs` 編輯驗證 Hook 維持不掛載，`xs_lint.py` 保留為獨立腳本。功能仍在迭代。
 
 📊 **成效**：[skill 助益量化報表](https://benjamin-teng.github.io/xs_helper/) —— 8 個真實 XS 任務「載 skill vs 未載」對照，通過率 100% vs 75%、零幻覺 token。
 
-reference 進度：
+reference 進度（共 11 份：5 份規範 ＋ 1 份 xshelp 名稱索引 ＋ 5 份範例）：
 
 | reference | 狀態 |
 |-----------|------|
@@ -115,6 +112,7 @@ reference 進度：
 | `system-functions.md`（sysfnc） | ✅ 已蒸餾（Preset 224 函數 × 14 分類） |
 | `builtin-functions.md`（bif） | ✅ 已蒸餾（xshelp 9 分類，v0.6.0 起新增 `SDTFUNC`） |
 | `fields.md`（三類欄位） | ✅ 已蒸餾（xshelp `Q*`/`T*`/`F*` × XQStrategy `GetField` 交叉驗證） |
+| `xshelp-index.md`（名稱索引） | ✅ 已產生（1621 個名稱、10 大類 54 分組，只含名稱與分組；`scripts/xshelp_mirror.py` 決定性產出） |
 | `script-types.md` + `example-*.md` ×5 | ✅ 已蒸餾（5 類 `{@type:}` 結構/邊界 + 各一份精選範例） |
 
 完整規格與交接見 [docs/SPEC.md](docs/SPEC.md)，版本變動見 [CHANGELOG.md](CHANGELOG.md)。
@@ -125,7 +123,7 @@ reference 蒸餾自 XQ 官方範例庫與說明站：`XScript_Preset`、`XQStrat
 
 ## 開發
 
-測試與 lint 指令、內容以 xshelp 為準等貢獻規則見 [AGENTS.md](AGENTS.md)。送 PR 前至少跑過 `python -B -m unittest discover -s tests`。
+測試與 lint 指令、內容以 xshelp 為準等貢獻規則見 [AGENTS.md](AGENTS.md)。送 PR 前至少跑過 `python -B -m unittest discover -s tests`。重生 xshelp 名稱索引用 `python -B scripts/xshelp_mirror.py fetch` 再 `index`（`fetch` 需網路）。
 
 ## License
 

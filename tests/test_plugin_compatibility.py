@@ -72,13 +72,13 @@ def _install_cards(html: str) -> list[dict]:
 
 
 class TestPluginManifests(unittest.TestCase):
-    def test_both_hosts_publish_version_0_6_0(self) -> None:
+    def test_both_hosts_publish_version_0_7_0(self) -> None:
         claude = load_json(".claude-plugin/plugin.json")
         codex = load_json(".codex-plugin/plugin.json")
         self.assertEqual(claude["name"], "xs-helper")
         self.assertEqual(codex["name"], "xs-helper")
-        self.assertEqual(claude["version"], "0.6.0")
-        self.assertEqual(codex["version"], "0.6.0")
+        self.assertEqual(claude["version"], "0.7.0")
+        self.assertEqual(codex["version"], "0.7.0")
 
     def test_codex_manifest_points_to_shared_skill_only(self) -> None:
         manifest = load_json(".codex-plugin/plugin.json")
@@ -336,7 +336,7 @@ class TestSkillLayoutForFixedDirInstallers(unittest.TestCase):
         # not from plugin.json (Sinotrade's shioaji entry carries one; the Codex
         # marketplace schema is unverified for this field, so it stays manifest-only).
         entry = next(p for p in load_json(".claude-plugin/marketplace.json")["plugins"] if p["name"] == "xs-helper")
-        self.assertEqual(entry["version"], "0.6.0")
+        self.assertEqual(entry["version"], "0.7.0")
 
     def test_maintained_docs_contain_no_obsolete_singular_reference_path(self) -> None:
         stale = re.compile(r"skills/xs/reference/|\]\(reference/|reference/examples/")

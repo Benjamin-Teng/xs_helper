@@ -12,7 +12,7 @@
     "lint_validation_script_runs": {
       "label": "lint 驗證掃描的腳本",
       "unit": "支·次",
-      "total": 10124,
+      "total": 10125,
       "note": "真實語料重掃、突變注入測試、精選語料測試的累計掃描量"
     },
     "false_positives_eliminated": {
@@ -30,7 +30,7 @@
     "skill_generated_test_scripts": {
       "label": "依 skill 規範產生的測試腳本",
       "unit": "支",
-      "total": 35,
+      "total": 36,
       "note": "五類各 4 支，用來同時檢驗 skill 與 lint"
     },
     "xshelp_entries_verified": {
@@ -108,13 +108,38 @@
         "xshelp_entries_verified": "Plot、OutputField 兩條目＋42 個 xshelp 函數（含新分類 SDTFUNC）逐條以 rest 索引 API 取 desc/fulldesc 撰寫；與 v0.5.0 已計的 110 個關鍵字條目重複核對者不重複計",
         "codex_review_rounds": "檢查點 A 1 輪、發版檢查點 B 2 輪（本 session 紀錄；最後只改統計數字的 commit 不另送審，由 TestEffortStats 把關）"
       }
+    },
+    {
+      "version": "v0.7.0",
+      "date": "2026-09-24",
+      "summary": "新增 xshelp 全站名稱索引（1621 個名稱）與本機鏡像腳本；F3 改走索引 API；lint 名單與索引一致性測試",
+      "deltas": {
+        "official_scripts_distilled": 0,
+        "lint_validation_script_runs": 1,
+        "false_positives_eliminated": 0,
+        "benchmark_task_runs": 0,
+        "skill_generated_test_scripts": 1,
+        "xshelp_entries_verified": 0,
+        "codex_review_rounds": 0
+      },
+      "evidence": {
+        "lint_validation_script_runs": "Task 5 驗收腳本 filter.xs 通過 xs_lint",
+        "skill_generated_test_scripts": "Task 5 由只讀 skill 的 fresh subagent 撰寫、使用只見於索引的欄位",
+        "xshelp_entries_verified": "索引只收名稱，不算逐條內容核對，故不增加",
+        "codex_review_rounds": "發版前審查完成後照實補"
+      }
     }
   ],
   "snapshot": {
     "reference_docs": {
       "label": "reference 文件",
-      "value": "10 份",
-      "note": "5 份規範 ＋ 5 份範例（含 12 段精選 XS 程式碼）"
+      "value": "11 份",
+      "note": "5 份規範 ＋ 1 份 xshelp 名稱索引 ＋ 5 份範例（含 12 段精選 XS 程式碼）"
+    },
+    "xshelp_index": {
+      "label": "xshelp 名稱索引",
+      "value": "1621 個",
+      "note": "10 大類 54 分組，只含名稱"
     },
     "system_functions": {
       "label": "收錄的 Preset 系統函數",
@@ -138,7 +163,7 @@
     },
     "known_tokens": {
       "label": "lint 內建已知 token",
-      "value": "644 個",
+      "value": "659 個",
       "note": "grammar ∪ Preset 系統函數 ∪ xshelp 內建函數 ∪ 可呼叫關鍵字，扣除保留字"
     },
     "lint_rules": {
@@ -148,7 +173,7 @@
     },
     "unit_tests": {
       "label": "單元測試",
-      "value": "70 個",
+      "value": "90 個",
       "note": "v0.1.0 時為 17 個"
     },
     "commits": {
@@ -158,8 +183,8 @@
     },
     "releases": {
       "label": "版本",
-      "value": "10 個",
-      "note": "v0.1.0 至 v0.6.0 的 git tag"
+      "value": "11 個",
+      "note": "v0.1.0 至 v0.7.0 的 git tag"
     },
     "dev_days": {
       "label": "開發期間",
