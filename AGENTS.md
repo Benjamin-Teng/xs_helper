@@ -27,4 +27,4 @@ markdownlint-cli2 "skills/**/*.md" README.md CHANGELOG.md
 
 - XS 的函數、欄位、關鍵字以 XQ 官方 xshelp（<https://xshelp.xq.com.tw/XSHelp/>）為準。vscode-xs grammar 收錄的名稱不代表可用，例如 `Bool` `Int` `Float` `Double` 在 xshelp 標為保留字，見 `skills/xs/references/language.md` §9。
 - 版本號要在 `.claude-plugin/plugin.json`、`.codex-plugin/plugin.json`、`.claude-plugin/marketplace.json` 三處一致，`tests/test_plugin_compatibility.py` 會檢查。
-- xshelp 名稱索引 `skills/xs/references/xshelp-index.md` 由 `python -B scripts/xshelp_mirror.py fetch` 再 `python -B scripts/xshelp_mirror.py index` 重生；`fetch` 需要網路，唯讀 review 沙箱內不要執行。
+- xshelp 名稱索引 `skills/xs/references/xshelp-index.md` 由 `python -B scripts/xshelp_mirror.py fetch` 再 `python -B scripts/xshelp_mirror.py index` 重生；`fetch` 需要網路，唯讀 review 沙箱內不要執行。`fetch` 會拒絕覆寫成筆數變少或遺漏既有 id 的鏡像；確認是官方真的刪除條目時才加 `--allow-shrink` 覆蓋。

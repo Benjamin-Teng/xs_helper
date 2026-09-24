@@ -138,10 +138,33 @@ def _get(url: str) -> str:
         return resp.read().decode("utf-8")
 
 
-def fetch(today: str) -> int:
+def check_no_shrink(old_ids: set[object], new_entries: list[dict[str, object]]) -> None:
+    """拒絕用「筆數變少」或「遺漏既有 id」的新資料覆寫鏡像（防止部分截斷的回應悄悄覆寫）。
+
+    未過 → ValueError；呼叫端保留既有鏡像。呼叫端須提供明確覆蓋（`--allow-shrink`）
+    才能繞過，供官方確實刪除條目時使用。
+    """
+    if len(new_entries) < len(old_ids):
+        raise ValueError(
+            f"新資料 {len(new_entries)} 筆少於既有鏡像 {len(old_ids)} 筆，拒絕覆寫"
+            "（若為官方刪除，加 --allow-shrink）"
+        )
+    new_ids = {e.get("id") for e in new_entries}
+    missing = old_ids - new_ids
+    if missing:
+        raise ValueError(
+            f"新資料遺漏既有鏡像的 id：{sorted(missing, key=str)}，拒絕覆寫"
+            "（若為官方刪除，加 --allow-shrink）"
+        )
+
+
+def fetch(today: str, *, allow_shrink: bool = False) -> int:
     """抓全量索引存成鏡像；全文為空的條目補抓條目頁 og:description。"""
     entries = parse_entries(_get(REST_ALL))
     validate_payload(entries)  # 寫入前、補抓 og:description 前先驗證，異常時不浪費請求也不覆寫鏡像
+    if not allow_shrink and MIRROR_FILE.exists():
+        old_ids = {e.get("id") for e in json.loads(MIRROR_FILE.read_text(encoding="utf-8"))["entries"]}
+        check_no_shrink(old_ids, entries)
     for e in entries:
         if not (e.get("desc") or e.get("fulldesc")):
             url = PAGE_URL.format(name=urllib.parse.quote(str(e["name"])), group=e["Description"])
@@ -161,22 +184,28 @@ def write_index() -> int:
     return len(mirror["entries"])
 
 
+_USAGE = "用法：python -B scripts/xshelp_mirror.py fetch [--allow-shrink]|index"
+
+
 def main(argv: list[str]) -> int:
-    if argv[1:] == ["fetch"]:
+    args = argv[1:]
+    if args and args[0] == "fetch" and args[1:] in ([], ["--allow-shrink"]):
         try:
-            print(f"鏡像 {fetch(datetime.now(UTC).date().isoformat())} 筆 → {MIRROR_FILE}")
+            allow_shrink = args[1:] == ["--allow-shrink"]
+            count = fetch(datetime.now(UTC).date().isoformat(), allow_shrink=allow_shrink)
+            print(f"鏡像 {count} 筆 → {MIRROR_FILE}")
         except ValueError as err:
             print(f"fetch 失敗，未覆寫鏡像：{err}", file=sys.stderr)
             return 1
         return 0
-    if argv[1:] == ["index"]:
+    if args == ["index"]:
         try:
             print(f"索引 {write_index()} 筆 → {INDEX_FILE}")
         except ValueError as err:
             print(f"index 失敗，未覆寫索引：{err}", file=sys.stderr)
             return 1
         return 0
-    print("用法：python -B scripts/xshelp_mirror.py fetch|index", file=sys.stderr)
+    print(_USAGE, file=sys.stderr)
     return 2
 
 

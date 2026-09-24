@@ -5,9 +5,9 @@ from __future__ import annotations
 import json
 import re
 import sys
-import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 
@@ -187,23 +187,37 @@ class TestValidatePayload(unittest.TestCase):
 
 class TestWriteIndexValidation(unittest.TestCase):
     def test_write_index_does_not_touch_index_file_when_mirror_invalid(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp:
-            tmp_path = Path(tmp)
-            mirror_file = tmp_path / "entries.json"
-            index_file = tmp_path / "xshelp-index.md"
-            index_file.write_text("原有內容", encoding="utf-8")
-            mirror_file.write_text(
-                json.dumps({"fetched": "2026-09-24", "source": "x", "entries": []}, ensure_ascii=False),
-                encoding="utf-8",
-            )
-            original_mirror, original_index = m.MIRROR_FILE, m.INDEX_FILE
-            m.MIRROR_FILE, m.INDEX_FILE = mirror_file, index_file
-            try:
-                with self.assertRaises(ValueError):
-                    m.write_index()
-            finally:
-                m.MIRROR_FILE, m.INDEX_FILE = original_mirror, original_index
-            self.assertEqual(index_file.read_text(encoding="utf-8"), "原有內容")
+        mirror_mock = mock.MagicMock()
+        mirror_mock.read_text.return_value = json.dumps(
+            {"fetched": "2026-09-24", "source": "x", "entries": []}, ensure_ascii=False
+        )
+        index_mock = mock.MagicMock()
+        with (
+            mock.patch.object(m, "MIRROR_FILE", mirror_mock),
+            mock.patch.object(m, "INDEX_FILE", index_mock),
+            self.assertRaises(ValueError),
+        ):
+            m.write_index()
+        index_mock.write_text.assert_not_called()
+
+
+class TestCheckNoShrink(unittest.TestCase):
+    def test_fewer_entries_raises(self) -> None:
+        old_ids: set[object] = {1, 2, 3}
+        new_entries: list[dict[str, object]] = [{"id": 1}, {"id": 2}]
+        with self.assertRaises(ValueError):
+            m.check_no_shrink(old_ids, new_entries)
+
+    def test_same_count_but_missing_old_id_raises(self) -> None:
+        old_ids: set[object] = {1, 2, 3}
+        new_entries: list[dict[str, object]] = [{"id": 1}, {"id": 2}, {"id": 4}]
+        with self.assertRaises(ValueError):
+            m.check_no_shrink(old_ids, new_entries)
+
+    def test_superset_passes(self) -> None:
+        old_ids: set[object] = {1, 2, 3}
+        new_entries: list[dict[str, object]] = [{"id": 1}, {"id": 2}, {"id": 3}, {"id": 4}]
+        m.check_no_shrink(old_ids, new_entries)  # 不應丟例外
 
 
 class TestLintCoversIndexedFunctions(unittest.TestCase):
