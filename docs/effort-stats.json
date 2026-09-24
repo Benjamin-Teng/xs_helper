@@ -42,7 +42,7 @@
     "codex_review_rounds": {
       "label": "Codex 對抗式審查",
       "unit": "輪",
-      "total": 13,
+      "total": 15,
       "note": "自 2026-09-23 起記錄；此前未留紀錄，不估算"
     }
   },
@@ -100,13 +100,13 @@
         "benchmark_task_runs": 0,
         "skill_generated_test_scripts": 15,
         "xshelp_entries_verified": 44,
-        "codex_review_rounds": 1
+        "codex_review_rounds": 3
       },
       "evidence": {
         "lint_validation_script_runs": "Task 7 三輪驗收：7＋7＋1 支，由未看計畫的 fresh subagent 只依 skills/xs/ 撰寫，全數通過 xs_lint",
         "skill_generated_test_scripts": "Task 7 三輪驗收：7＋7＋1 支，由未看計畫的 fresh subagent 只依 skills/xs/ 撰寫，全數通過 xs_lint",
         "xshelp_entries_verified": "Plot、OutputField 兩條目＋42 個 xshelp 函數（含新分類 SDTFUNC）逐條以 rest 索引 API 取 desc/fulldesc 撰寫；與 v0.5.0 已計的 110 個關鍵字條目重複核對者不重複計",
-        "codex_review_rounds": "檢查點 A 1 輪（發版檢查點 B 完成後照實補）"
+        "codex_review_rounds": "檢查點 A 1 輪、發版檢查點 B 2 輪（本 session 紀錄；最後只改統計數字的 commit 不另送審，由 TestEffortStats 把關）"
       }
     }
   ],
@@ -153,7 +153,7 @@
     },
     "commits": {
       "label": "commit",
-      "value": "53 個",
+      "value": "68 個",
       "note": "main 分支"
     },
     "releases": {
