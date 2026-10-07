@@ -48,6 +48,29 @@ reference 未涵蓋的函數 / 欄位，依序三步：
 
 查無此函數 → 明確告知「查無，可能版本差異或拼寫」，**不杜撰**。
 
+## XQ 編譯器相容性（實編回饋）
+
+> 此節**不是 xshelp 官方定義**，只記錄部分 XQ 版本的實編行為；官方函數語意仍以
+> reference 與 F3 查證為準。
+
+- 呼叫 `LinearReg` 時，使用完整七參數形式：
+
+<!-- markdownlint-disable MD013 -->
+```xs
+{@type:indicator}
+input: Length(20);
+variable: status(0), outSlopeValue(0), outAngleValue(0), outIntercept(0), outPrediction(0);
+status = LinearReg(Close, Length, 0, outSlopeValue, outAngleValue, outIntercept, outPrediction);
+```
+<!-- markdownlint-enable MD013 -->
+
+- 輸出變數避免獨立命名為 `slope` 或 `angle`。部分編譯器會將它們解析為保留
+  token，連鎖出現「不支援 slope 語法」、「Angle 需要 2 個參數」與 `LinearReg`
+  參數數量錯誤；可使用 `bigLrSlopeValue`、`bigLrAngleValue` 等具體名稱。此現象
+  不代表所有 XQ 版本或官方 XS 規範。
+- 只有使用者明確要求「交由 XQ 保護」時，才省略額外的頻率、input 合法性、暖機、
+  OHLC、除零及 `LinearReg` status `if` 防護；這不是一般預設規則。
+
 ## 硬邊界（不得逾越）
 
 - 不執行 / 回測 XS；只生成與解說。

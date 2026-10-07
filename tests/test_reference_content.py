@@ -22,6 +22,56 @@ def xs_blocks(text: str) -> list[str]:
     return re.findall(r"```xs\n(.*?)```", text, re.DOTALL)
 
 
+_DECLARATION_RE = re.compile(
+    r"\b(?P<kind>inputs?|vars?|variables?)\s*:(?!=)(?P<body>.*?);",
+    re.IGNORECASE | re.DOTALL,
+)
+_DECLARED_NAME_RE = re.compile(
+    r"(?:^|,)\s*(?:intraBarPersist\s+)?(?P<name>[A-Za-z_]\w*)\s*\(",
+    re.IGNORECASE,
+)
+_LINEARREG_RE = re.compile(
+    r"\b(?P<receiver>[A-Za-z_]\w*)\s*=\s*LinearReg\s*\((?P<arguments>[^()]*)\)",
+    re.IGNORECASE | re.DOTALL,
+)
+
+
+def linearreg_compatibility_issues(block: str) -> list[str]:
+    """驗證單一 XS code block 中平坦的 LinearReg 相容性範例。
+
+    此處刻意不是 XS parser：只檢查 skill 內範例所需的直接參數與宣告形式，且宣告
+    必須出現在同一 code block、每次呼叫之前。
+    """
+    code = xs_lint.strip_comments(block)
+    issues: list[str] = []
+    for call in _LINEARREG_RE.finditer(code):
+        variables: set[str] = set()
+        for declaration in _DECLARATION_RE.finditer(code, 0, call.start()):
+            names = {
+                name.group("name").lower()
+                for name in _DECLARED_NAME_RE.finditer(declaration.group("body"))
+            }
+            if not declaration.group("kind").lower().startswith("input"):
+                variables.update(names)
+
+        arguments = [argument.strip() for argument in call.group("arguments").split(",")]
+        if len(arguments) != 7 or any(not argument for argument in arguments):
+            issues.append("LinearReg 必須有七個非空參數")
+            continue
+        if call.group("receiver").lower() not in variables:
+            issues.append("LinearReg 接收變數必須先宣告為 variable")
+
+        outputs = arguments[3:]
+        output_names = [output.lower() for output in outputs]
+        if any(name not in variables for name in output_names):
+            issues.append("LinearReg 四個輸出必須先宣告為 variable")
+        if len(set(output_names)) != 4:
+            issues.append("LinearReg 四個輸出必須互異")
+        if any(name in {"slope", "angle"} for name in output_names):
+            issues.append("LinearReg 輸出不可獨立命名為 slope 或 angle")
+    return issues
+
+
 class TestReferenceCodeBlocksLintClean(unittest.TestCase):
     def test_every_xs_block_has_no_lint_warning(self) -> None:
         for path in sorted(REFS.glob("*.md")):
@@ -218,6 +268,77 @@ class TestXshelpIndexWiring(unittest.TestCase):
     def test_fields_points_to_index_for_full_lists(self) -> None:
         text = read_ref("fields.md")
         self.assertIn("xshelp-index.md", text)
+
+
+class TestXqCompilerCompatibilityFeedback(unittest.TestCase):
+    def setUp(self) -> None:
+        self.skill = (ROOT / "skills" / "xs" / "SKILL.md").read_text(encoding="utf-8")
+
+    def test_linearreg_example_is_structurally_compatible(self) -> None:
+        blocks = xs_blocks(self.skill)
+        linearreg_blocks = [block for block in blocks if re.search(r"\bLinearReg\s*\(", block, re.IGNORECASE)]
+        self.assertEqual(len(linearreg_blocks), 1)
+        self.assertEqual(linearreg_compatibility_issues(linearreg_blocks[0]), [])
+
+    def test_linearreg_example_is_pasteable_indicator_with_input(self) -> None:
+        block = next(
+            block for block in xs_blocks(self.skill) if re.search(r"\bLinearReg\s*\(", block, re.IGNORECASE)
+        )
+        self.assertTrue(block.startswith("{@type:indicator}"))
+        self.assertRegex(block, r"(?im)^input\s*:")
+
+    def test_linearreg_structure_accepts_case_and_newline_variants(self) -> None:
+        block = """INPUT: length(20);
+VARIABLE: status(0), outputOne(0), outputTwo(0), outputThree(0), outputFour(0);
+STATUS = linearreg(
+    CLOSE, length, 0,
+    outputOne, outputTwo, outputThree, outputFour
+);"""
+        self.assertEqual(linearreg_compatibility_issues(block), [])
+
+    def test_linearreg_structure_accepts_generic_first_three_parameters(self) -> None:
+        block = """input: period(20);
+variable: status(0), outputOne(0), outputTwo(0), outputThree(0), outputFour(0);
+status = LinearReg(priceSeries, windowSize, projectionTarget, outputOne, outputTwo, outputThree, outputFour);"""
+        self.assertEqual(linearreg_compatibility_issues(block), [])
+
+    def test_linearreg_structure_rejects_incompatible_examples(self) -> None:
+        valid = """input: length(20);
+variable: status(0), outputOne(0), outputTwo(0), outputThree(0), outputFour(0);
+status = LinearReg(Close, length, 0, outputOne, outputTwo, outputThree, outputFour);"""
+        cases = {
+            "missing_receiver": valid.replace("status(0), ", ""),
+            "missing_output": valid.replace("outputFour(0);", "").replace("outputFour);", "missingOutput);"),
+            "six_parameters": valid.replace(", outputFour);", ");"),
+            "eight_parameters": valid.replace("outputFour);", "outputFour, extraOutput);"),
+            "empty_parameter": valid.replace("outputTwo,", ","),
+            "reserved_slope": valid.replace("outputOne", "slope"),
+            "reserved_angle": valid.replace("outputTwo", "angle"),
+            "duplicate_output": valid.replace("outputFour);", "outputThree);"),
+            "late_declaration": valid.replace(
+                "variable: status(0), outputOne(0), outputTwo(0), outputThree(0), outputFour(0);\n",
+                "",
+            ) + "\nvariable: status(0), outputOne(0), outputTwo(0), outputThree(0), outputFour(0);",
+            "commented_declaration": valid.replace(
+                "variable: status(0), outputOne(0), outputTwo(0), outputThree(0), outputFour(0);",
+                "// variable: status(0), outputOne(0), outputTwo(0), outputThree(0), outputFour(0);",
+            ),
+        }
+        for name, block in cases.items():
+            with self.subTest(name=name):
+                self.assertNotEqual(linearreg_compatibility_issues(block), [])
+
+        # 宣告不能跨 fenced block 串接；前一區塊的 variable 對下一區塊無效。
+        first_block = "variable: status(0), outputOne(0), outputTwo(0), outputThree(0), outputFour(0);"
+        second_block = "input: length(20);\n" + valid.split("\n", 2)[2]
+        self.assertEqual(linearreg_compatibility_issues(first_block), [])
+        self.assertNotEqual(linearreg_compatibility_issues(second_block), [])
+
+    def test_feedback_is_not_presented_as_official_or_default_protection_rule(self) -> None:
+        self.assertIn("不是 xshelp 官方定義", self.skill)
+        self.assertIn("部分 XQ 版本", self.skill)
+        self.assertIn("只有使用者明確要求「交由 XQ 保護」時", self.skill)
+        self.assertIn("這不是一般預設規則", self.skill)
 
 
 if __name__ == "__main__":
